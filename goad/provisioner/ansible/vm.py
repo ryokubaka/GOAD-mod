@@ -32,6 +32,7 @@ class VmAnsibleProvisioner(Ansible):
         if self.jumpbox is None:
             Log.error('Jumpbox not set')
             return False
+        self.jumpbox.ip = "192.168.120.200"
         return super().run(playbook)
 
     def run_playbook(self, playbook, inventories, tries=3, timeout=30, playbook_path=None):
@@ -39,7 +40,7 @@ class VmAnsibleProvisioner(Ansible):
             playbook_path = self.remote_project_path + '/ansible/'
         else:
             playbook_path = Utils.transform_local_path_to_remote_path(playbook_path, self.remote_project_path)
-
+        self.jumpbox.ip = "192.168.120.200"
         remote_inventories = []
         for inventory in inventories:
             remote_inventories.append(Utils.transform_local_path_to_remote_path(inventory, self.remote_project_path))

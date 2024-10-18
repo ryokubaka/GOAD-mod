@@ -37,8 +37,8 @@ boxes.append(
 
   config.winrm.transport = "plaintext"
   config.winrm.basic_auth_only = true
-  config.winrm.retry_limit = 100
-  config.winrm.retry_delay = 2
+  config.winrm.retry_limit = 30
+  config.winrm.retry_delay = 10
 
   boxes.each do |box|
     config.vm.define box[:name] do |target|
