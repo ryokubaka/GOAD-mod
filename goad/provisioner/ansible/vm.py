@@ -14,7 +14,8 @@ class VmAnsibleProvisioner(Ansible):
 
     def prepare_jumpbox(self, jumpbox_ip):
         if self.jumpbox is not None:
-            self.jumpbox.ip = jumpbox_ip
+            #self.jumpbox.ip = jumpbox_ip
+            self.jumpbox.ip = "192.168.120.200"
             self.jumpbox.provision()
             self.jumpbox.sync_sources()
         else:
@@ -22,6 +23,7 @@ class VmAnsibleProvisioner(Ansible):
 
     def sync_source_jumpbox(self):
         if self.jumpbox is not None:
+            self.jumpbox.ip = "192.168.120.200"
             self.jumpbox.sync_sources()
         else:
             Log.error('no jumpbox for provisioner')

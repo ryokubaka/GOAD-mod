@@ -1,0 +1,11 @@
+{
+    "name": "velociraptor",
+    "description": "Add the Velociraptor visibility tool into the lab",
+    "machines": [
+        "velo_all"
+    ],
+    "compatibility": [
+        "*"
+    ],
+    "impact": "add a velociraptor machine and a velociraptor agent on all windows machine"
+}

@@ -1,0 +1,246 @@
+---
+- name: Ensure jq is installed
+  apt:
+    name: jq
+    state: present
+
+- name: Check for cluster health; wait 120 seconds for health status
+  shell: |
+    curl -XGET -u {{ es_api_basic_auth_username }}:{{ es_api_basic_auth_password }} \
+    'http://{{ fleet_server }}:9200/_cluster/health?wait_for_status=yellow&timeout=120s' -H 'kbn-xsrf: true'
+
+- name: Create service token
+  uri:
+    url: "http://{{ fleet_server }}:5601/api/fleet/service-tokens"
+    method: POST
+    user: "{{ es_api_basic_auth_username }}"
+    password: "{{ es_api_basic_auth_password }}"
+    force_basic_auth: yes
+    headers:
+      Content-Type: "application/json"
+      kbn-xsrf: "true"
+    status_code: 200
+  register: fleet_enrollment_token
+
+- name: Add fleet server host URL
+  shell: |
+    curl -u {{ es_api_basic_auth_username }}:{{ es_api_basic_auth_password }} -XPUT -H "kbn-xsrf: kibana" -H "Content-type: application/json" "http://{{ fleet_server }}:5601/api/fleet/settings" -d '{"fleet_server_hosts": ["http://{{ fleet_server }}:8220"]}'
+  
+- name: Ensure installation directory exists
+  file:
+    path: "{{ install_dir }}"
+    state: directory
+    mode: '0755'
+
+- name: Check if elastic agent is already downloaded
+  stat:
+    path: "/tmp/{{ elastic_agent_tar }}"
+  register: agenttar_stat
+
+- name: Download Elastic Agent
+  get_url:
+    url: "{{ elastic_agent_url }}"
+    dest: "/tmp/{{ elastic_agent_tar }}"
+    mode: '0644'
+  when: not agenttar_stat.stat.exists
+
+- name: Extract Elastic Agent
+  unarchive:
+    src: "/tmp/{{ elastic_agent_tar }}"
+    dest: "{{ install_dir }}"
+    remote_src: yes
+
+- name: Check if Agent already installed
+  stat:
+    path: "/usr/bin/elastic-agent"
+  register: agentinstall_stat
+
+- name: Uninstall Elastic Agent
+  shell: "echo 'Y' | sudo /usr/bin/elastic-agent uninstall"
+  when: agentinstall_stat.stat.exists
+  register: uninstall_stat
+
+- name: Pause for 15 seconds
+  ansible.builtin.pause:
+    seconds: 15
+  when: uninstall_stat
+
+- name: Install Elastic Agent
+  # Since I am using self-signed certificate, I have added "--insecure" flag at the end.
+  shell: "echo 'Y' | sudo {{ install_dir }}/elastic-agent-{{ elastic_agent_version }}-linux-x86_64/elastic-agent install --fleet-server-es=http://{{ fleet_server }}:{{ fleet_port }} --fleet-server-host={{ fleet_server }} --fleet-server-service-token={{ fleet_enrollment_token.json.value }} --fleet-server-policy=fleet-server-policy --fleet-server-port=8220 --fleet-server-insecure-http -f"
+  when: not agentinstall_stat.stat.exists or uninstall_stat
+
+- name: Find existing policies
+  shell: |
+    curl -XGET -u {{ es_api_basic_auth_username }}:{{ es_api_basic_auth_password }} \
+    'http://{{ fleet_server }}:5601/api/fleet/package_policies' -H 'Content-Type: application/json' \
+     -H 'kbn-xsrf: true'
+  register: package_policies
+
+- name: Set fact for policies
+  set_fact:
+    policy_list_1: "{{ package_policies.stdout | from_json }}"
+  
+- name: Delete endpoint package policy if it already exists
+  block:
+    - name: Find package policy ID for endpoint
+      set_fact:
+        endpoint_policy_id: "{{ policy_list_1 | json_query(\"items[?package.title == 'Elastic Defend'].id | [0]\") | replace('\"', '') }}"
+
+    - name: Delete endpoint package policy
+      command: |
+        curl -X POST -u {{ es_api_basic_auth_username }}:{{ es_api_basic_auth_password }} \
+        'http://{{ fleet_server }}:5601/api/fleet/package_policies/delete' -H 'kbn-xsrf: true' -H 'Content-Type: application/json' \
+        -d '{"packagePolicyIds": ["{{ endpoint_policy_id }}"], "force": true}' 
+  when: "'Elastic Defend' in policy_list_1 | json_query('items[*].package.title')"
+
+# - name: Install windows package policy
+#   shell: |
+#     curl -XPOST -u {{ es_api_basic_auth_username }}:{{ es_api_basic_auth_password }} \
+#     'http://{{ fleet_server }}:5601/api/fleet/package_policies' -H 'Content-Type: application/json' \
+#     -H 'kbn-xsrf: true' -d '{{ lookup("template", "windows_initial.json") | to_nice_json }}'
+#   register: windows_install
+
+- name: Install endpoint package policy
+  shell: |
+    curl -XPOST -u {{ es_api_basic_auth_username }}:{{ es_api_basic_auth_password }} \
+    'http://{{ fleet_server }}:5601/api/fleet/package_policies' -H 'Content-Type: application/json' \
+    -H 'kbn-xsrf: true' -d '{{ lookup("template", "endpoint_initial.json") | to_nice_json }}'
+  register: endpoint_install
+
+- name: Set fact for endpoint package policy
+  set_fact:
+    endpoint_package: "{{ endpoint_install.stdout | from_json }}"
+
+- name: Create modified endpoint package
+  copy:
+    content: "{{ endpoint_package | json_query('item') | to_nice_json }}"
+    dest: /tmp/endpoint_integration.json
+    force: true
+  when: endpoint_package
+
+- name: Fix mode lines in integration file
+  replace:
+    path: /tmp/endpoint_integration.json
+    regexp: '"mode": "off"'
+    replace: '"mode": "prevent"'
+
+- name: Fix enabled lines in integration file
+  replace:
+    path: /tmp/endpoint_integration.json
+    regexp: '"enabled": false'
+    replace: '"enabled": true'
+
+- name: Fix blocklist lines in integration file
+  replace:
+    path: /tmp/endpoint_integration.json
+    regexp: '"blocklist": false'
+    replace: '"blocklist": true'
+
+- name: Remove bad lines
+  lineinfile:
+    path: /tmp/endpoint_integration.json
+    regexp: "{{ item }}"
+    state: absent
+  loop:
+    - "\"id\""
+    - "revision"
+    - "created_at"
+    - "created_by"
+    - "updated_at"
+    - "updated_by"
+
+- name: Read new modified integration file
+  slurp:
+    src: /tmp/endpoint_integration.json
+  register: endpoint_integration
+
+- name: Find existing policies again (now with Elastic Defend installed)
+  shell: |
+    curl -XGET -u {{ es_api_basic_auth_username }}:{{ es_api_basic_auth_password }} \
+    'http://{{ fleet_server }}:5601/api/fleet/package_policies' -H 'Content-Type: application/json' \
+    -H 'kbn-xsrf: true'
+  register: package_policies
+
+- name: Set fact for policies (part 2)
+  set_fact:
+    policy_list_2: "{{ package_policies.stdout | from_json }}"
+
+- name: Find package policy ID for endpoint
+  set_fact:
+    endpoint_policy_id: "{{ policy_list_2 | json_query(\"items[?package.title == 'Elastic Defend'].id | [0]\") | replace('\"', '') }}"
+
+- name: Update endpoint package policy to enable rules
+  shell: |
+    curl -XPUT -u {{ es_api_basic_auth_username }}:{{ es_api_basic_auth_password }} \
+    'http://{{ fleet_server }}:5601/api/fleet/package_policies/{{ endpoint_policy_id }}' -H 'Content-Type: application/json' \
+    -H 'kbn-xsrf: true' -d '{{ endpoint_integration["content"] | b64decode | to_nice_json }}'
+  register: endpoint_package
+
+- name: Check for cluster health; wait 120 seconds for health status
+  shell: |
+    curl -XGET -u {{ es_api_basic_auth_username }}:{{ es_api_basic_auth_password }} \
+    'http://{{ fleet_server }}:9200/_cluster/health?wait_for_status=yellow&timeout=120s' -H 'kbn-xsrf: true'
+
+- name: Block for Detection Rule enablement
+  block:
+    - name: Query the API for all detetion rules
+      uri:
+        url: "http://{{ fleet_server }}:5601/api/detection_engine/rules/_find?per_page={{ page_size }}&page={{ current_page }}&filter=alert.attributes.enabled:false"
+        method: GET
+        user: "{{ es_api_basic_auth_username }}"
+        password: "{{ es_api_basic_auth_password }}"
+        headers:
+          kbn-xsrf: "true"
+          Content-Type: "application/json"
+        force_basic_auth: yes
+        return_content: yes
+      register: query_result
+      no_log: true
+
+    - name: Calculate number of pages and total disabled rules
+      set_fact:
+        loop_rule_page: "{{ query_result.json | json_query('perPage') | int }}"
+        loop_rule_total: "{{ query_result.json | json_query('total') | int }}"
+
+    - name: Calculate number of times to loop
+      set_fact:
+        loop_rule_count: "{{ ((loop_rule_total | int) / (loop_rule_page | int)) | round(0, 'ceil') | int }}"
+
+    - name: Initialize an empty list to store rule IDs
+      set_fact:
+        rule_ids: []
+
+    - name: Loop through pages and collect rule IDs
+      include_tasks: xpack/security/kibana-rules.yml
+      loop: "{{ range(1, (loop_rule_count | int + 1)) }}"
+
+    - name: Create chunks of rules in batches of 100 (Elastic limit for bulk API action)
+      set_fact:
+        rule_ids_chunked: "{{ rule_ids | batch(100) }}"
+      no_log: true
+
+    - name: Enable rules in chunks of 100 (Elastic limit for bulk API action)
+      uri:
+        url: "http://{{ fleet_server }}:5601/api/detection_engine/rules/_bulk_action"
+        method: POST
+        user: "{{ es_api_basic_auth_username }}"
+        password: "{{ es_api_basic_auth_password }}"
+        headers:
+          kbn-xsrf: "true"
+          Content-Type: "application/json"
+        body: |
+          {
+            "ids": {{ item }},
+            "action": "enable"
+          }
+        body_format: json
+        force_basic_auth: yes
+        status_code: 200
+      loop: "{{ rule_ids_chunked }}"
+      no_log: true
+
+# - name: Clean up the downloaded tar file
+#   file:
+#     path: "/tmp/{{ elastic_agent_tar }}"
+#     state: absent

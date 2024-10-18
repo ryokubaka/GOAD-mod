@@ -1,0 +1,16 @@
+[default]
+velociraptor ansible_host={{ip_range}}.52 ansible_connection=ssh ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+
+[extensions]
+velociraptor
+
+; Recipe associations -------------------
+[velociraptor_all:children]
+velociraptor_server
+velociraptor_client
+
+[velociraptor_server]
+velociraptor
+
+[velociraptor_client]
+domain
