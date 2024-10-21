@@ -1,1 +1,11 @@
 ---
+- name: Clone Rita-ELK Git repository
+  git:
+    repo: 'https://github.com/example/repo.git'
+    dest: '/opt/rita-elk'
+    version: 'main'  # You can specify the branch or tag here
+    update: yes  # Ensures the repo is updated if it already exists
+
+- name: Install RITA index template
+  shell: sudo curl -X PUT https://{{ es_api_basic_auth_username }}:{{ es_api_basic_auth_password }}@{{ elk_host }}:9200/_template/template-rita -H 'Content-Type: application/json' --data-binary "@./Elasticsearch/template-rita.json" -k
+

@@ -1,5 +1,5 @@
 boxes.append(
-    { :name => "ELK",
+    { :name => "{{lab_name}}-ELK",
       :ip => "{{ip_range}}.50",
       :box => "bento/ubuntu-22.04",
       :os => "linux",

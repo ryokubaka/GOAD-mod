@@ -12,5 +12,11 @@ velociraptor_client
 [velociraptor_server]
 velociraptor
 
-[velociraptor_client]
+[velociraptor_client:children]
 domain
+
+[velociraptor_server:vars]
+velociraptor_server=true
+
+[velociraptor_client:vars]
+velociraptor_client=true

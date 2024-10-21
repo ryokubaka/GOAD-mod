@@ -1,22 +1,8 @@
-- name: Gather VM info
-  import_playbook: '../../../ansible/interfaces.yml'
-
-- name: Install ELK
+- name: Install ELK and RITA
   hosts: elk_server
   become: yes
   roles:
     - { role: 'elk', tags: 'elk' }
-  pre_tasks:
-    - name: Enable NAT interface
-      shell: 'ip link set eth0 up'
-  tasks:
-    - name: Disable NAT interface
-      shell: 'ip link set eth0 down'
-
-- name: Install RITA
-  hosts: elk_server
-  become: yes
-  roles:
     - { role: 'rita', tags: 'rita' }
   pre_tasks:
     - name: Enable NAT interface
@@ -24,7 +10,6 @@
   tasks:
     - name: Disable NAT interface
       shell: 'ip link set eth0 down'
-
 
 - name: Install log agent on windows vms and disable the NAT adapter
   hosts: elk_log
