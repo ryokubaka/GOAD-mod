@@ -1,6 +1,28 @@
-- name: Install velociraptor server and client on hosts
-  hosts: velociraptor_all
+- name: Enable nat interface (server)
+  hosts: velociraptor_server
+  tasks:
+    - name: Enable NAT interface
+      shell: 'ip link set eth0 up'
+      become: true
+
+- name: Enable nat interface (windows)
+  hosts: domain
   roles:
-    - { role: 'settings/enable_nat_adapter' , tags: 'enable_nat_adapter'}
+    - { role: '../../../ansible/roles/settings/enable_nat_adapter' , tags: 'enable_nat_adapter'}
+
+- name: Install velociraptor server and client on hosts
+  hosts: velo_all
+  roles:
     - { role: 'velociraptor', tags: 'velociraptor' }
-    - { role: 'settings/disable_nat_adapter' , tags: 'disable_nat_adapter'}
+
+- name: Disable nat interface (windows)
+  hosts: domain
+  roles:
+    - { role: '../../../ansible/roles/settings/disable_nat_adapter' , tags: 'disable_nat_adapter'}
+
+- name: Disable nat interface (server)
+  hosts: velociraptor_server
+  tasks:
+    - name: Disable NAT interface
+      shell: 'ip link set eth0 down'
+      become: true
