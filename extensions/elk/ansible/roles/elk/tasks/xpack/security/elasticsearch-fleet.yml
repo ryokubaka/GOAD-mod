@@ -123,7 +123,7 @@
   replace:
     path: /tmp/endpoint_integration.json
     regexp: '"mode": "off"'
-    replace: '"mode": "prevent"'
+    replace: '"mode": "detect"'
 
 - name: Fix enabled lines in integration file
   replace:
