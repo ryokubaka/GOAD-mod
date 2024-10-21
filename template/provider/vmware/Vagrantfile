@@ -87,6 +87,7 @@ boxes.append(
           end
           target.vm.communicator = "ssh"
           target.vm.provision "shell", inline: "sudo apt install -y dos2unix"
+          target.vm.provision "shell", inline: "sudo apt install -y sshpass"
       elsif box[:distro] == "kali"
           target.vm.network :private_network, ip: box[:ip], :use_dhcp_assigned_default_route => true
           target.vm.provision :shell, inline: <<-EOF

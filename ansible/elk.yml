@@ -3,9 +3,13 @@
   hosts: elk_server
   become: yes
   roles:
-    - { role: 'settings/enable_nat_adapter' , tags: 'enable_nat_adapter'}
     - { role: 'elk', tags: 'elk' }
-    - { role: 'settings/disable_nat_adapter' , tags: 'disable_nat_adapter'}
+  pre_tasks:
+    - name: Enable NAT interface
+      shell: 'ip link set eth0 up'
+  tasks:
+    - name: Disable NAT interface
+      shell: 'ip link set eth0 down'
 
 - name: Install log agent on windows vms and disable the NAT adapter
   hosts: elk_log
