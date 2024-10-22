@@ -10,7 +10,7 @@
   hosts: domain
   gather_facts: false
   roles:
-    - { role: '../../../ansible/roles/settings/enable_nat_adapter' , tags: 'enable_nat_adapter'}
+    - { role: 'settings/enable_nat_adapter' , tags: 'enable_nat_adapter'}
 
 - name: Install velociraptor server and client on hosts
   hosts: velociraptor_all
@@ -21,7 +21,7 @@
   hosts: domain
   gather_facts: false
   roles:
-    - { role: '../../../ansible/roles/settings/disable_nat_adapter' , tags: 'disable_nat_adapter'}
+    - { role: 'settings/disable_nat_adapter' , tags: 'disable_nat_adapter'}
 
 - name: Disable nat interface (server)
   hosts: velociraptor_server

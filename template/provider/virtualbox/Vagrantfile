@@ -72,6 +72,7 @@ boxes.append(
       else
         target.vm.communicator = "ssh"
         target.vm.provision :shell, inline: "sudo apt install -y dos2unix"
+        target.vm.provision :shell, inline: "sudo apt install -y sshpass"
       end
 
       if box.has_key?(:forwarded_port)

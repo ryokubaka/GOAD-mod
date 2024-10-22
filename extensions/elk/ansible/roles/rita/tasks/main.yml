@@ -8,4 +8,3 @@
 
 - name: Install RITA index template
   shell: sudo curl -X PUT https://{{ es_api_basic_auth_username }}:{{ es_api_basic_auth_password }}@{{ elk_host }}:9200/_template/template-rita -H 'Content-Type: application/json' --data-binary "@./Elasticsearch/template-rita.json" -k
-

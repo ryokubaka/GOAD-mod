@@ -27,6 +27,7 @@
   hosts: ws01
   roles:
     # build.yml
+    - { role: 'settings/enable_nat_adapter' , tags: 'enable_nat_adapter'}
     - { role: 'common', tags: 'common', http_proxy: "{{enable_http_proxy}}" }
     - { role: 'settings/keyboard', tags: 'keyboard', layouts: "{{keyboard_layouts}}" }
     # ad-servers.yml
@@ -37,6 +38,7 @@
     # ad-relations.yml : domain group and users local permissions
     - { role: "settings/adjust_rights", tags: 'adjust_rights' }
     - { role: "settings/user_rights", tags: 'adjust_rights' }
+    - { role: 'settings/disable_nat_adapter' , tags: 'disable_nat_adapter'}
   vars:
     local_admin_password: "{{lab.hosts[dict_key].local_admin_password}}"
     hostname: "{{lab.hosts[dict_key].hostname}}"
