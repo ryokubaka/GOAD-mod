@@ -27,8 +27,7 @@
   hosts: ws01
   gather_facts: false
   roles:
-    # build.yml
-    - { role: 'settings/enable_nat_adapter' , tags: 'enable_nat_adapter'}
+    - { role: 'settings/enable_nat_adapter' , tags: 'enable_nat_adapter', nat_adapter: 'Ethernet0 2'}
 
 - name: prepare workstation
   hosts: ws01
@@ -70,5 +69,4 @@
   hosts: ws01
   gather_facts: false
   roles:
-    # build.yml
-    - { role: 'settings/disable_nat_adapter' , tags: 'disable_nat_adapter'}
+    - { role: 'settings/disable_nat_adapter' , tags: 'disable_nat_adapter', nat_adapter: 'Ethernet0 2'}

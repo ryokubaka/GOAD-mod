@@ -73,7 +73,7 @@
                     "setup": "c:\\setup"
                 },
                 "credentials" : {
-                    "TERMSRV/castelblack": {
+                    "TERMSRV/castleblack": {
                         "username" : "north\\robb.stark",
                         "secret"   : "sexywolfy",
                         "runas"    : "north\\robb.stark",
@@ -315,7 +315,7 @@
                     "description" : "sql service",
                     "groups"      : [],
                     "path"        : "CN=Users,DC=North,DC=sevenkingdoms,DC=local",
-                    "spns"        : ["MSSQLSvc/castelblack.north.sevenkingdoms.local:1433","MSSQLSvc/castelblack.north.sevenkingdoms.local"]
+                    "spns"        : ["MSSQLSvc/castleblack.north.sevenkingdoms.local:1433","MSSQLSvc/castleblack.north.sevenkingdoms.local"]
                 }
             }
         },

@@ -40,6 +40,5 @@
   - pstools
   - microsoft-edge
   - microsoft-teams
-  - discord
   - wireshark
   ignore_errors: yes

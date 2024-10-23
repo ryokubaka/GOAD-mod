@@ -8,7 +8,7 @@ version:
   compiler: go1.22.4
 Client:
   server_urls:
-  - https://192.168.56.60:8000/
+  - https://192.168.56.52:8000/
   ca_certificate: |
     -----BEGIN CERTIFICATE-----
     MIIDSzCCAjOgAwIBAgIQLL+ujv+HPLpBLZrjUyMHlDANBgkqhkiG9w0BAQsFADAa
@@ -62,7 +62,7 @@ Client:
     filename_windows: $TEMP/Velociraptor_Buffer.bin
     filename_darwin: /var/tmp/Velociraptor_Buffer.bin
 API:
-  hostname: 192.168.56.60
+  hostname: 192.168.56.52
   bind_address: 0.0.0.0
   bind_port: 8001
   bind_scheme: tcp
@@ -118,7 +118,7 @@ GUI:
     Yi8D3w52cyh26w5lzgakiuqpPEa2afWNAteY4CpHEQ2Qy6Hs9KZlv5gJ1xe8fe8Q
     XYE5UQn1Ru9AVzdXfpyYQkl0TdLi3sVem91fDsAHB+moT0ao1lADHFE=
     -----END RSA PRIVATE KEY-----
-  public_url: https://192.168.56.60:8889/
+  public_url: https://192.168.56.52:8889/
   links:
   - text: Documentation
     url: https://docs.velociraptor.app/
@@ -161,7 +161,7 @@ CA:
     f5yfmGI+R2ALzlWxlo58kYOWIC3LT9qPyoQbG6CPUgs1sYYt9O1Ogw==
     -----END RSA PRIVATE KEY-----
 Frontend:
-  hostname: 192.168.56.60
+  hostname: 192.168.56.52
   bind_address: 0.0.0.0
   bind_port: 8000
   certificate: |

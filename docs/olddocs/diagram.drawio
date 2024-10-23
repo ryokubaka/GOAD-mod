@@ -10,7 +10,7 @@
         <mxCell id="b0sqUQxNu4gCeeOOgRk0-1" value="DC02 - winterfell&lt;br&gt;192.168.56.11&lt;br&gt;Windows Server 2019&lt;br&gt;rpc user enum" style="verticalLabelPosition=bottom;aspect=fixed;html=1;verticalAlign=top;strokeColor=none;align=center;outlineConnect=0;shape=mxgraph.citrix.directory_server;" parent="1" vertex="1">
           <mxGeometry x="226.75" y="70" width="65" height="88.5" as="geometry" />
         </mxCell>
-        <mxCell id="b0sqUQxNu4gCeeOOgRk0-2" value="SRV02 -&amp;nbsp;castelblack&lt;br&gt;192.168.56.22&lt;br&gt;Windows Server 2019 - &lt;b&gt;no defender&lt;br&gt;&lt;/b&gt;IIS + upload ASP&lt;br&gt;MSSQL + execute as + trusted link" style="verticalLabelPosition=bottom;aspect=fixed;html=1;verticalAlign=top;strokeColor=none;align=center;outlineConnect=0;shape=mxgraph.citrix.web_server;" parent="1" vertex="1">
+        <mxCell id="b0sqUQxNu4gCeeOOgRk0-2" value="SRV02 -&amp;nbsp;castleblack&lt;br&gt;192.168.56.22&lt;br&gt;Windows Server 2019 - &lt;b&gt;no defender&lt;br&gt;&lt;/b&gt;IIS + upload ASP&lt;br&gt;MSSQL + execute as + trusted link" style="verticalLabelPosition=bottom;aspect=fixed;html=1;verticalAlign=top;strokeColor=none;align=center;outlineConnect=0;shape=mxgraph.citrix.web_server;" parent="1" vertex="1">
           <mxGeometry x="226.75" y="279.25" width="76.5" height="90" as="geometry" />
         </mxCell>
         <mxCell id="b0sqUQxNu4gCeeOOgRk0-5" value="&lt;b&gt;&lt;font style=&quot;font-size: 15px&quot;&gt;sevenkingdoms.local&lt;/font&gt;&lt;/b&gt;" style="shape=trapezoid;perimeter=trapezoidPerimeter;whiteSpace=wrap;html=1;fixedSize=1;size=240;verticalAlign=top;labelPosition=center;verticalLabelPosition=bottom;align=center;" parent="1" vertex="1">
@@ -244,7 +244,7 @@
         <mxCell id="WRKRBF4SFF5rAj7hGP-u-3" value="DC02 - winterfell&lt;br&gt;192.168.56.11&lt;br&gt;Windows Server 2019&lt;br&gt;rpc user enum" style="verticalLabelPosition=bottom;aspect=fixed;html=1;verticalAlign=top;strokeColor=none;align=center;outlineConnect=0;shape=mxgraph.citrix.directory_server;" vertex="1" parent="WRKRBF4SFF5rAj7hGP-u-1">
           <mxGeometry x="226.75" y="70" width="65" height="88.5" as="geometry" />
         </mxCell>
-        <mxCell id="WRKRBF4SFF5rAj7hGP-u-4" value="SRV02 -&amp;nbsp;castelblack&lt;br&gt;192.168.56.22&lt;br&gt;Windows Server 2019 - &lt;b&gt;no defender&lt;br&gt;&lt;/b&gt;IIS + upload ASP&lt;br&gt;MSSQL + execute as + trusted link" style="verticalLabelPosition=bottom;aspect=fixed;html=1;verticalAlign=top;strokeColor=none;align=center;outlineConnect=0;shape=mxgraph.citrix.web_server;" vertex="1" parent="WRKRBF4SFF5rAj7hGP-u-1">
+        <mxCell id="WRKRBF4SFF5rAj7hGP-u-4" value="SRV02 -&amp;nbsp;castleblack&lt;br&gt;192.168.56.22&lt;br&gt;Windows Server 2019 - &lt;b&gt;no defender&lt;br&gt;&lt;/b&gt;IIS + upload ASP&lt;br&gt;MSSQL + execute as + trusted link" style="verticalLabelPosition=bottom;aspect=fixed;html=1;verticalAlign=top;strokeColor=none;align=center;outlineConnect=0;shape=mxgraph.citrix.web_server;" vertex="1" parent="WRKRBF4SFF5rAj7hGP-u-1">
           <mxGeometry x="226.75" y="279.25" width="76.5" height="90" as="geometry" />
         </mxCell>
         <mxCell id="WRKRBF4SFF5rAj7hGP-u-6" value="DC01 - kingslanding&lt;br&gt;192.168.56.10&lt;br&gt;Windows Server 2019" style="verticalLabelPosition=bottom;aspect=fixed;html=1;verticalAlign=top;strokeColor=none;align=center;outlineConnect=0;shape=mxgraph.citrix.directory_server;" vertex="1" parent="WRKRBF4SFF5rAj7hGP-u-1">
@@ -510,7 +510,7 @@
         <mxCell id="o3wmvLj6rM7aHJygYUtF-3" value="DC02 - winterfell&lt;br&gt;192.168.56.11&lt;br&gt;Windows Server 2019&lt;br&gt;rpc user enum&lt;br&gt;ntlm downgrade" style="verticalLabelPosition=bottom;aspect=fixed;html=1;verticalAlign=top;strokeColor=none;align=center;outlineConnect=0;shape=mxgraph.citrix.directory_server;" parent="o3wmvLj6rM7aHJygYUtF-1" vertex="1">
           <mxGeometry x="226.75" y="70" width="65" height="88.5" as="geometry" />
         </mxCell>
-        <mxCell id="o3wmvLj6rM7aHJygYUtF-4" value="SRV02 -&amp;nbsp;castelblack&lt;br&gt;192.168.56.22&lt;br&gt;Windows Server 2019 - &lt;b&gt;no defender&lt;br&gt;&lt;/b&gt;IIS + upload ASP&lt;br&gt;MSSQL + execute as + trusted link" style="verticalLabelPosition=bottom;aspect=fixed;html=1;verticalAlign=top;strokeColor=none;align=center;outlineConnect=0;shape=mxgraph.citrix.web_server;" parent="o3wmvLj6rM7aHJygYUtF-1" vertex="1">
+        <mxCell id="o3wmvLj6rM7aHJygYUtF-4" value="SRV02 -&amp;nbsp;castleblack&lt;br&gt;192.168.56.22&lt;br&gt;Windows Server 2019 - &lt;b&gt;no defender&lt;br&gt;&lt;/b&gt;IIS + upload ASP&lt;br&gt;MSSQL + execute as + trusted link" style="verticalLabelPosition=bottom;aspect=fixed;html=1;verticalAlign=top;strokeColor=none;align=center;outlineConnect=0;shape=mxgraph.citrix.web_server;" parent="o3wmvLj6rM7aHJygYUtF-1" vertex="1">
           <mxGeometry x="226.75" y="279.25" width="76.5" height="90" as="geometry" />
         </mxCell>
         <mxCell id="o3wmvLj6rM7aHJygYUtF-5" value="&lt;b&gt;&lt;font style=&quot;font-size: 15px&quot;&gt;sevenkingdoms.local&lt;/font&gt;&lt;/b&gt;" style="shape=trapezoid;perimeter=trapezoidPerimeter;whiteSpace=wrap;html=1;fixedSize=1;size=240;verticalAlign=top;labelPosition=center;verticalLabelPosition=bottom;align=center;" parent="o3wmvLj6rM7aHJygYUtF-1" vertex="1">
@@ -858,7 +858,7 @@
             <mxPoint x="-186.50000000000003" y="-7" as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="Q8LpXQ9D0kiZg2cMLjGx-0" value="SRV02 -&amp;nbsp;castelblack&lt;br style=&quot;font-size: 13px;&quot;&gt;192.168.56.22" style="verticalLabelPosition=bottom;aspect=fixed;html=1;verticalAlign=top;strokeColor=none;align=center;outlineConnect=0;shape=mxgraph.citrix.web_server;fontSize=13;labelBackgroundColor=#000000;fontColor=#FFFFFF;" parent="ibhNdLfUEIW59064bE3n-1" vertex="1">
+        <mxCell id="Q8LpXQ9D0kiZg2cMLjGx-0" value="SRV02 -&amp;nbsp;castleblack&lt;br style=&quot;font-size: 13px;&quot;&gt;192.168.56.22" style="verticalLabelPosition=bottom;aspect=fixed;html=1;verticalAlign=top;strokeColor=none;align=center;outlineConnect=0;shape=mxgraph.citrix.web_server;fontSize=13;labelBackgroundColor=#000000;fontColor=#FFFFFF;" parent="ibhNdLfUEIW59064bE3n-1" vertex="1">
           <mxGeometry x="-510" y="140" width="76.5" height="90" as="geometry" />
         </mxCell>
         <mxCell id="Q8LpXQ9D0kiZg2cMLjGx-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=13;labelBackgroundColor=#000000;fontColor=#FFFFFF;" parent="ibhNdLfUEIW59064bE3n-1" source="Q8LpXQ9D0kiZg2cMLjGx-1" target="Q8LpXQ9D0kiZg2cMLjGx-6" edge="1">

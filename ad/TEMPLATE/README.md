@@ -190,8 +190,8 @@ srv02
             },
             "executeasuser" : {},
             "linked_servers": {
-                "CASTELBLACK" : {
-                    "data_src": "castelblack.north.sevenkingdoms.local",
+                "castleblack" : {
+                    "data_src": "castleblack.north.sevenkingdoms.local",
                     "users_mapping": [
                         {"local_login": "ESSOS\\khal.drogo","remote_login": "sa", "remote_password": "Sup1_sa_P@ssw0rd!"}
                     ]
