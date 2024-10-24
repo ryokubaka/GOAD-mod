@@ -1,0 +1,17 @@
+- name: Make directory
+  touch:
+    path: /opt/rita
+    state: directory
+    mode: '0755'
+
+- name: Download Rita/Zeek installer
+  get_url:
+    url: https://github.com/activecm/rita/releases/download/v5.0.8/install-rita-zeek-here.sh
+    dest: /opt/rita/install-rita-zeek-here.sh
+    mode: '0755'
+
+- name: Execute Rita/Zeek installer
+  shell: /opt/rita/install-rita-zeek.sh > /opt/rita/install_log.txt
+
+- name: Start zeek
+  shell: 'zeek start'
