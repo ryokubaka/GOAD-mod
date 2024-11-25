@@ -31,8 +31,6 @@
     path: /opt/zeek/share/zeek/site/autoload/100-default.zeek
     line: '@load policy/tuning/json-logs.zeek'
 
-- name: Adjust internal subnets as test beacons are internal
-
 - name: Include the .56 GOAD subnet in Rita config
   lineinfile:
     path: /etc/rita/config.hjson
