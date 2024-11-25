@@ -17,13 +17,21 @@
     - "Logstash"
     - "Rita"
 
-- name: Install RITA index template into Elasticsearch
-  shell: >
-    "curl -X PUT https://{{ es_api_basic_auth_username }}:{{ es_api_basic_auth_password }}@{{ elk_host }}:9200/_template/template-rita -H 'Content-Type: application/json' --data-binary "@/opt/rita-elk/Elasticsearch/template-rita.json" -k"
+# - name: Install RITA index template into Elasticsearch
+#   shell: >
+#     "curl -X PUT http://{{ es_api_basic_auth_username }}:{{ es_api_basic_auth_password }}@{{ fleet_server }}:9200/_template/template-rita -H 'Content-Type: application/json' --data-binary '@/opt/rita-elk/Elasticsearch/template-rita.json'"
+
+- name: Upload Elasticsearch template
+  uri:
+    url: "http://{{ es_api_basic_auth_username }}:{{ es_api_basic_auth_password }}@{{ fleet_server }}:9200/_template/template-rita"
+    method: PUT
+    headers:
+      Content-Type: "application/json"
+    body: "{{ lookup('file', 'Elasticsearch/template-rita.json') }}"
+    body_format: json
 
 - name: Import RITA dashboard into Kibana
-  shell: >
-    "curl -X POST https://{{ es_api_basic_auth_username }}:{{ es_api_basic_auth_password }}@{{ elk_host }}:5601/api/saved_objects/_import?createNewCopies=false --form file='@/opt/rita-elk/Kibana/rita_dashboards.ndjson' -H 'kbn-xsrf: true' -k"
+  shell: "curl -X POST 'http://{{ es_api_basic_auth_username }}:{{ es_api_basic_auth_password }}@{{ fleet_server }}:5601/api/saved_objects/_import?createNewCopies=false&overwrite=true' -H 'kbn-xsrf: true' --form file=@/opt/rita-elk/Kibana/rita_dashboards.ndjson"
 
 - name: Copy cron file to hourly parse zeek logs
   copy:
@@ -33,7 +41,7 @@
 
 - name: Copy logstash configuration files
   copy:
-    src: /opt/rita-elk/Logstash/*
+    src: /opt/rita-elk/Logstash/
     dest: /etc/logstash/conf.d/
     remote_src: true
 
@@ -44,9 +52,10 @@
     line: "{{ item.line }}"
     state: present
   loop:
-    - { regexp: '^(.*)hosts => ["<ip_elasticsearch>:9200"](.*)$', line: 'hosts => ["{{ elk_host }}:9200"]' }
-    - { regexp: '^(.*)user => username(.*)$', line: 'user => {{ es_api_basic_auth_username }}' }
-    - { regexp: '^(.*)password => password(.*)$', line: 'password => {{ es_api_basic_auth_password }}' }
+    - { regexp: '^(.*)hosts =>(.*)$', line: '      hosts => ["{{ fleet_server }}:9200"]' }
+    - { regexp: '^(.*)user => username(.*)$', line: '      user => {{ es_api_basic_auth_username }}' }
+    - { regexp: '^(.*)password => password(.*)$', line: '      password => {{ es_api_basic_auth_password }}' }
+    - { regexp: '^(.*)ssl => true(.*)$', line: '      ssl => false' }
 
 - name: Restart elasticsearch and kibana
   service:

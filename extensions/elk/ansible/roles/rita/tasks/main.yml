@@ -1,3 +1,4 @@
 ---
+- include_vars: ../../elk/vars/main.yml
 - import_tasks: rita.yml
 - import_tasks: rita-elk.yml

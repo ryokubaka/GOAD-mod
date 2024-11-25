@@ -1,6 +1,15 @@
+- name: Prepare jumpbox to connect
+  hosts: localhost
+  become: true
+  tasks:
+    - name: Install sshpass
+      apt:
+        name: sshpass
+        state: latest
+
 - name: Install ELK and RITA
   hosts: elk_server
-  become: yes
+  become: true
   roles:
     - { role: 'elk', tags: 'elk' }
     - { role: 'rita', tags: 'rita' }
@@ -14,6 +23,6 @@
 - name: Install log agent on windows vms and disable the NAT adapter
   hosts: elk_log
   roles:
-    - { role: 'ansible/roles/settings/enable_nat_adapter' , tags: 'enable_nat_adapter'}
+    - { role: 'settings/enable_nat_adapter' , tags: 'enable_nat_adapter'}
     - { role: 'logs_windows', tags: 'agent' }
-    - { role: 'ansible/roles/settings/disable_nat_adapter' , tags: 'disable_nat_adapter'}
+    - { role: 'settings/disable_nat_adapter' , tags: 'disable_nat_adapter'}

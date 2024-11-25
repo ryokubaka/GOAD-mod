@@ -1,1 +1,1 @@
-2 * * * * rita import --rolling /opt/zeek/logs/$(date --date='-1 hour' +\%Y-\%m-\%d)/ test
+2 * * * * rita import --rolling --logs=/opt/zeek/logs/$(date +\%Y-\%m-\%d)/ --database=goad
