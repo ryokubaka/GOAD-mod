@@ -8,7 +8,7 @@
   },
   "name": "zeek-1",
   "description": "",
-  "namespace": "",
+  "namespace": "", 
   "inputs": {
     "zeek-logfile": {
       "enabled": true,
@@ -16,7 +16,8 @@
         "base_paths": [
           "/var/log/bro/current",
           "/opt/zeek/logs/current",
-          "/usr/local/var/spool/zeek"
+          "/usr/local/var/spool/zeek",
+          "/opt/zeek/spool/manager"
         ]
       },
       "streams": {

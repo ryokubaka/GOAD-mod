@@ -21,6 +21,11 @@
 #   shell: >
 #     "curl -X PUT http://{{ es_api_basic_auth_username }}:{{ es_api_basic_auth_password }}@{{ fleet_server }}:9200/_template/template-rita -H 'Content-Type: application/json' --data-binary '@/opt/rita-elk/Elasticsearch/template-rita.json'"
 
+- name: Check for cluster health; wait 120 seconds for health status
+  shell: |
+    curl -XGET -u {{ es_api_basic_auth_username }}:{{ es_api_basic_auth_password }} \
+    'http://{{ fleet_server }}:9200/_cluster/health?wait_for_status=yellow&timeout=120s' -H 'kbn-xsrf: true'
+
 - name: Upload Elasticsearch template
   uri:
     url: "http://{{ es_api_basic_auth_username }}:{{ es_api_basic_auth_password }}@{{ fleet_server }}:9200/_template/template-rita"
