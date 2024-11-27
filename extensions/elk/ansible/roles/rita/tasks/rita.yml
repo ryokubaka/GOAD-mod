@@ -45,14 +45,5 @@
     line: '        #online_feeds: ["https://feodotracker.abuse.ch/downloads/ipblocklist.txt"],'
     state: present
 
-- name: Fix rita filter
-  lineinfile:
-    path: /etc/logstash/conf.d/10-rita_filter.conf
-    regexp: "{{ item.regexp }}"
-    line: "{{ item.line }}"
-    state: present
-  loop:
-    - { regexp: '^(.*)hosts =>(.*)$', line: '      hosts => ["{{ fleet_server }}:9200"]' }
-
 - name: Start zeek
   shell: 'zeek start'
