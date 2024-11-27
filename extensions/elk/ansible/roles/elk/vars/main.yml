@@ -5,8 +5,8 @@ sysd_config_file: "/etc/systemd/system/elasticsearch.service.d/override.conf"
 
 fleet_server: 192.168.56.50
 fleet_port: 9200
-es_version: "8.16.1"
-elastic_agent_version: "8.16.1"
+es_version: "8.15.1"
+elastic_agent_version: "8.15.1"
 es_xpack_trial: true
 es_api_basic_auth_username: elastic
 es_api_basic_auth_password: MeowMeow123
