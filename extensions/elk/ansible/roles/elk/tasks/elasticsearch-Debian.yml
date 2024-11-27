@@ -112,7 +112,7 @@
 
 - name: Install kibana
   apt:
-    name: kibana
+    name: "kibana={{ es_version }}"
     state: present
 
 - name: copy kibana config
