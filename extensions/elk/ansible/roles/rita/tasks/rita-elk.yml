@@ -17,15 +17,6 @@
     - "Logstash"
     - "Rita"
 
-- name: Fix rita filter
-  lineinfile:
-    path: /etc/logstash/conf.d/10-rita_filter.conf
-    regexp: "{{ item.regexp }}"
-    line: "{{ item.line }}"
-    state: present
-  loop:
-    - { regexp: '^(.*)hosts =>(.*)$', line: '      hosts => ["{{ fleet_server }}:9200"]' }
-
 # - name: Install RITA index template into Elasticsearch
 #   shell: >
 #     "curl -X PUT http://{{ es_api_basic_auth_username }}:{{ es_api_basic_auth_password }}@{{ fleet_server }}:9200/_template/template-rita -H 'Content-Type: application/json' --data-binary '@/opt/rita-elk/Elasticsearch/template-rita.json'"
@@ -59,6 +50,15 @@
     src: Logstash/
     dest: /etc/logstash/conf.d/
     remote_src: true
+
+- name: Fix rita filter
+  lineinfile:
+    path: /etc/logstash/conf.d/10-rita_filter.conf
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    state: present
+  loop:
+    - { regexp: '^(.*)hosts =>(.*)$', line: '      hosts => ["{{ fleet_server }}:9200"]' }
 
 - name: Replace lines in config file
   lineinfile:
