@@ -45,6 +45,12 @@
     mode: 0755
     remote_src: true
 
+- name: Copy logstash configuration files
+  copy:
+    src: /opt/rita-elk/Logstash/
+    dest: /etc/logstash/conf.d/
+    remote_src: true
+
 - name: Fix rita filter
   lineinfile:
     path: /etc/logstash/conf.d/10-rita_filter.conf
