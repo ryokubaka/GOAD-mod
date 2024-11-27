@@ -35,7 +35,14 @@
   lineinfile:
     path: /etc/rita/config.hjson
     regexp: '^(.*)always_included_subnets:(.*)'
-    line: '        always_included_subnets: ["192.168.56.0/25"]'
+    line: '        always_included_subnets: ["192.168.56.0/25"],'
+    state: present
+
+- name: Remove external internet threat check
+  lineinfile:
+    path: /etc/rita/config.hjson
+    regexp: '^(.*)online_feeds(.*)'
+    line: '        #online_feeds: ["https://feodotracker.abuse.ch/downloads/ipblocklist.txt"],'
     state: present
 
 - name: Fix rita filter

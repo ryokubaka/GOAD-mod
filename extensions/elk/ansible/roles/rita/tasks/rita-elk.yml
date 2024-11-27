@@ -38,10 +38,11 @@
 - name: Import RITA dashboard into Kibana
   shell: "curl -X POST 'http://{{ es_api_basic_auth_username }}:{{ es_api_basic_auth_password }}@{{ fleet_server }}:5601/api/saved_objects/_import?createNewCopies=false&overwrite=true' -H 'kbn-xsrf: true' --form file=@/opt/rita-elk/Kibana/rita_dashboards.ndjson"
 
-- name: Copy cron file to hourly parse zeek logs
+- name: Copy script file to hourly parse zeek logs
   copy:
-    src: /opt/rita-elk/Rita/rita.cron
-    dest: /etc/cron.d/
+    src: /opt/rita-elk/Rita/rita
+    dest: /etc/cron.hourly/rita
+    mode: 0755
     remote_src: true
 
 - name: Copy logstash configuration files
