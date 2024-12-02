@@ -1,9 +1,24 @@
-- name: Ensure chocolatey is installed
-  win_chocolatey:
-    name:
-    - chocolatey
-    - chocolatey-core.extension
-    state: present
+- name: ensure .NET Framework 4.8 requirement is satisfied for Chocolatey CLI v2.0.0+
+  block:
+  - name: install Chocolatey CLI v1.4.0
+    win_chocolatey:
+      name: 'chocolatey'
+      state: present
+      version: '1.4.0'
+    ignore_errors: true
+
+  - name: install Microsoft .NET Framework 4.8
+    win_chocolatey:
+      name: netfx-4.8
+      state: present
+
+  - name: Reboot the host to complete .NET Framework 4.8 install
+    ansible.windows.win_reboot:
+
+  - name: install Chocolatey CLI v2.0.0+ when .NET Framework 4.8 dependency is met
+    win_chocolatey:
+      name: chocolatey
+      state: latest
 
 - name: Disable enhanced exit codes
   win_chocolatey_feature:
@@ -23,4 +38,7 @@
   - sysinternals
   - wget
   - pstools
+  - microsoft-edge
+  - microsoft-teams
+  - wireshark
   ignore_errors: yes

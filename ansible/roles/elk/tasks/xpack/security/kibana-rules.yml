@@ -1,0 +1,23 @@
+- name: Query the API for disabled rules on current page
+  uri:
+    url: "http://{{ fleet_server }}:5601/api/detection_engine/rules/_find?per_page={{ page_size }}&page={{ current_page }}&filter=alert.attributes.enabled:false"
+    method: GET
+    user: "{{ es_api_basic_auth_username }}"
+    password: "{{ es_api_basic_auth_password }}"
+    headers:
+      kbn-xsrf: "true"
+      Content-Type: "application/json"
+    force_basic_auth: yes
+    return_content: yes
+  register: query_result
+  no_log: true
+
+- name: Extract rule IDs from query result
+  set_fact:
+    rule_ids: "{{ rule_ids + query_result.json.data | json_query('[*].id') }}"
+  no_log: true
+
+- name: Check if there are more pages
+  set_fact:
+    has_more_pages: "{{ query_result.json.data | length == page_size }}"
+    current_page: "{{ current_page | int + 1 }}"

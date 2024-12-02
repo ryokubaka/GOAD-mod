@@ -6,13 +6,14 @@ sudo apt-get install -y git python3-venv python3-pip git
 
 # git clone goad
 GOAD_REPO=/home/vagrant/GOAD
-GIT_FOLDER=$LOCALREPO/.git
+GIT_FOLDER=$GOAD_REPO/.git
 if [ ! -d $GIT_FOLDER ]
 then
     rm -rf $GOAD_REPO
-    git clone https://github.com/Orange-Cyberdefense/GOAD.git $GOAD_REPO
+    #git clone https://github.com/Orange-Cyberdefense/GOAD.git $GOAD_REPO
+    git clone https://github.com/ryokubaka/GOAD-mod.git $GOAD_REPO
     cd $GOAD_REPO
-    # git checkout -b v3-beta origin/v3-beta
+    git checkout v3-meow
 else
     cd $GOAD_REPO
     git pull

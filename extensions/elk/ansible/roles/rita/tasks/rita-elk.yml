@@ -1,0 +1,81 @@
+---
+# - name: Clone Rita-ELK Git repository
+#   git:
+#     repo: 'https://github.com/example/repo.git'
+#     dest: '/opt/rita-elk'
+#     version: 'main'  # You can specify the branch or tag here
+#     update: yes  # Ensures the repo is updated if it already exists
+
+- name: Copy files to destination server
+  copy:
+    src: "{{ item }}"
+    dest: /opt/rita-elk/
+    force: true
+  loop:
+    - "Elasticsearch"
+    - "Kibana"
+    - "Logstash"
+    - "Rita"
+
+# - name: Install RITA index template into Elasticsearch
+#   shell: >
+#     "curl -X PUT http://{{ es_api_basic_auth_username }}:{{ es_api_basic_auth_password }}@{{ fleet_server }}:9200/_template/template-rita -H 'Content-Type: application/json' --data-binary '@/opt/rita-elk/Elasticsearch/template-rita.json'"
+
+- name: Check for cluster health; wait 120 seconds for health status
+  shell: |
+    curl -XGET -u {{ es_api_basic_auth_username }}:{{ es_api_basic_auth_password }} \
+    'http://{{ fleet_server }}:9200/_cluster/health?wait_for_status=yellow&timeout=120s' -H 'kbn-xsrf: true'
+
+- name: Upload Elasticsearch template
+  uri:
+    url: "http://{{ es_api_basic_auth_username }}:{{ es_api_basic_auth_password }}@{{ fleet_server }}:9200/_template/template-rita"
+    method: PUT
+    headers:
+      Content-Type: "application/json"
+    body: "{{ lookup('file', 'Elasticsearch/template-rita.json') }}"
+    body_format: json
+
+- name: Import RITA dashboard into Kibana
+  shell: "curl -X POST 'http://{{ es_api_basic_auth_username }}:{{ es_api_basic_auth_password }}@{{ fleet_server }}:5601/api/saved_objects/_import?createNewCopies=false&overwrite=true' -H 'kbn-xsrf: true' --form file=@/opt/rita-elk/Kibana/rita_dashboards.ndjson"
+
+- name: Copy script file to hourly parse zeek logs
+  copy:
+    src: /opt/rita-elk/Rita/rita
+    dest: /etc/cron.hourly/rita
+    mode: 0755
+    remote_src: true
+
+- name: Copy logstash configuration files
+  copy:
+    src: /opt/rita-elk/Logstash/
+    dest: /etc/logstash/conf.d/
+    remote_src: true
+
+- name: Fix rita filter
+  lineinfile:
+    path: /etc/logstash/conf.d/10-rita_filter.conf
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    state: present
+  loop:
+    - { regexp: '^(.*)hosts =>(.*)$', line: '      hosts => ["{{ fleet_server }}:9200"]' }
+
+- name: Replace lines in config file
+  lineinfile:
+    path: /etc/logstash/conf.d/10-rita_filter.conf
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    state: present
+  loop:
+    - { regexp: '^(.*)hosts =>(.*)$', line: '      hosts => ["{{ fleet_server }}:9200"]' }
+    - { regexp: '^(.*)user => username(.*)$', line: '      user => {{ es_api_basic_auth_username }}' }
+    - { regexp: '^(.*)password => password(.*)$', line: '      password => {{ es_api_basic_auth_password }}' }
+    - { regexp: '^(.*)ssl => true(.*)$', line: '      ssl => false' }
+
+- name: Restart elasticsearch and kibana
+  service:
+    name: "{{ item }}"
+    state: restarted
+  loop:
+    - elasticsearch
+    - kibana

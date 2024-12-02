@@ -1,0 +1,3 @@
+#!/bin/bash
+
+script -q /dev/null -c "rita import --rolling --logs=/opt/zeek/logs/$(date +\%Y-\%m-\%d)/ --database=goad"

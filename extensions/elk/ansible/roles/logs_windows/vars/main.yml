@@ -1,0 +1,4 @@
+elk_host: 192.168.56.50
+es_api_basic_auth_username: elastic
+es_api_basic_auth_password: MeowMeow123
+elastic_agent_version: "8.15.1"

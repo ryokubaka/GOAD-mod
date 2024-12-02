@@ -7,5 +7,5 @@
     "compatibility": [
         "*"
     ],
-    "impact": "add a linux machine and add a logbeat agent on all windows machine"
+    "impact": "add a linux machine and add the elastic agent on all windows machines"
 }

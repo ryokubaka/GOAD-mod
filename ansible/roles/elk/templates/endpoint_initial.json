@@ -1,0 +1,29 @@
+{
+  "name": "endpoint-1",
+  "namespace": "default",
+  "description": "",
+  "force": "true",
+  "package": {
+    "name": "endpoint",
+    "version": "{{ elastic_agent_version }}",
+  },
+  "enabled": true,
+  "policy_id": "agent-policy",
+  "inputs": [
+    {
+      "type": "endpoint",
+      "enabled": true,
+      "streams": [],
+      "config": {
+        "integration_config": {
+          "value": {
+            "type": "endpoint",
+            "endpointConfig": {
+              "preset": "EDRComplete"
+            }
+          }
+        }
+      }
+    }
+  ]
+}

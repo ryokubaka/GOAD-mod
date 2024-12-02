@@ -23,6 +23,12 @@
       win_shell: |
         Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Force
 
+- name: enable nat
+  hosts: ws01
+  gather_facts: false
+  roles:
+    - { role: 'settings/enable_nat_adapter' , tags: 'enable_nat_adapter', nat_adapter: 'Ethernet0 2'}
+
 - name: prepare workstation
   hosts: ws01
   roles:
@@ -58,3 +64,9 @@
       loop: "{{lab.hosts[dict_key].security | default([]) }}"
       loop_control:
         loop_var: secu
+
+- name: disable nat
+  hosts: ws01
+  gather_facts: false
+  roles:
+    - { role: 'settings/disable_nat_adapter' , tags: 'disable_nat_adapter', nat_adapter: 'Ethernet0 2'}

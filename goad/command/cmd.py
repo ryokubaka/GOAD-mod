@@ -214,6 +214,8 @@ class Command:
 
     def scp(self, source, destination, ssh_key, path):
         # scp files
+        Log.info(f'dos2unix against SSH key')
+        subprocess.run(["dos2unix", ssh_key], check=True)
         Log.info(f'Launch scp {source} -> {destination}')
         scp_command = f"scp -o StrictHostKeyChecking=no -i {ssh_key}"
         command = f'{scp_command} {source} {destination}'

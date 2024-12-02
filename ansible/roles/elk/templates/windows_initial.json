@@ -1,0 +1,57 @@
+{
+    "name":"windows-1",
+    "namespace":"default",
+    "description":"",
+    "force":"true",
+    "package":{
+       "name":"windows",
+       "version":"2.0.2"
+    },
+    "enabled":true,
+    "policy_id":"agent-policy",
+    "inputs": [
+       {
+          "type":"windows-winlog",
+          "enabled":true,
+          "streams":[
+             {
+                "data_stream.dataset":"windows.applocker_exe_and_dll",
+                "ignore_older":"72h",
+                "preserve_original_event":false
+             },
+             {
+                "data_stream.dataset":"windows.applocker_msi_and_script",
+                "ignore_older":"72h",
+                "preserve_original_event":false
+             },
+             {
+                "data_stream.dataset":"windows.applocker_packaged_app_deployment",
+                "ignore_older":"72h",
+                "preserve_original_event":false
+             },
+             {
+                "data_stream.dataset":"windows.applocker_packaged_app_execution",
+                "ignore_older":"72h",
+                "preserve_original_event":false
+             },
+             {
+                "data_stream.dataset":"windows.sysmon_operational",
+                "ignore_older":"72h",
+                "preserve_original_event":false
+             },
+             {
+                "data_stream.dataset":"windows.powershell",
+                "ignore_older":"72h",
+                "preserve_original_event":false,
+                "event_id":"400, 403, 600, 800"
+             },
+             {
+                "data_stream.dataset":"windows.powershell_operational",
+                "ignore_older":"72h",
+                "preserve_original_event":false,
+                "event_id":"4103, 4104, 4105, 4106"
+             }
+          ]
+       }
+    ]
+}

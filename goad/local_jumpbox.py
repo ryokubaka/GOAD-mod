@@ -26,6 +26,7 @@ class LocalJumpBox(JumpBox):
             self.run_command("sudo apt update && sudo apt install -y dos2unix", '~')
             self.run_command("dos2unix setup.sh", '~')
         self.run_command('bash setup.sh', '~')
+        self.run_command('bash setup.sh', '~') # run again because reasons
 
     def get_jumpbox_key(self, creation=False):
         if not creation:

@@ -1,0 +1,579 @@
+### THIS IS JUST AN EXAMPLE
+### Ansible will create this file locally on the box after creating the integration
+{
+  "name": "endpoint-1",
+  "namespace": "default",
+  "description": "",
+  "force": "true",
+  "package": {
+    "name": "endpoint",
+    "version": "{{ elastic_agent_version }}",
+  },
+  "enabled": true,
+  "policy_id": "agent-policy",
+  "inputs": [
+    {
+      "type": "endpoint",
+      "enabled": true,
+      "streams": [],
+      "config": {
+        "integration_config": {
+          "value": {
+            "type": "endpoint",
+            "endpointConfig": {
+              "preset": "EDRComplete"
+            }
+          }
+        },
+        "artifact_manifest": {
+          "value": {
+          "manifest_version": "1.0.1167",
+          "schema_version": "1.0.0",
+          "artifacts": {
+            "diagnostic-configuration-v1": {
+                "compression_algorithm": "zlib",
+                "decoded_sha256": "f70edb954f800cd878b041b7ea610a3ddecef18403c97ca08cef5121044bcc9e",
+                "decoded_size": 8468,
+                "encoded_sha256": "59bd0f6791b3da2a67765d8c899bbd2d546b420d9edb29c1a302c256bf878293",
+                "encoded_size": 1257,
+                "encryption_algorithm": "RC4-c51f5065b860947796aeff228ebe409c",
+                "relative_url": "/downloads/endpoint/diagnostic-configuration-v1/59bd0f6791b3da2a67765d8c899bbd2d546b420d9edb29c1a302c256bf878293"
+            },
+            "diagnostic-endpointelf-v1-blocklist": {
+                "compression_algorithm": "zlib",
+                "decoded_sha256": "39fecb66f9337eb33f5c0359f51ad37761ff13e4a7c4be390e03d2c227ac7cf6",
+                "decoded_size": 987,
+                "encoded_sha256": "5093bb6536c76a5c6d90c2588e552a74845710fe8af4b8adb2967320dd771a19",
+                "encoded_size": 309,
+                "encryption_algorithm": "RC4-c51f5065b860947796aeff228ebe409c",
+                "relative_url": "/downloads/endpoint/diagnostic-endpointelf-v1-blocklist/5093bb6536c76a5c6d90c2588e552a74845710fe8af4b8adb2967320dd771a19"
+            },
+            "diagnostic-endpointelf-v1-exceptionlist": {
+                "compression_algorithm": "zlib",
+                "decoded_sha256": "e3eb12da99e044ecc7d50cea407bf17f33c546e5309aa7ee661234baed2b7750",
+                "decoded_size": 15,
+                "encoded_sha256": "30aeab4ad131ea70bd21e9c2e9528b4d178279aa3c8fe6de57c5645e49a185a9",
+                "encoded_size": 23,
+                "encryption_algorithm": "RC4-c51f5065b860947796aeff228ebe409c",
+                "relative_url": "/downloads/endpoint/diagnostic-endpointelf-v1-exceptionlist/30aeab4ad131ea70bd21e9c2e9528b4d178279aa3c8fe6de57c5645e49a185a9"
+            },
+            "diagnostic-endpointelf-v1-model": {
+                "compression_algorithm": "zlib",
+                "decoded_sha256": "885020b5bb99b3b875f51678efae67874bae37bfcc0036ad86bd2f7cbf767824",
+                "decoded_size": 68,
+                "encoded_sha256": "98611a30e1ce18f374d6e3d81934581f475cf644cf56434120915de660ca6a6b",
+                "encoded_size": 68,
+                "encryption_algorithm": "RC4-c51f5065b860947796aeff228ebe409c",
+                "relative_url": "/downloads/endpoint/diagnostic-endpointelf-v1-model/98611a30e1ce18f374d6e3d81934581f475cf644cf56434120915de660ca6a6b"
+            },
+            "diagnostic-endpointmacho-v1-blocklist": {
+                "compression_algorithm": "zlib",
+                "decoded_sha256": "98a87a375e91dcf50c31fe73e538192f72ad40d925d9e142e997ed45203dc53f",
+                "decoded_size": 598,
+                "encoded_sha256": "5e0cbcbcc1b63c0b89a85c80b1a7622d29d1d5cd94a4738e5fd21d61fc823758",
+                "encoded_size": 384,
+                "encryption_algorithm": "RC4-c51f5065b860947796aeff228ebe409c",
+                "relative_url": "/downloads/endpoint/diagnostic-endpointmacho-v1-blocklist/5e0cbcbcc1b63c0b89a85c80b1a7622d29d1d5cd94a4738e5fd21d61fc823758"
+            },
+            "diagnostic-endpointmacho-v1-exceptionlist": {
+                "compression_algorithm": "zlib",
+                "decoded_sha256": "9003e4d904017ac04c186a257c9f37d985e1dc0cda4e3380ba202216d95a13e7",
+                "decoded_size": 1043855,
+                "encoded_sha256": "86fe37fc57bbd9134c6259548507308487e633bb5cd09aa3bfa31309b8803cd2",
+                "encoded_size": 592766,
+                "encryption_algorithm": "RC4-c51f5065b860947796aeff228ebe409c",
+                "relative_url": "/downloads/endpoint/diagnostic-endpointmacho-v1-exceptionlist/86fe37fc57bbd9134c6259548507308487e633bb5cd09aa3bfa31309b8803cd2"
+            },
+            "diagnostic-endpointmacho-v1-model": {
+                "compression_algorithm": "zlib",
+                "decoded_sha256": "93f8fc142e09dbbd16ae5d636935c29eebb824b0d233b43a6fc7115ec2feac66",
+                "decoded_size": 2112492,
+                "encoded_sha256": "8f9d2f9e1bc4384a18072f8b11804b18e7fb89b23bae5a21385d5bda71075c14",
+                "encoded_size": 744522,
+                "encryption_algorithm": "RC4-c51f5065b860947796aeff228ebe409c",
+                "relative_url": "/downloads/endpoint/diagnostic-endpointmacho-v1-model/8f9d2f9e1bc4384a18072f8b11804b18e7fb89b23bae5a21385d5bda71075c14"
+            },
+            "diagnostic-endpointpe-v4-blocklist": {
+                "compression_algorithm": "zlib",
+                "decoded_sha256": "338eb3e0d0c2b7efcd291ca270a0a6188d3632a25c7a8dc5d020fdb44293e12f",
+                "decoded_size": 464,
+                "encoded_sha256": "02ffbee79a29413f8479aa0e3106acd2a5aa5cad366364da1ea30b59125d8667",
+                "encoded_size": 310,
+                "encryption_algorithm": "RC4-c51f5065b860947796aeff228ebe409c",
+                "relative_url": "/downloads/endpoint/diagnostic-endpointpe-v4-blocklist/02ffbee79a29413f8479aa0e3106acd2a5aa5cad366364da1ea30b59125d8667"
+            },
+            "diagnostic-endpointpe-v4-exceptionlist": {
+                "compression_algorithm": "zlib",
+                "decoded_sha256": "fcec1cba8fe8a87919cb9d9167b637e63959cfc4234d2979f73950e65264ad5b",
+                "decoded_size": 3924989,
+                "encoded_sha256": "60400abf14d2a4301864dd1e74041fc685a55e28df2ceea61e0c6cc6cbb36776",
+                "encoded_size": 2226946,
+                "encryption_algorithm": "RC4-c51f5065b860947796aeff228ebe409c",
+                "relative_url": "/downloads/endpoint/diagnostic-endpointpe-v4-exceptionlist/60400abf14d2a4301864dd1e74041fc685a55e28df2ceea61e0c6cc6cbb36776"
+            },
+            "diagnostic-endpointpe-v4-model": {
+                "compression_algorithm": "zlib",
+                "decoded_sha256": "7c822a5c87c48ef1eff2a4847385829087f9d50596b5a3ce59803381edecfb1a",
+                "decoded_size": 18297300,
+                "encoded_sha256": "e4d21fb2cdc4679bac89edd28df60b7d035ff976a252cf1d7d1386e0377fdb78",
+                "encoded_size": 6948615,
+                "encryption_algorithm": "RC4-c51f5065b860947796aeff228ebe409c",
+                "relative_url": "/downloads/endpoint/diagnostic-endpointpe-v4-model/e4d21fb2cdc4679bac89edd28df60b7d035ff976a252cf1d7d1386e0377fdb78"
+            },
+            "diagnostic-malware-signature-v1-linux": {
+                "compression_algorithm": "zlib",
+                "decoded_sha256": "97da1dc5dabd9b0653fe08c856ce6488dc94999522c4548af2c71d4b62754d9a",
+                "decoded_size": 596330,
+                "encoded_sha256": "9f097cea1fae2f1a54725ff9d1ebeefeb495f190eb72fcc22b4ab33ba20f8555",
+                "encoded_size": 143909,
+                "encryption_algorithm": "RC4-c51f5065b860947796aeff228ebe409c",
+                "relative_url": "/downloads/endpoint/diagnostic-malware-signature-v1-linux/9f097cea1fae2f1a54725ff9d1ebeefeb495f190eb72fcc22b4ab33ba20f8555"
+            },
+            "diagnostic-malware-signature-v1-macos": {
+                "compression_algorithm": "zlib",
+                "decoded_sha256": "5efc137604755736dc3373ebf0624bdcb12364476758e6eea3cd34f0be73eec4",
+                "decoded_size": 105806,
+                "encoded_sha256": "9b3adfefeebad23e0b7b258ae5478c2f0e3b2f8399a60b4d06126292df3dd4e7",
+                "encoded_size": 28136,
+                "encryption_algorithm": "RC4-c51f5065b860947796aeff228ebe409c",
+                "relative_url": "/downloads/endpoint/diagnostic-malware-signature-v1-macos/9b3adfefeebad23e0b7b258ae5478c2f0e3b2f8399a60b4d06126292df3dd4e7"
+            },
+            "diagnostic-malware-signature-v1-windows": {
+                "compression_algorithm": "zlib",
+                "decoded_sha256": "34cb1710b42cf5c773da566653c07ab102ce0fd2e6a06f7d157a187b0dae6d85",
+                "decoded_size": 797693,
+                "encoded_sha256": "77582aedee255ff7ba3b04e1003fd047f68dd4496a6c2e1b506bbd22ef4c4842",
+                "encoded_size": 204534,
+                "encryption_algorithm": "RC4-c51f5065b860947796aeff228ebe409c",
+                "relative_url": "/downloads/endpoint/diagnostic-malware-signature-v1-windows/77582aedee255ff7ba3b04e1003fd047f68dd4496a6c2e1b506bbd22ef4c4842"
+            },
+            "diagnostic-ransomware-v1-windows": {
+                "compression_algorithm": "zlib",
+                "decoded_sha256": "85ba15a24149320d7571532fe26f06a0d7224e6894722d3485008a765af4d936",
+                "decoded_size": 248641,
+                "encoded_sha256": "bab30c2911cc75de6f25fd226c7ba9b008bec8ba74869da82de457570b2edb77",
+                "encoded_size": 36416,
+                "encryption_algorithm": "RC4-c51f5065b860947796aeff228ebe409c",
+                "relative_url": "/downloads/endpoint/diagnostic-ransomware-v1-windows/bab30c2911cc75de6f25fd226c7ba9b008bec8ba74869da82de457570b2edb77"
+            },
+            "diagnostic-rules-linux-v1": {
+                "compression_algorithm": "zlib",
+                "decoded_sha256": "179bbf759ec7a296246b0d392e4521f5950d13750d62ccb8ebd6eddb4fa27f5b",
+                "decoded_size": 489931,
+                "encoded_sha256": "1d48ec0fb4c9f2840eb9e560d6c6a842b6b20102c71a68007a9b3a053f6c6d70",
+                "encoded_size": 57865,
+                "encryption_algorithm": "RC4-c51f5065b860947796aeff228ebe409c",
+                "relative_url": "/downloads/endpoint/diagnostic-rules-linux-v1/1d48ec0fb4c9f2840eb9e560d6c6a842b6b20102c71a68007a9b3a053f6c6d70"
+            },
+            "diagnostic-rules-macos-v1": {
+                "compression_algorithm": "zlib",
+                "decoded_sha256": "198fe9ce10836450756dc36a5f5a595215c36d99ac34147bf416468db2499987",
+                "decoded_size": 645827,
+                "encoded_sha256": "c5d3e1fc0d5916464d9917a3bf1afe78966243988433d63df0953e1f3577377f",
+                "encoded_size": 86355,
+                "encryption_algorithm": "RC4-c51f5065b860947796aeff228ebe409c",
+                "relative_url": "/downloads/endpoint/diagnostic-rules-macos-v1/c5d3e1fc0d5916464d9917a3bf1afe78966243988433d63df0953e1f3577377f"
+            },
+            "diagnostic-rules-windows-v1": {
+                "compression_algorithm": "zlib",
+                "decoded_sha256": "0ea2751ad76d5a3898a8a03f25acdabe24bd94d7f8544ebba7780e31fda81dd1",
+                "decoded_size": 2848951,
+                "encoded_sha256": "e4e567b46754e034826092da46142979b588a5e823b17e30592dee55fcdf869d",
+                "encoded_size": 488198,
+                "encryption_algorithm": "RC4-c51f5065b860947796aeff228ebe409c",
+                "relative_url": "/downloads/endpoint/diagnostic-rules-windows-v1/e4e567b46754e034826092da46142979b588a5e823b17e30592dee55fcdf869d"
+            },
+            "endpointelf-v1-blocklist": {
+                "compression_algorithm": "zlib",
+                "decoded_sha256": "0d4754c43a899fb1e8389d36e95c87b1ed852661fc007041d41b45929a3b34f4",
+                "decoded_size": 986,
+                "encoded_sha256": "ac2d9422b1b393944685126590282d9a801bf8150187f723408a3d51e368bc2d",
+                "encoded_size": 310,
+                "encryption_algorithm": "RC4-c51f5065b860947796aeff228ebe409c",
+                "relative_url": "/downloads/endpoint/endpointelf-v1-blocklist/ac2d9422b1b393944685126590282d9a801bf8150187f723408a3d51e368bc2d"
+            },
+            "endpointelf-v1-exceptionlist": {
+                "compression_algorithm": "zlib",
+                "decoded_sha256": "eb9689f4e89f0b8b88f6fde235f1d5d9329c3056a21e6f451e36f23604ff8394",
+                "decoded_size": 16,
+                "encoded_sha256": "277de851fee8bb4e612bcaaf1f155518936d633567dd8c0a209ea131ba634f45",
+                "encoded_size": 24,
+                "encryption_algorithm": "RC4-c51f5065b860947796aeff228ebe409c",
+                "relative_url": "/downloads/endpoint/endpointelf-v1-exceptionlist/277de851fee8bb4e612bcaaf1f155518936d633567dd8c0a209ea131ba634f45"
+            },
+            "endpointelf-v1-model": {
+                "compression_algorithm": "zlib",
+                "decoded_sha256": "ae9943982909af94f2bef6f2418b103935ac731db362dd74de9bfe4b490c61cf",
+                "decoded_size": 69,
+                "encoded_sha256": "ca945fb4b8e2eb3a768d5600449805df173ca757e803f6030c848396484ac2f2",
+                "encoded_size": 69,
+                "encryption_algorithm": "RC4-c51f5065b860947796aeff228ebe409c",
+                "relative_url": "/downloads/endpoint/endpointelf-v1-model/ca945fb4b8e2eb3a768d5600449805df173ca757e803f6030c848396484ac2f2"
+            },
+            "endpointmacho-v1-blocklist": {
+                "compression_algorithm": "zlib",
+                "decoded_sha256": "514399cde4e603d775265bb00a10d9872e909dfc1eab19454cfe6a33d12a0de1",
+                "decoded_size": 897527,
+                "encoded_sha256": "c4ca5ad5b42f9b5e349b865fa9ff01ee95082271b2fa3552f5c38e12f0ed4868",
+                "encoded_size": 509803,
+                "encryption_algorithm": "RC4-c51f5065b860947796aeff228ebe409c",
+                "relative_url": "/downloads/endpoint/endpointmacho-v1-blocklist/c4ca5ad5b42f9b5e349b865fa9ff01ee95082271b2fa3552f5c38e12f0ed4868"
+            },
+            "endpointmacho-v1-exceptionlist": {
+                "compression_algorithm": "zlib",
+                "decoded_sha256": "ac477b4d296b8f870b0db15ab158d8e15fd9afddc497286f633d540b1c1e29d6",
+                "decoded_size": 402866,
+                "encoded_sha256": "b33a69b2798cb308d24217d456a8b07bc3686ba794d304b015c4388104b406a6",
+                "encoded_size": 229110,
+                "encryption_algorithm": "RC4-c51f5065b860947796aeff228ebe409c",
+                "relative_url": "/downloads/endpoint/endpointmacho-v1-exceptionlist/b33a69b2798cb308d24217d456a8b07bc3686ba794d304b015c4388104b406a6"
+            },
+            "endpointmacho-v1-model": {
+                "compression_algorithm": "zlib",
+                "decoded_sha256": "affb95a974f23f0143019e2f48913475928533fd013682c54e223036602004e0",
+                "decoded_size": 2054199,
+                "encoded_sha256": "a4f76caca486f052401c9628e2af37c5875a1651889372961dfc0376137eb074",
+                "encoded_size": 721466,
+                "encryption_algorithm": "RC4-c51f5065b860947796aeff228ebe409c",
+                "relative_url": "/downloads/endpoint/endpointmacho-v1-model/a4f76caca486f052401c9628e2af37c5875a1651889372961dfc0376137eb074"
+            },
+            "endpointpe-v4-blocklist": {
+                "compression_algorithm": "zlib",
+                "decoded_sha256": "2b4fddba1c98321fc5bc029d448caf0ee903fbafa47644d06608ff20bfaa2d09",
+                "decoded_size": 3924989,
+                "encoded_sha256": "82fc11e639c91901b0cc5ec4afb5e5a804550fb615a2327850b811c0836af1b6",
+                "encoded_size": 2227320,
+                "encryption_algorithm": "RC4-c51f5065b860947796aeff228ebe409c",
+                "relative_url": "/downloads/endpoint/endpointpe-v4-blocklist/82fc11e639c91901b0cc5ec4afb5e5a804550fb615a2327850b811c0836af1b6"
+            },
+            "endpointpe-v4-exceptionlist": {
+                "compression_algorithm": "zlib",
+                "decoded_sha256": "f8fadfe3dc4a83f8f244d40a0e3b57acfa8018e3ac2ece1f40e20b43467f50bd",
+                "decoded_size": 3962107,
+                "encoded_sha256": "e5b30b9b81d942c46f0b7a8987339811d13b260f9f7ecd4ec3eeb450bdfbbfbc",
+                "encoded_size": 2202810,
+                "encryption_algorithm": "RC4-c51f5065b860947796aeff228ebe409c",
+                "relative_url": "/downloads/endpoint/endpointpe-v4-exceptionlist/e5b30b9b81d942c46f0b7a8987339811d13b260f9f7ecd4ec3eeb450bdfbbfbc"
+            },
+            "endpointpe-v4-model": {
+                "compression_algorithm": "zlib",
+                "decoded_sha256": "fad002affd3275f6c43af3c54dfdf16c5ed0bef615c58826c6fc1427a9457ee0",
+                "decoded_size": 18230100,
+                "encoded_sha256": "ae26d1a7dc9b9e928f2135cae5ae57a5cf443f57b9b967ad68e8f14f5f38dd5d",
+                "encoded_size": 6926024,
+                "encryption_algorithm": "RC4-c51f5065b860947796aeff228ebe409c",
+                "relative_url": "/downloads/endpoint/endpointpe-v4-model/ae26d1a7dc9b9e928f2135cae5ae57a5cf443f57b9b967ad68e8f14f5f38dd5d"
+            },
+            "global-configuration-v1": {
+                "compression_algorithm": "zlib",
+                "decoded_sha256": "733a909f87e84f71d7fbfb71e810eb21c81d32e2709c42d5ebc70913145d6c75",
+                "decoded_size": 27721,
+                "encoded_sha256": "64fe035cdf2ab2871bf836c2068abf5e1e0d866d3527b37a1e399c8bb6f8dde8",
+                "encoded_size": 5258,
+                "encryption_algorithm": "RC4-c51f5065b860947796aeff228ebe409c",
+                "relative_url": "/downloads/endpoint/global-configuration-v1/64fe035cdf2ab2871bf836c2068abf5e1e0d866d3527b37a1e399c8bb6f8dde8"
+            },
+            "global-eventfilterlist-linux-v1": {
+                "compression_algorithm": "zlib",
+                "decoded_sha256": "8edb978e046d60ca6739c50fbb25f49376983ca5ed8d3e79d710a43b01369c8c",
+                "decoded_size": 2088,
+                "encoded_sha256": "48ae9c16f4be1ebfdf7fb223d2661dc8bb5c37a0d391c93dd820a3e4e1691102",
+                "encoded_size": 497,
+                "encryption_algorithm": "RC4-c51f5065b860947796aeff228ebe409c",
+                "relative_url": "/downloads/endpoint/global-eventfilterlist-linux-v1/48ae9c16f4be1ebfdf7fb223d2661dc8bb5c37a0d391c93dd820a3e4e1691102"
+            },
+            "global-eventfilterlist-macos-v1": {
+                "compression_algorithm": "zlib",
+                "decoded_sha256": "59a81ce065d8b703a7f1bab251505e1f17c80701275037b5bade97d28db30e3a",
+                "decoded_size": 4069,
+                "encoded_sha256": "41b31c0a4f153459ec1a34e89210055ed2a72c6aab65adedff849a408b36dd8b",
+                "encoded_size": 740,
+                "encryption_algorithm": "RC4-c51f5065b860947796aeff228ebe409c",
+                "relative_url": "/downloads/endpoint/global-eventfilterlist-macos-v1/41b31c0a4f153459ec1a34e89210055ed2a72c6aab65adedff849a408b36dd8b"
+            },
+            "global-eventfilterlist-windows-v1": {
+                "compression_algorithm": "zlib",
+                "decoded_sha256": "c799ac41a1e8d3ca42b901e01374e16d1239348928d0beb956746392b69b8f79",
+                "decoded_size": 23163,
+                "encoded_sha256": "ed80ce1e6ef895a93673568447bab3776f87837410a594f6d7563f1f02e8d543",
+                "encoded_size": 2509,
+                "encryption_algorithm": "RC4-c51f5065b860947796aeff228ebe409c",
+                "relative_url": "/downloads/endpoint/global-eventfilterlist-windows-v1/ed80ce1e6ef895a93673568447bab3776f87837410a594f6d7563f1f02e8d543"
+            },
+            "global-exceptionlist-linux": {
+                "compression_algorithm": "zlib",
+                "decoded_sha256": "efb48796d598412bf50555cece86abacb6b6e803d428ff1093e662ad5babb649",
+                "decoded_size": 8660,
+                "encoded_sha256": "24e4ee785f49744b209fa6e1e64c5896bf4e3849a175f4a885dfe76349db677e",
+                "encoded_size": 1447,
+                "encryption_algorithm": "RC4-c51f5065b860947796aeff228ebe409c",
+                "relative_url": "/downloads/endpoint/global-exceptionlist-linux/24e4ee785f49744b209fa6e1e64c5896bf4e3849a175f4a885dfe76349db677e"
+            },
+            "global-exceptionlist-macos": {
+                "compression_algorithm": "zlib",
+                "decoded_sha256": "4fc876bf18815f0c69ca5e25d9a3169e4d21273917de4a168c6a3120bead6f50",
+                "decoded_size": 13641,
+                "encoded_sha256": "fd73583e366ada8784a1e7a07e07190537b19d8faf3536952bcdc6391e3a3675",
+                "encoded_size": 3333,
+                "encryption_algorithm": "RC4-c51f5065b860947796aeff228ebe409c",
+                "relative_url": "/downloads/endpoint/global-exceptionlist-macos/fd73583e366ada8784a1e7a07e07190537b19d8faf3536952bcdc6391e3a3675"
+            },
+            "global-exceptionlist-windows": {
+                "compression_algorithm": "zlib",
+                "decoded_sha256": "f3f5b017c1519bc66831d468930fd4f991a3d140c88161fd69b5a88dcf64b762",
+                "decoded_size": 743160,
+                "encoded_sha256": "41f66b7fc7d7225cea6e687c5db07b5a4a6a7b28a54d8f36adae420ee817a9ed",
+                "encoded_size": 56478,
+                "encryption_algorithm": "RC4-c51f5065b860947796aeff228ebe409c",
+                "relative_url": "/downloads/endpoint/global-exceptionlist-windows/41f66b7fc7d7225cea6e687c5db07b5a4a6a7b28a54d8f36adae420ee817a9ed"
+            },
+            "global-trustlist-linux-v1": {
+                "compression_algorithm": "zlib",
+                "decoded_sha256": "614b22fc1a515442f53135ad6ddfa84e5f5cbfb0cb7d8f5a141d22645d589986",
+                "decoded_size": 2405,
+                "encoded_sha256": "d593c090ed8cc805e0a5b281312c4c6f71c42db7d166fd813788438164d0d5b3",
+                "encoded_size": 494,
+                "encryption_algorithm": "RC4-c51f5065b860947796aeff228ebe409c",
+                "relative_url": "/downloads/endpoint/global-trustlist-linux-v1/d593c090ed8cc805e0a5b281312c4c6f71c42db7d166fd813788438164d0d5b3"
+            },
+            "global-trustlist-macos-v1": {
+                "compression_algorithm": "zlib",
+                "decoded_sha256": "73a33eb89f524242be6ee5aadf6b389d2472ba479d6dfc4b56d22e79e5865604",
+                "decoded_size": 9402,
+                "encoded_sha256": "96786deb6191f7664d0598473c9f453f3b11fc972656f27bbebe604e7e339b7f",
+                "encoded_size": 1319,
+                "encryption_algorithm": "RC4-c51f5065b860947796aeff228ebe409c",
+                "relative_url": "/downloads/endpoint/global-trustlist-macos-v1/96786deb6191f7664d0598473c9f453f3b11fc972656f27bbebe604e7e339b7f"
+            },
+            "global-trustlist-windows-v1": {
+                "compression_algorithm": "zlib",
+                "decoded_sha256": "b2eacc24c52b4fb86c129ddf5902750d8eb0db77ac90cfee2822baa72d1efba1",
+                "decoded_size": 50505,
+                "encoded_sha256": "ca99c72828da451526f7d3d624de5659c72a2f43434feff64bf28ba64a3d7c6d",
+                "encoded_size": 4662,
+                "encryption_algorithm": "RC4-c51f5065b860947796aeff228ebe409c",
+                "relative_url": "/downloads/endpoint/global-trustlist-windows-v1/ca99c72828da451526f7d3d624de5659c72a2f43434feff64bf28ba64a3d7c6d"
+            },
+            "production-malware-signature-v1-linux": {
+                "compression_algorithm": "zlib",
+                "decoded_sha256": "19e8dec7b3ece3bba1cae3385e360ab03f008ae230373a758ff8150fb9cf76c4",
+                "decoded_size": 559208,
+                "encoded_sha256": "80146fc121f2630345039e9af5c9972fb9ab74e4bc8fae862692574acd11a826",
+                "encoded_size": 135544,
+                "encryption_algorithm": "RC4-c51f5065b860947796aeff228ebe409c",
+                "relative_url": "/downloads/endpoint/production-malware-signature-v1-linux/80146fc121f2630345039e9af5c9972fb9ab74e4bc8fae862692574acd11a826"
+            },
+            "production-malware-signature-v1-macos": {
+                "compression_algorithm": "zlib",
+                "decoded_sha256": "71e751e40031e260bc7247938d60f9d0af8ea59c681159726242f4c839d62887",
+                "decoded_size": 82317,
+                "encoded_sha256": "a0001e04d9a58b7a20a3b92cf0d1d5921506ab8ec48454d6cb7c64eeafe23684",
+                "encoded_size": 22997,
+                "encryption_algorithm": "RC4-c51f5065b860947796aeff228ebe409c",
+                "relative_url": "/downloads/endpoint/production-malware-signature-v1-macos/a0001e04d9a58b7a20a3b92cf0d1d5921506ab8ec48454d6cb7c64eeafe23684"
+            },
+            "production-malware-signature-v1-windows": {
+                "compression_algorithm": "zlib",
+                "decoded_sha256": "4876ffeef95f34fed80b8a01db7d707629c0cf50345966a237004aad624e83a8",
+                "decoded_size": 769596,
+                "encoded_sha256": "716611b7858b30ee0bba97a22fbf559983cbb2110a172748b8f967317c5f7af5",
+                "encoded_size": 198826,
+                "encryption_algorithm": "RC4-c51f5065b860947796aeff228ebe409c",
+                "relative_url": "/downloads/endpoint/production-malware-signature-v1-windows/716611b7858b30ee0bba97a22fbf559983cbb2110a172748b8f967317c5f7af5"
+            },
+            "production-ransomware-v1-windows": {
+                "compression_algorithm": "zlib",
+                "decoded_sha256": "091aec25766f616d6d9d59e05a2559d153d2c2622d51af055650efbbce352717",
+                "decoded_size": 238381,
+                "encoded_sha256": "51a6792dc8ef5ee1c00fa90911676fe774c01c72fd33c3c5cd69b7926a4399ec",
+                "encoded_size": 34480,
+                "encryption_algorithm": "RC4-c51f5065b860947796aeff228ebe409c",
+                "relative_url": "/downloads/endpoint/production-ransomware-v1-windows/51a6792dc8ef5ee1c00fa90911676fe774c01c72fd33c3c5cd69b7926a4399ec"
+            },
+            "production-rules-linux-v1": {
+                "compression_algorithm": "zlib",
+                "decoded_sha256": "bf8e7219811516795bd3e7ce6f45ecad6d32f3e4c7ad014afaf08701f04895d1",
+                "decoded_size": 316124,
+                "encoded_sha256": "22f56838f28e255aaeb8041ea8852728ad5456de1ec37a1e7a0256831712b7b5",
+                "encoded_size": 34466,
+                "encryption_algorithm": "RC4-c51f5065b860947796aeff228ebe409c",
+                "relative_url": "/downloads/endpoint/production-rules-linux-v1/22f56838f28e255aaeb8041ea8852728ad5456de1ec37a1e7a0256831712b7b5"
+            },
+            "production-rules-macos-v1": {
+                "compression_algorithm": "zlib",
+                "decoded_sha256": "e700445b82ed692ea16c4e05a6bce60b6eac148f0c5730e35f17b68328627b20",
+                "decoded_size": 725536,
+                "encoded_sha256": "52e7d76f0be5e02b6fb4bf800093bbda85954bc59becdf399fcc7e0511aa90b4",
+                "encoded_size": 89502,
+                "encryption_algorithm": "RC4-c51f5065b860947796aeff228ebe409c",
+                "relative_url": "/downloads/endpoint/production-rules-macos-v1/52e7d76f0be5e02b6fb4bf800093bbda85954bc59becdf399fcc7e0511aa90b4"
+            },
+            "production-rules-windows-v1": {
+                "compression_algorithm": "zlib",
+                "decoded_sha256": "5a56b70ef04e42d559c10560cdf1946373ee920f4a432530d674a3a958e6c668",
+                "decoded_size": 3027630,
+                "encoded_sha256": "2240d8e7a8960af943571ea9530c74cec969110aa28626acea18f824fcaecc46",
+                "encoded_size": 460184,
+                "encryption_algorithm": "RC4-c51f5065b860947796aeff228ebe409c",
+                "relative_url": "/downloads/endpoint/production-rules-windows-v1/2240d8e7a8960af943571ea9530c74cec969110aa28626acea18f824fcaecc46"
+            },
+            "ransomware-v1-artifact-windows": {
+                "compression_algorithm": "zlib",
+                "decoded_sha256": "4f211c08f4e850400658d743eb825e6b19cd896f91e85dde5db28471146ce38b",
+                "decoded_size": 168235,
+                "encoded_sha256": "0aaa2c3e420b2aa4e72bbb8ee9942fe52094bc0b9ff0924544cfac4a288de216",
+                "encoded_size": 20882,
+                "encryption_algorithm": "RC4-c51f5065b860947796aeff228ebe409c",
+                "relative_url": "/downloads/endpoint/ransomware-v1-artifact-windows/0aaa2c3e420b2aa4e72bbb8ee9942fe52094bc0b9ff0924544cfac4a288de216"
+            },
+            "tamper-protection-config-v1": {
+                "compression_algorithm": "zlib",
+                "decoded_sha256": "07f2a166efe84d3b52b6cd8b841f33ffe6eb8e2297cefd4eaa3e50e567b4d30e",
+                "decoded_size": 157,
+                "encoded_sha256": "bdc4f41615a708fbabaf29e7aca660f71321bf3ef9f2f263079bb372f0de1303",
+                "encoded_size": 126,
+                "encryption_algorithm": "RC4-c51f5065b860947796aeff228ebe409c",
+                "relative_url": "/downloads/endpoint/tamper-protection-config-v1/bdc4f41615a708fbabaf29e7aca660f71321bf3ef9f2f263079bb372f0de1303"
+              }
+            }
+          }
+        },
+        "policy": {
+          "value": {
+            "windows": {
+              "events": {
+                "api": true,
+                "dll_and_driver_load": true,
+                "dns": true,
+                "file": true,
+                "network": true,
+                "process": true,
+                "registry": true,
+                "security": true
+              },
+              "malware": {
+                "mode": "detect",
+                "blocklist": true
+              },
+              "ransomware": {
+                "mode": "detect",
+                "supported": true
+              },
+              "memory_protection": {
+                "mode": "detect",
+                "supported": true
+              },
+              "behavior_protection": {
+                "mode": "detect",
+                "supported": true
+              },
+              "popup": {
+                "malware": {
+                  "message": "",
+                  "enabled": true
+                },
+                "ransomware": {
+                  "message": "",
+                  "enabled": true
+                },
+                "memory_protection": {
+                  "message": "",
+                  "enabled": true
+                },
+                "behavior_protection": {
+                  "message": "",
+                  "enabled": true
+                }
+              },
+              "logging": {
+                "file": "info"
+              },
+              "antivirus_registration": {
+                "enabled": false
+              },
+              "attack_surface_reduction": {
+                "credential_hardening": {
+                  "enabled": true
+                }
+              }
+            },
+            "mac": {
+              "events": {
+                "process": true,
+                "file": true,
+                "network": true
+              },
+              "malware": {
+                "mode": "detect",
+                "blocklist": true
+              },
+              "behavior_protection": {
+                "mode": "detect",
+                "supported": true
+              },
+              "memory_protection": {
+                "mode": "detect",
+                "supported": true
+              },
+              "popup": {
+                "malware": {
+                  "message": "",
+                  "enabled": true
+                },
+                "behavior_protection": {
+                  "message": "",
+                  "enabled": true
+                },
+                "memory_protection": {
+                  "message": "",
+                  "enabled": true
+                }
+              },
+              "logging": {
+                "file": "info"
+              }
+            },
+            "linux": {
+              "events": {
+                "process": true,
+                "file": true,
+                "network": true,
+                "session_data": true,
+                "tty_io": true
+              },
+              "malware": {
+                "mode": "detect",
+                "blocklist": true
+              },
+              "behavior_protection": {
+                "mode": "detect",
+                "supported": true
+              },
+              "memory_protection": {
+                "mode": "detect",
+                "supported": true
+              },
+              "popup": {
+                "malware": {
+                  "message": "",
+                  "enabled": true
+                },
+                "behavior_protection": {
+                  "message": "",
+                  "enabled": true
+                },
+                "memory_protection": {
+                  "message": "",
+                  "enabled": true
+                }
+              },
+              "logging": {
+                "file": "info"
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

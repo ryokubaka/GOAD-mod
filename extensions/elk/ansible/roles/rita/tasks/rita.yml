@@ -1,0 +1,49 @@
+- name: Make directory
+  file:
+    path: /opt/rita
+    state: directory
+    mode: '0755'
+
+# - name: Download Rita/Zeek installer
+#   get_url:
+#     url: https://github.com/activecm/rita/releases/download/v{{ rita_ver }}/rita-v{{ rita_ver }}.tar.gz
+#     dest: /opt/rita/rita-v{{ rita_ver }}.tar.gz
+#     mode: '0755'
+
+# - name: Untar rita
+#   shell: tar -xzvf /opt/rita/rita-v{{ rita_ver }}.tar.gz -C /opt/rita/
+
+- name: Download Rita/Zeek installer
+  get_url:
+    url: https://github.com/activecm/rita/releases/download/v{{ rita_ver }}/install-rita-zeek-here.sh
+    dest: /opt/rita/install-rita-zeek-here.sh
+    mode: '0755'
+
+- name: Execute Rita/Zeek installer
+  pause: 
+    prompt: |
+      "===================="
+      "Rita must be installed manually. Run /opt/rita/install-rita-zeek-here.sh` on the ELK VM and press `ENTER` here to continue when complete."
+      "===================="
+
+- name: Add requisite policy to zeek for json
+  lineinfile:
+    path: /opt/zeek/share/zeek/site/autoload/100-default.zeek
+    line: '@load policy/tuning/json-logs.zeek'
+
+- name: Include the .56 GOAD subnet in Rita config
+  lineinfile:
+    path: /etc/rita/config.hjson
+    regexp: '^(.*)always_included_subnets:(.*)'
+    line: '        always_included_subnets: ["192.168.56.0/25"],'
+    state: present
+
+- name: Remove external internet threat check
+  lineinfile:
+    path: /etc/rita/config.hjson
+    regexp: '^(.*)online_feeds(.*)'
+    line: '        #online_feeds: ["https://feodotracker.abuse.ch/downloads/ipblocklist.txt"],'
+    state: present
+
+- name: Start zeek
+  shell: 'zeek start'

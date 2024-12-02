@@ -15,7 +15,7 @@ This lab is actually composed of five virtual machines:
 **domain north.sevenkingdoms.local**
 
 - **winterfell**   : DC02  running on Windows Server 2019 (with windefender enabled by default)
-- **castelblack**  : SRV02 running on Windows Server 2019 (with windefender **disabled** by default)
+- **castleblack**  : SRV02 running on Windows Server 2019 (with windefender **disabled** by default)
 
 **domain essos.local**
 
@@ -40,7 +40,7 @@ This lab is actually composed of five virtual machines:
         - Admins : eddard.stark (U), catelyn.stark (U), robb.stark (U)
         - RDP: Stark(G)
 
-    - SRV02 : castelblack.essos.local (Windows Server 2019) (IIS, MSSQL, SMB share)
+    - SRV02 : castleblack.essos.local (Windows Server 2019) (IIS, MSSQL, SMB share)
         - Admins: jeor.mormont (U)
         - RDP: Night Watch (G), Mormont (G), Stark (G)
         - IIS : allow asp upload, run as NT Authority/network
@@ -65,7 +65,7 @@ This lab is actually composed of five virtual machines:
             - impersonate :
                 - execute as login : jorah.mormont -> sa
             - link:
-                - to castelblack: jorah.mormont -> sa
+                - to castleblack: jorah.mormont -> sa
 
 ## Users/Groups and associated scenarios
 
@@ -74,7 +74,7 @@ This lab is actually composed of five virtual machines:
 
 NORTH.SEVENKINGDOMS.LOCAL
 
-- STARKS:              RDP on WINTERFELL AND CASTELBLACK
+- STARKS:              RDP on WINTERFELL AND castleblack
     - arya.stark:        Execute as user on mssql, pass on all share
     - eddard.stark:      DOMAIN ADMIN NORTH/ (bot 5min) LLMRN request to do NTLM relay with responder
     - catelyn.stark:     
@@ -84,13 +84,13 @@ NORTH.SEVENKINGDOMS.LOCAL
     - rickon.stark:      pass spray WinterYYYY
     - jon.snow:          mssql admin / KERBEROASTING / mssql trusted link
     - hodor:             PASSWORD SPRAY (user=password)
-- NIGHT WATCH:         RDP on CASTELBLACK
+- NIGHT WATCH:         RDP on castleblack
     - samwell.tarly:     Password in ldap description / mssql execute as login
                         GPO abuse (Edit Settings on "STARKWALLPAPER" GPO)
     - jon.snow:          (see starks)
     - jeor.mormont:      (see mormont)
-- MORMONT:             RDP on CASTELBLACK
-     - jeor.mormont:      Admin castelblack, pass in sysvol script
+- MORMONT:             RDP on castleblack
+     - jeor.mormont:      Admin castleblack, pass in sysvol script
 - AcrossTheSea :       cross forest group
 
 SEVENKINGDOMS.LOCAL
