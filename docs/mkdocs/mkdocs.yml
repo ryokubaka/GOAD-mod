@@ -20,6 +20,7 @@ nav:
     - index: labs/index.md
     - GOAD: labs/GOAD.md
     - GOAD-Light: labs/GOAD-Light.md
+    - GOAD-Mini: labs/GOAD-Mini.md
     - NHA: labs/NHA.md
     - SCCM: labs/SCCM.md
     - MINILAB: labs/MINILAB.md
@@ -33,6 +34,11 @@ nav:
     - index : usage/index.md
     - Arguments: usage/goad_args.md
     - Interactive: usage/goad_console.md
+  - 📝 Developers: 
+    - index : developers/index.md
+    - Add Extension: developers/add_extension.md
+    - Add Lab: developers/add_lab.md
+    - Add Provider: developers/add_provider.md
   - 🇮 instances: instances.md
   - 🛠️ provisioning: provisioning.md
   - ⚠️ Troubleshoot :  troobleshoot.md
@@ -78,9 +84,11 @@ extra:
     - icon: fontawesome/brands/github
       link: https://github.com/Orange-Cyberdefense/GOAD
     - icon: fontawesome/brands/x-twitter
-      link: https://github.com/mayfly277
+      link: https://x.com/M4yFly
     - icon: fontawesome/brands/discord
       link: https://discord.gg/NYy7rsMf3u
+    - icon: fontawesome/solid/heart
+      link: https://github.com/sponsors/Mayfly277
 markdown_extensions:
   - attr_list
   - md_in_html
