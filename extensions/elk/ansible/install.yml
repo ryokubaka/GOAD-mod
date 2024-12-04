@@ -7,12 +7,12 @@
         name: sshpass
         state: latest
 
-- name: Install ELK and RITA
+- name: Install ELK #and RITA
   hosts: elk_server
   become: true
   roles:
     - { role: 'elk', tags: 'elk' }
-    - { role: 'rita', tags: 'rita' }
+   # - { role: 'rita', tags: 'rita' }
   pre_tasks:
     - name: Enable NAT interface
       shell: 'ip link set eth0 up'
