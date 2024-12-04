@@ -26,6 +26,13 @@
     curl -XGET -u {{ es_api_basic_auth_username }}:{{ es_api_basic_auth_password }} \
     'http://{{ fleet_server }}:9200/_cluster/health?wait_for_status=yellow&timeout=120s' -H 'kbn-xsrf: true'
 
+- name: Install zeek package policy
+ shell: |
+   curl -XPOST -u {{ es_api_basic_auth_username }}:{{ es_api_basic_auth_password }} \
+   'http://{{ fleet_server }}:5601/api/fleet/package_policies' -H 'Content-Type: application/json' \
+   -H 'kbn-xsrf: true' -d '{{ lookup("template", "zeek_integration.json") | to_nice_json }}'
+ register: zeek_install
+
 - name: Upload Elasticsearch template
   uri:
     url: "http://{{ es_api_basic_auth_username }}:{{ es_api_basic_auth_password }}@{{ fleet_server }}:9200/_template/template-rita"
