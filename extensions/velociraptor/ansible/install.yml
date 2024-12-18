@@ -1,32 +1,32 @@
-# - name: Enable nat interface (server)
-#   hosts: velociraptor_server
-#   gather_facts: false
-#   tasks:
-#     - name: Enable NAT interface
-#       shell: 'ip link set eth0 up'
-#       become: true
+- name: Enable nat interface (server)
+  hosts: velociraptor_server
+  gather_facts: false
+  tasks:
+    - name: Enable NAT interface
+      shell: 'ip link set eth0 up'
+      become: true
 
 - name: Enable nat interface (windows)
   hosts: domain
   gather_facts: false
-  # roles:
-  #   - { role: 'settings/enable_nat_adapter' , tags: 'enable_nat_adapter'}
+  roles:
+    - { role: 'settings/enable_nat_adapter' , tags: 'enable_nat_adapter'}
 
 - name: Install velociraptor server and client on hosts
   hosts: velociraptor_all
   roles:
     - { role: 'velociraptor', tags: 'velociraptor' }
 
-# - name: Disable nat interface (windows)
-#   hosts: domain
-#   gather_facts: false
-#   roles:
-#     - { role: 'settings/disable_nat_adapter' , tags: 'disable_nat_adapter'}
+- name: Disable nat interface (windows)
+  hosts: domain
+  gather_facts: false
+  roles:
+    - { role: 'settings/disable_nat_adapter' , tags: 'disable_nat_adapter'}
 
-# - name: Disable nat interface (server)
-#   hosts: velociraptor_server
-#   gather_facts: false
-#   tasks:
-#     - name: Disable NAT interface
-#       shell: 'ip link set eth0 down'
-#       become: true
+- name: Disable nat interface (server)
+  hosts: velociraptor_server
+  gather_facts: false
+  tasks:
+    - name: Disable NAT interface
+      shell: 'ip link set eth0 down'
+      become: true

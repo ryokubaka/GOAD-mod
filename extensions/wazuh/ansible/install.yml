@@ -1,18 +1,18 @@
 #Aleem Ladha @LadhaAleem
 #Credits to SOCFortress and Mayfly277
-# - name: Enable nat interface (server)
-#   hosts: wazuh_server
-#   gather_facts: false
-#   tasks:
-#     - name: Enable NAT interface
-#       shell: 'ip link set eth0 up'
-#       become: true
+- name: Enable nat interface (server)
+  hosts: wazuh_server
+  gather_facts: false
+  tasks:
+    - name: Enable NAT interface
+      shell: 'ip link set eth0 up'
+      become: true
 
-# - name: Enable nat interface (windows)
-#   hosts: wazuh_agents
-#   gather_facts: false
-#   roles:
-#     - { role: 'settings/enable_nat_adapter' , tags: 'enable_nat_adapter'}
+- name: Enable nat interface (windows)
+  hosts: wazuh_agents
+  gather_facts: false
+  roles:
+    - { role: 'settings/enable_nat_adapter' , tags: 'enable_nat_adapter'}
 
 - name: Install and configure Wazuh Manager
   hosts: wazuh_server
@@ -27,16 +27,16 @@
   vars:
     wazuh_manager_host: "{{ hostvars['wazuh']['ansible_host'] }}"
 
-# - name: Disable nat interface (windows)
-#   hosts: wazuh_agents
-#   gather_facts: false
-#   roles:
-#     - { role: 'settings/disable_nat_adapter' , tags: 'disable_nat_adapter'}
+- name: Disable nat interface (windows)
+  hosts: wazuh_agents
+  gather_facts: false
+  roles:
+    - { role: 'settings/disable_nat_adapter' , tags: 'disable_nat_adapter'}
 
-# - name: Disable nat interface (server)
-#   hosts: wazuh_server
-#   gather_facts: false
-#   tasks:
-#     - name: Disable NAT interface
-#       shell: 'ip link set eth0 down'
-#       become: true
+- name: Disable nat interface (server)
+  hosts: wazuh_server
+  gather_facts: false
+  tasks:
+    - name: Disable NAT interface
+      shell: 'ip link set eth0 down'
+      become: true
