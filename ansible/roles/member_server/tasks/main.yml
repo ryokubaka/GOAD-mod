@@ -25,6 +25,7 @@
 #    domain_ou_path: "{{member_domain_ou_path}}"
     state: domain
   register: domain_state
+  ignore_errors: true
 
 - name: Reboot if needed
   win_reboot:
