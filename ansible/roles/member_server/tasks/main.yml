@@ -32,4 +32,5 @@
     reboot_timeout: 1500
     post_reboot_delay: 100
   when: domain_state.reboot_required
+  ignore_errors: true
 
