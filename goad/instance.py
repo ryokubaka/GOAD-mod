@@ -1,5 +1,6 @@
 import json
 import shutil
+import os
 from jinja2 import Template, Environment, FileSystemLoader
 from goad.goadpath import *
 from goad.log import Log
@@ -82,9 +83,6 @@ class LabInstance:
     def is_vagrant(self):
         return self.provider_name == VMWARE or self.provider_name == VMWARE_ESXI or self.provider_name == VIRTUALBOX
 
-    def is_vmware_esxi(self):
-        return self.provider_name == VMWARE_ESXI
-
     def is_ludus(self):
         return self.provider_name == LUDUS
 
@@ -129,12 +127,13 @@ class LabInstance:
         lab_extensions_content = ''
         for extension in self.extensions:
             extension_provider_folder = GoadPath.get_extension_providers_provider_path(extension, self.provider_name)
-            extension_environment = Environment(loader=FileSystemLoader(extension_provider_folder))
-            lab_extension_vagrantfile_template = extension_environment.get_template("Vagrantfile")
-            lab_extensions_content += lab_extension_vagrantfile_template.render(
-                lab_name=self.lab_name,
-                ip_range=self.ip_range
-            ) + "\n"
+            if os.path.isfile(f'{extension_provider_folder}{sep}Vagrantfile'):
+                extension_environment = Environment(loader=FileSystemLoader(extension_provider_folder))
+                lab_extension_vagrantfile_template = extension_environment.get_template("Vagrantfile")
+                lab_extensions_content += lab_extension_vagrantfile_template.render(
+                    lab_name=self.lab_name,
+                    ip_range=self.ip_range
+                ) + "\n"
 
         # load extensions Vagrantfile into instance
         use_provisioning_vm = True if self.provisioner_name == PROVISIONING_VM else False
@@ -286,7 +285,6 @@ class LabInstance:
         Log.info('Create instance providing files')
         if self.is_vagrant():
             self._create_vagrantfile()
-        #if self.provider_name == VMWARE_ESXI:
         if self.is_vmware_esxi():
             self._create_esxi_env()
         if self.is_ludus():
