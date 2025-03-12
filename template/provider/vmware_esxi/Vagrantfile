@@ -14,8 +14,10 @@ end
 {% if use_provisioning_vm %}
 boxes.append(
     { :name => "PROVISIONING",
+      :type => PROVISIONING,
       :ip => "{{ip_range}}.3",
       :box => "bento/ubuntu-22.04",
+      :box_version => "202401.31.0",
       :os => "linux",
       :cpus => 2,
       :mem => 2000,
@@ -46,7 +48,7 @@ boxes.append(
         v.esxi_password         = 'env:GOAD_VAGRANT_ESXIPASSWORD'
         v.esxi_virtual_network  = [ ENV['GOAD_VAGRANT_ESXINETNAT'], ENV['GOAD_VAGRANT_ESXINETDOM'] ]
         v.guest_numvcpus        = '4'
-        v.guest_memsize         = '6000'
+        v.guest_memsize         = '4096'
         v.guest_name            = box[:name]
         v.esxi_disk_store       = ENV['GOAD_VAGRANT_ESXISTORE']
       end
@@ -64,6 +66,11 @@ boxes.append(
       target.vm.network :private_network, ip: box[:ip]
 
       # OS specific
+
+      if box[:type] == "PROVISIONING"
+        target.vm.network :public_network, ip: ENV['GOAD_VAGRANT_PROVISIONIP'], netmask: '255.255.255.128'
+      end
+
       if box[:os] == "windows"
         target.vm.guest = :windows
         target.vm.communicator = "winrm"

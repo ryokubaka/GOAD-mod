@@ -15,7 +15,7 @@ ENV['VAGRANT_DEFAULT_PROVIDER'] = 'vmware_desktop'
 
 {% if use_provisioning_vm %}
 boxes.append(
-    { :name => "PROVISIONING",
+    { :name => "GOAD-PROVISIONING",
       :ip => "{{ip_range}}.3",
       :natip => "192.168.120.200",
       :box => "bento/ubuntu-22.04",

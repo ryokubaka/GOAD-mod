@@ -67,7 +67,7 @@
 
 - name: Install Elastic Agent
   # Since I am using self-signed certificate, I have added "--insecure" flag at the end.
-  shell: "echo 'Y' | sudo {{ install_dir }}/elastic-agent-{{ elastic_agent_version }}-linux-x86_64/elastic-agent install --fleet-server-es=http://{{ fleet_server }}:{{ fleet_port }} --fleet-server-host={{ fleet_server }} --fleet-server-service-token={{ fleet_enrollment_token.json.value }} --fleet-server-policy=fleet-server-policy --fleet-server-port=8220 --fleet-server-insecure-http -f"
+  shell: "echo 'Y' | sudo {{ install_dir }}/elastic-agent-{{ elastic_agent_version }}-linux-x86_64/elastic-agent install --fleet-server-es=http://{{ fleet_server }}:{{ fleet_port }} --fleet-server-host={{ fleet_server }} --fleet-server-service-token={{ fleet_enrollment_token.json.value }} --fleet-server-policy=fleet-server-policy --fleet-server-port=8220 --fleet-server-insecure-http -f --insecure"
   when: not agentinstall_stat.stat.exists or uninstall_stat
 
 - name: Find existing policies
@@ -239,13 +239,6 @@
         status_code: 200
       loop: "{{ rule_ids_chunked }}"
       no_log: true
-
-- name: Install zeek package policy
-  shell: |
-    curl -XPOST -u {{ es_api_basic_auth_username }}:{{ es_api_basic_auth_password }} \
-    'http://{{ fleet_server }}:5601/api/fleet/package_policies' -H 'Content-Type: application/json' \
-    -H 'kbn-xsrf: true' -d '{{ lookup("template", "zeek_integration.json") | to_nice_json }}'
-  register: zeek_install
 
 # - name: Clean up the downloaded tar file
 #   file:
