@@ -19,6 +19,7 @@ boxes.append(
       :ip => "{{ip_range}}.3",
       :natip => "192.168.120.200",
       :box => "bento/ubuntu-22.04",
+      :box_version => "202401.31.0",
       :os => "linux",
       :cpus => 2,
       :mem => 2000,
