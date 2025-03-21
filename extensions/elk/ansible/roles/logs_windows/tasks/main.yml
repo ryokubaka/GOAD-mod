@@ -70,11 +70,6 @@
 #   register: result
 #   run_once: true
 
-- name: Pause for 15 seconds
-  ansible.builtin.pause:
-    seconds: 15
-  when: uninstall_stat
-
 - name: Extract api_key for specific policy_id
   set_fact:
     api_key: "{{ result.json.list | selectattr('policy_id', 'equalto', 'agent-policy') | map(attribute='api_key') | first }}"
