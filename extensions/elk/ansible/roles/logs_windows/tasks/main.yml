@@ -52,15 +52,28 @@
   run_once: true
 
 - name: Fetch enrollment API keys
-  win_uri:
-    url: "http://{{ elk_host }}:5601/api/fleet/enrollment-api-keys"
-    method: GET
-    user: "{{ es_api_basic_auth_username }}"
-    password: "{{ es_api_basic_auth_password }}"
-    force_basic_auth: yes
-    return_content: yes
+  win_shell: |
+    curl.exe -XGET -u {{ es_api_basic_auth_username }}:{{ es_api_basic_auth_password }} \
+    'http://{{ elk_host }}:5601/api/fleet/enrollment-api-keys' -H 'Content-Type: application/json' \
+    -H 'kbn-xsrf: true'
   register: result
   run_once: true
+
+# - name: Fetch enrollment API keys
+#   win_uri:
+#     url: "http://{{ elk_host }}:5601/api/fleet/enrollment-api-keys"
+#     method: GET
+#     user: "{{ es_api_basic_auth_username }}"
+#     password: "{{ es_api_basic_auth_password }}"
+#     force_basic_auth: yes
+#     return_content: yes
+#   register: result
+#   run_once: true
+
+- name: Pause for 15 seconds
+  ansible.builtin.pause:
+    seconds: 15
+  when: uninstall_stat
 
 - name: Extract api_key for specific policy_id
   set_fact:
