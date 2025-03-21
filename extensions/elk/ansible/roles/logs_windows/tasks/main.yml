@@ -47,7 +47,7 @@
 - name: Check for cluster health; wait 120 seconds for health status
   win_shell: |
     curl.exe -XGET -u {{ es_api_basic_auth_username }}:{{ es_api_basic_auth_password }} \
-    'http://{{ fleet_server }}:5601/api/fleet/package_policies' -H 'Content-Type: application/json' \
+    'http://{{ elk_host }}:5601/api/fleet/package_policies' -H 'Content-Type: application/json' \
     -H 'kbn-xsrf: true'
   run_once: true
 
