@@ -285,8 +285,6 @@ class LabInstance:
         Log.info('Create instance providing files')
         if self.is_vagrant():
             self._create_vagrantfile()
-        if self.is_vmware_esxi():
-            self._create_esxi_env()
         if self.is_ludus():
             self._create_ludus_config_file()
         if self.is_terraform():
