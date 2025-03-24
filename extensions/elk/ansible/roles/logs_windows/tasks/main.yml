@@ -49,7 +49,10 @@
     curl.exe -XGET -u {{ es_api_basic_auth_username }}:{{ es_api_basic_auth_password }} \
     'http://{{ elk_host }}:5601/api/fleet/package_policies' -H 'Content-Type: application/json' \
     -H 'kbn-xsrf: true'
-  run_once: true
+  register: result
+  until: result.stdout.find("Kibana server is not ready yet") == -1
+  retries: 5
+  delay: 10
 
 - name: Fetch enrollment API keys
   win_shell: |
@@ -70,14 +73,10 @@
 #   register: result
 #   run_once: true
 
-- name: Pause for 15 seconds
-  ansible.builtin.pause:
-    seconds: 15
-  when: uninstall_stat
-
 - name: Extract api_key for specific policy_id
   set_fact:
-    api_key: "{{ result.json.list | selectattr('policy_id', 'equalto', 'agent-policy') | map(attribute='api_key') | first }}"
+    #api_key: "{{ result.json.list | selectattr('policy_id', 'equalto', 'agent-policy') | map(attribute='api_key') | first }}"
+    api_key: "{{ result.stdout | to_json | selectattr('policy_id', 'equalto', 'agent-policy') | map(attribute='api_key') | first }}"
   run_once: true
 
 - name: Install Elastic Agent
