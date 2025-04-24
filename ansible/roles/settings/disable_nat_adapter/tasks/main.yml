@@ -4,4 +4,4 @@
   until: "disable_adapter_interface is not failed"
   retries: 3
   delay: 120
-  #when: two_adapters
+  when: two_adapters
