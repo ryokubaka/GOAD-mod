@@ -26,7 +26,7 @@
 
         - name: Disable NAT interface
           shell: 'ip link set {{ target_interface }} down'
-      when: ludus != true
+      when: two_adapters == true
 
 - name: Install log agent on windows vms and disable the NAT adapter
   hosts: elk_log
