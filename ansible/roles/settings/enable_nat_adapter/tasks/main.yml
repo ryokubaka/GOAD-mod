@@ -3,5 +3,6 @@
   register: enable_adapter_interface
   until: "enable_adapter_interface is not failed"
   retries: 3
-  delay: 120
+  delay: 5
   when: two_adapters
+  ignore_errors: true
