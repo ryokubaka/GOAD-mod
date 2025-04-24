@@ -1,11 +1,11 @@
-- name: Prepare jumpbox to connect
-  hosts: localhost
-  become: true
-  tasks:
-    - name: Install sshpass
-      apt:
-        name: sshpass
-        state: latest
+# - name: Prepare jumpbox to connect
+#   hosts: localhost
+#   become: true
+#   tasks:
+#     - name: Install sshpass
+#       apt:
+#         name: sshpass
+#         state: latest
 
 - name: Install ELK #and RITA
   hosts: elk_server
