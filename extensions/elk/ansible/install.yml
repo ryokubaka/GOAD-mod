@@ -14,9 +14,9 @@
     - { role: 'elk', tags: 'elk' }
    # - { role: 'rita', tags: 'rita' }
   pre_tasks:
-    - name: Find interface with IP ending in .50
+    - name: Find NAT interface
       set_fact:
-        target_interface: "{{ ansible_facts.interfaces | selectattr('ipv4', 'defined') | selectattr('ipv4.address', 'match', '.*\\.50/24.*') | first }}"
+        target_interface: "{{ ansible_facts.interfaces[1] }}"
       register: interface_result
 
     - name: Enable NAT interface

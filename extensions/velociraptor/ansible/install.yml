@@ -2,8 +2,13 @@
   hosts: velociraptor_server
   gather_facts: false
   tasks:
+    - name: Find NAT interface
+      set_fact:
+        target_interface: "{{ ansible_facts.interface[1] }}"
+      register: interface_result
+
     - name: Enable NAT interface
-      shell: 'ip link set eth0 up'
+      shell: 'ip link set {{ target_interface }} up'
       become: true
 
 - name: Enable nat interface (windows)
@@ -27,9 +32,9 @@
   hosts: velociraptor_server
   gather_facts: false
   tasks:
-    - name: Find interface with IP ending in .52
+    - name: Find NAT interface
       set_fact:
-        target_interface: "{{ ansible_facts.interfaces | selectattr('ipv4', 'defined') | selectattr('ipv4.address', 'match', '.*\\.52/24.*') | first }}"
+        target_interface: "{{ ansible_facts.interfaces[1] }}"
       register: interface_result
 
     - name: Disable NAT interface

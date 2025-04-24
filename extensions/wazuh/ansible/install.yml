@@ -4,9 +4,9 @@
   hosts: wazuh_server
   gather_facts: false
   tasks:
-    - name: Find interface with IP ending in .51
+    - name: Find NAT interface
       set_fact:
-        target_interface: "{{ ansible_facts.interfaces | selectattr('ipv4', 'defined') | selectattr('ipv4.address', 'match', '.*\\.51/24.*') | first }}"
+        target_interface: "{{ ansible_facts.interfaces[1] }}"
       register: interface_result
 
     - name: Enable NAT interface
@@ -42,9 +42,9 @@
   hosts: wazuh_server
   gather_facts: false
   tasks:
-    - name: Find interface with IP ending in .50
+    - name: Find NAT interface
       set_fact:
-        target_interface: "{{ ansible_facts.interfaces | selectattr('ipv4', 'defined') | selectattr('ipv4.address', 'match', '.*\\.51/24.*') | first }}"
+        target_interface: "{{ ansible_facts.interfaces[1] }}"
       register: interface_result
 
     - name: Disable NAT interface
