@@ -4,8 +4,13 @@
   hosts: wazuh_server
   gather_facts: false
   tasks:
+    - name: Find interface with IP ending in .51
+      set_fact:
+        target_interface: "{{ ansible_interfaces | selectattr('ipv4.address', 'match', '.*\\.51$') | map(attribute='device') | first }}"
+      register: interface_result
+
     - name: Enable NAT interface
-      shell: 'ip link set eth0 up'
+      shell: 'ip link set {{ target_interface }} up'
       become: true
 
 - name: Enable nat interface (windows)
@@ -37,6 +42,11 @@
   hosts: wazuh_server
   gather_facts: false
   tasks:
+    - name: Find interface with IP ending in .51
+      set_fact:
+        target_interface: "{{ ansible_interfaces | selectattr('ipv4.address', 'match', '.*\\.51$') | map(attribute='device') | first }}"
+      register: interface_result
+
     - name: Disable NAT interface
-      shell: 'ip link set eth0 down'
+      shell: 'ip link set {{ target_interface }} down'
       become: true

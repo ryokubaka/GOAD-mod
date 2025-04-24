@@ -14,11 +14,16 @@
     - { role: 'elk', tags: 'elk' }
    # - { role: 'rita', tags: 'rita' }
   pre_tasks:
+    - name: Find interface with IP ending in .50
+      set_fact:
+        target_interface: "{{ ansible_interfaces | selectattr('ipv4.address', 'match', '.*\\.50$') | map(attribute='device') | first }}"
+      register: interface_result
+
     - name: Enable NAT interface
-      shell: 'ip link set eth0 up'
+      shell: 'ip link set {{ target_interface }} up'
   tasks:
     - name: Disable NAT interface
-      shell: 'ip link set eth0 down'
+      shell: 'ip link set {{ target_interface }} down'
 
 - name: Install log agent on windows vms and disable the NAT adapter
   hosts: elk_log

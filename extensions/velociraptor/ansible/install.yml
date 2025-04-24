@@ -27,6 +27,11 @@
   hosts: velociraptor_server
   gather_facts: false
   tasks:
+    - name: Find interface with IP ending in .52
+      set_fact:
+        target_interface: "{{ ansible_interfaces | selectattr('ipv4.address', 'match', '.*\\.52$') | map(attribute='device') | first }}"
+      register: interface_result
+
     - name: Disable NAT interface
-      shell: 'ip link set eth0 down'
+      shell: 'ip link set {{ target_interface }} down'
       become: true
