@@ -6,3 +6,4 @@
     ram_gb: 4
     cpus: 2
     linux: true
+    ludus: true
