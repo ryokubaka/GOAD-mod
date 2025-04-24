@@ -4,14 +4,17 @@
   hosts: wazuh_server
   gather_facts: false
   tasks:
-    - name: Find NAT interface
-      set_fact:
-        target_interface: "{{ ansible_facts.interfaces[1] }}"
-      register: interface_result
+    - name: NAT interface check
+      block:
+        - name: Find NAT interface
+          set_fact:
+            target_interface: "{{ ansible_facts.interfaces[1] }}"
+          register: interface_result
 
-    - name: Enable NAT interface
-      shell: 'ip link set {{ target_interface }} up'
-      become: true
+        - name: Enable NAT interface
+          shell: 'ip link set {{ target_interface }} up'
+          become: true
+      when: two_adapters == true
 
 - name: Enable nat interface (windows)
   hosts: wazuh_agents
@@ -42,11 +45,14 @@
   hosts: wazuh_server
   gather_facts: false
   tasks:
-    - name: Find NAT interface
-      set_fact:
-        target_interface: "{{ ansible_facts.interfaces[1] }}"
-      register: interface_result
+    - name: NAT interface check
+      block:
+        - name: Find NAT interface
+          set_fact:
+            target_interface: "{{ ansible_facts.interfaces[1] }}"
+          register: interface_result
 
-    - name: Disable NAT interface
-      shell: 'ip link set {{ target_interface }} down'
-      become: true
+        - name: Disable NAT interface
+          shell: 'ip link set {{ target_interface }} down'
+          become: true
+      when: two_adapters == true
