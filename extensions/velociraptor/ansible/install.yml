@@ -29,7 +29,7 @@
   tasks:
     - name: Find interface with IP ending in .52
       set_fact:
-        target_interface: "{{ ansible_facts.interfaces | selectattr('ipv4', 'defined') | selectattr('ipv4.address', 'match', '.*\\.52$') | first }}"
+        target_interface: "{{ ansible_facts.interfaces | selectattr('ipv4', 'defined') | selectattr('ipv4.address', 'match', '.*\\.52/24.*') | first }}"
       register: interface_result
 
     - name: Disable NAT interface

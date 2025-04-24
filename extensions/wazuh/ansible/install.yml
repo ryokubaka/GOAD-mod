@@ -6,7 +6,7 @@
   tasks:
     - name: Find interface with IP ending in .51
       set_fact:
-        target_interface: "{{ ansible_facts.interfaces | selectattr('ipv4', 'defined') | selectattr('ipv4.address', 'match', '.*\\.51$') | first }}"
+        target_interface: "{{ ansible_facts.interfaces | selectattr('ipv4', 'defined') | selectattr('ipv4.address', 'match', '.*\\.51/24.*') | first }}"
       register: interface_result
 
     - name: Enable NAT interface
@@ -44,7 +44,7 @@
   tasks:
     - name: Find interface with IP ending in .50
       set_fact:
-        target_interface: "{{ ansible_facts.interfaces | selectattr('ipv4', 'defined') | selectattr('ipv4.address', 'match', '.*\\.51$') | first }}"
+        target_interface: "{{ ansible_facts.interfaces | selectattr('ipv4', 'defined') | selectattr('ipv4.address', 'match', '.*\\.51/24.*') | first }}"
       register: interface_result
 
     - name: Disable NAT interface

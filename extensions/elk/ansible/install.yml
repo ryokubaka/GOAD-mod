@@ -16,7 +16,7 @@
   pre_tasks:
     - name: Find interface with IP ending in .50
       set_fact:
-        target_interface: "{{ ansible_facts.interfaces | selectattr('ipv4', 'defined') | selectattr('ipv4.address', 'match', '.*\\.50$') | first }}"
+        target_interface: "{{ ansible_facts.interfaces | selectattr('ipv4', 'defined') | selectattr('ipv4.address', 'match', '.*\\.50/24.*') | first }}"
       register: interface_result
 
     - name: Enable NAT interface
