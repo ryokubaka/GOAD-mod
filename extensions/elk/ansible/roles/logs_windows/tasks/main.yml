@@ -83,7 +83,7 @@
 
 - name: Convert enrollment_key to proper data structure
   set_fact:
-    parsed_enrollment_key: "{{ enrollment_key | from_json }}"
+    parsed_enrollment_key: "{{ enrollment_key.stdout | from_json }}"
 
 - name: Extract api_key for specific policy_id
   set_fact:
