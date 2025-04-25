@@ -10,14 +10,22 @@
   tags:
       - always
 
+- name: Count network adapters
+  set_fact:
+    adapter_count: "{{ ansible_facts.interfaces | length }}"
+
+- name: Set two_adapters fact based on adapter count
+  set_fact:
+    two_adapters: "{{ adapter_count | int > 2 }}"
+
 - name: Define fleet_server IP address where no NAT is used
   set_fact:
-    fleet_server: "{{ ansible_facts.interfaces[1].ipv4.address }}"
+    fleet_server: "{{ ansible_facts[ansible_facts.interfaces | difference(['lo']) | first].ipv4.address }}"
   when: two_adapters == false
 
 - name: Define fleet_server IP address where NAT is used
   set_fact:
-    fleet_server: "{{ ansible_facts.interfaces[2].ipv4.address }}"
+    fleet_server: "{{ ansible_facts[ansible_facts.interfaces | difference(['lo']) | last].ipv4.address }}"
   when: two_adapters == true
 
 - name: set compatibility variables
