@@ -44,6 +44,14 @@
   when: agentinstall_stat.stat.exists
   register: uninstall_stat
 
+- name: Count network adapters
+  set_fact:
+    adapter_count: "{{ ansible_facts.interfaces | length }}"
+
+- name: Set two_adapters fact based on adapter count
+  set_fact:
+    two_adapters: "{{ adapter_count | int > 1 }}"
+
 - name: Define elk_server IP address where no NAT is used
   set_fact:
     elk_host: "{{ ansible_facts.interfaces[0].ipv4.address.split('.')[0:3] | join('.') }}.50"
