@@ -10,6 +10,12 @@
     path: "{{ elastic_agent_zip }}"
   register: agentzip_stat
 
+- name: Create elastic agent zip directory if it doesn't exist
+  win_file:
+    path: "C:\\tmp"
+    state: directory
+    mode: '0755'
+
 - name: Download Elastic Agent
   win_get_url:
     url: "{{ elastic_agent_url }}"
