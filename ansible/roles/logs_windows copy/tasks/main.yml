@@ -44,6 +44,16 @@
   when: agentinstall_stat.stat.exists
   register: uninstall_stat
 
+- name: Define elk_server IP address where no NAT is used
+  set_fact:
+    elk_host: "{{ ansible_facts.interfaces[0].ipv4.address.split('.')[0:3] | join('.') }}.50"
+  when: two_adapters == false
+
+- name: Define fleet_server IP address where NAT is used
+  set_fact:
+    elk_host: "{{ ansible_facts.interfaces[1].ipv4.address.split('.')[0:3] | join('.') }}.50"
+  when: two_adapters == true
+
 - name: Check for cluster health; wait 120 seconds for health status
   win_shell: |
     Invoke-RestMethod -Uri "http://{{ elk_host }}:9200/_cluster/health?wait_for_status=yellow&timeout=120s" -Method Get \

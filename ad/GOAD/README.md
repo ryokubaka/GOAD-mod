@@ -126,7 +126,7 @@ ESSOS.LOCAL
 
 ## Blueteam / ELK
 
-- **elk** a kibana is configured on http://192.168.56.50:5601 to follow the lab events
+- **elk** a kibana is configured on http://[INSTANCE_IP].50:5601 to follow the lab events
 - infos : log encyclopedia : https://www.ultimatewindowssecurity.com/securitylog/encyclopedia/
 - the elk is not installed by default due to resources reasons. 
 

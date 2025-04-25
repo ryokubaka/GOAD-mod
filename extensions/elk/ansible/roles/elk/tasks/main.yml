@@ -10,6 +10,16 @@
   tags:
       - always
 
+- name: Define fleet_server IP address where no NAT is used
+  set_fact:
+    fleet_server: "{{ ansible_facts.interfaces[1].ipv4.address }}"
+  when: two_adapters == false
+
+- name: Define fleet_server IP address where NAT is used
+  set_fact:
+    fleet_server: "{{ ansible_facts.interfaces[2].ipv4.address }}"
+  when: two_adapters == true
+
 - name: set compatibility variables
   import_tasks: compatibility-variables.yml
   tags:
