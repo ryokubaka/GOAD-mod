@@ -87,7 +87,7 @@
 
 - name: Extract api_key for specific policy_id
   set_fact:
-    api_key: "{{ parsed_enrollment_key.list | to_json | selectattr('policy_id', 'equalto', 'agent-policy') | map(attribute='api_key') | first }}"
+    api_key: "{{ parsed_enrollment_key.list | selectattr('policy_id', 'equalto', 'agent-policy') | map(attribute='api_key') | first }}"
   run_once: true
 
 - name: Install Elastic Agent
