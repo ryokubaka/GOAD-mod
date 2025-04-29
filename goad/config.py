@@ -63,7 +63,7 @@ class Config:
         config.add_section('ludus')
         config.set('ludus', '; api key must not have % if you have a % in it, change it by a %%')
         config.set('ludus', 'ludus_api_key', 'change_me')
-        config.set('ludus', 'use_impersonation', 'yes')
+        config.set('ludus', 'use_impersonation', 'no')
 
         config.add_section('vmware_esxi')
         config.set('vmware_esxi', 'esxi_hostname', '10.10.10.10')
