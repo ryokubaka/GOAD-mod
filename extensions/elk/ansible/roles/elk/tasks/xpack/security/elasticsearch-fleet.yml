@@ -60,10 +60,14 @@
   when: agentinstall_stat.stat.exists
   register: uninstall_stat
 
-- name: Pause for 15 seconds
-  ansible.builtin.pause:
-    seconds: 15
-  when: uninstall_stat
+- name: Reboot ELK server before elastic agent installation
+  ansible.builtin.reboot:
+    msg: "Rebooting ELK server before elastic agent installation"
+
+- name: Check for cluster health; wait 120 seconds for health status
+  shell: |
+    curl -XGET -u {{ es_api_basic_auth_username }}:{{ es_api_basic_auth_password }} \
+    'http://{{ fleet_server }}:9200/_cluster/health?wait_for_status=yellow&timeout=120s' -H 'kbn-xsrf: true'
 
 - name: Install Elastic Agent
   # Since I am using self-signed certificate, I have added "--insecure" flag at the end.
