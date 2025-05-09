@@ -1,11 +1,17 @@
 - name: ensure .NET Framework 4.8 requirement is satisfied for Chocolatey CLI v2.0.0+
   block:
+  - name: install Chocolatey CLI
+    win_chocolatey:
+      name: 'chocolatey'
+      state: present
+    ignore_errors: true
+
   - name: Check if 192.0.2.2:8081 is reachable
-    uri:
-      url: http://192.0.2.2:8081/
-      method: GET
-      return_content: no
-      status_code: 200
+    win_wait_for:
+      host: 192.0.2.2
+      port: 8081
+      timeout: 5
+      state: started
     register: repo_check
     ignore_errors: yes
 
@@ -20,13 +26,6 @@
       state: present
       source: http://192.0.2.2:8081/repository/chocolatey-proxy/
     when: repo_reachable is defined and repo_reachable
-
-  - name: install Chocolatey CLI v1.4.0
-    win_chocolatey:
-      name: 'chocolatey'
-      state: present
-      version: '1.4.0'
-    ignore_errors: true
 
   - name: install Microsoft .NET Framework 4.8
     win_chocolatey:
