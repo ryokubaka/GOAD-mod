@@ -10,17 +10,23 @@
     'http://{{ fleet_server }}:9200/_cluster/health?wait_for_status=yellow&timeout=120s' -H 'kbn-xsrf: true'
 
 - name: Create service token
-  uri:
-    url: "http://{{ fleet_server }}:5601/api/fleet/service-tokens"
-    method: POST
-    user: "{{ es_api_basic_auth_username }}"
-    password: "{{ es_api_basic_auth_password }}"
-    force_basic_auth: yes
-    headers:
-      Content-Type: "application/json"
-      kbn-xsrf: "true"
-    status_code: 200
+  shell: |
+    curl -XPOST -u {{ es_api_basic_auth_username }}:{{ es_api_basic_auth_password }} \
+    'http://{{ fleet_server }}:5601/api/fleet/service-tokens' -H 'Content-Type: application/json' \
+    -H 'kbn-xsrf: true' -d '{"name": "fleet-server-token"}'
   register: fleet_enrollment_token
+
+  # uri:
+  #   url: "http://{{ fleet_server }}:5601/api/fleet/service-tokens"
+  #   method: POST
+  #   user: "{{ es_api_basic_auth_username }}"
+  #   password: "{{ es_api_basic_auth_password }}"
+  #   force_basic_auth: yes
+  #   headers:
+  #     Content-Type: "application/json"
+  #     kbn-xsrf: "true"
+  #   status_code: 200
+  # register: fleet_enrollment_token
 
 - name: Add fleet server host URL
   shell: |
