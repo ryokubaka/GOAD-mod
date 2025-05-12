@@ -4,6 +4,7 @@
     win_chocolatey:
       name: 'chocolatey'
       state: present
+      version: '1.4.0'
     ignore_errors: true
 
   - name: install Microsoft .NET Framework 4.8
