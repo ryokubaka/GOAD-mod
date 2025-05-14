@@ -31,7 +31,6 @@
 - name: Install Wazuh Agent
   hosts: wazuh_agents
   roles:
-    - { role: 'add_bookmark', tags: 'add_bookmark', vars: { bookmark_name: "Wazuh", bookmark_url: "https://{{ wazuh_server.ansible_host }}" } }
     - { role: 'wazuh_agent', tags: 'wazuh_agent' }
   vars:
     wazuh_manager_host: "{{ hostvars['wazuh']['ansible_host'] }}"
