@@ -4,5 +4,5 @@
   until: "enable_adapter_interface is not failed"
   retries: 3
   delay: 5
-  when: two_adapters and not (ludus | default(false))
+  when: (two_adapters | default(false)) and not (ludus | default(false))
   ignore_errors: true
