@@ -12,7 +12,7 @@
         - name: Enable NAT interface
           shell: 'ip link set {{ target_interface }} up'
           become: true
-      when: two_adapters == true
+      when: (two_adapters | default(false)) == true
 
 - name: Enable nat interface (windows)
   hosts: domain
@@ -45,4 +45,4 @@
         - name: Disable NAT interface
           shell: 'ip link set {{ target_interface }} down'
           become: true
-      when: two_adapters == true
+      when: (two_adapters | default(false)) == true
