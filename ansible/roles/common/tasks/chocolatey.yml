@@ -65,16 +65,16 @@
   - wireshark
   ignore_errors: yes
 
+- name: Make sure C:\Temp exists
+  win_file:
+    path: C:\Temp
+    state: directory
+
 - name: Install spice-guest-tools
   win_get_url:
     url: https://www.spice-space.org/download/binaries/spice-guest-tools/spice-guest-tools-latest.exe
     dest: C:\Temp\spice-guest-tools.msi
   register: spice_guest_tools
-
-- name: Make sure C:\Temp exists
-  win_file:
-    path: C:\Temp
-    state: directory
 
 - name: Install spice-guest-tools
   win_shell: "C:\\Temp\\spice-guest-tools.exe /S"
