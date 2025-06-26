@@ -70,14 +70,14 @@
     path: C:\Temp
     state: directory
 
-- name: Install spice-guest-tools
+- name: Download spice-guest-tools
   win_get_url:
     url: https://www.spice-space.org/download/binaries/spice-guest-tools/spice-guest-tools-latest.exe
-    dest: C:\Temp\spice-guest-tools.msi
+    dest: C:\Temp\spice-guest-tools.exe
   register: spice_guest_tools
 
-- name: Install spice-guest-tools
-  win_shell: "C:\\Temp\\spice-guest-tools.exe /S"
-  args:
-    chdir: C:\Temp
-  when: spice_guest_tools
+- name: Install SPICE guest tools (Windows example)
+  ansible.windows.win_package:
+    path: C:\Temp\spice-guest-tools.exe
+    arguments: "/S"
+    state: present
