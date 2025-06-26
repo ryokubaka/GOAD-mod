@@ -71,6 +71,11 @@
     dest: C:\Temp\spice-guest-tools.msi
   register: spice_guest_tools
 
+- name: Make sure C:\Temp exists
+  win_file:
+    path: C:\Temp
+    state: directory
+
 - name: Install spice-guest-tools
   win_shell: "C:\\Temp\\spice-guest-tools.exe /S"
   args:
