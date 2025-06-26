@@ -72,7 +72,7 @@
   register: spice_guest_tools
 
 - name: Install spice-guest-tools
-  win_shell: "C:\Temp\spice-guest-tools.exe /S"
+  win_shell: "C:\\Temp\\spice-guest-tools.exe /S"
   args:
     chdir: C:\Temp
   when: spice_guest_tools
