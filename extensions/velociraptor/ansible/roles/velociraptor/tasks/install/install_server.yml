@@ -52,8 +52,8 @@
     name: pexpect
 
 - name: Install Server | Put server.config.yaml in place
-  copy:
-    src: files/server.config.yaml
+  ansible.builtin.template:
+    src: server.config.yaml.j2
     dest: "{{ velociraptor_config_dir }}/server.config.yaml"
 
 # - name: "Install Server | Generate Velociraptor Server Config"

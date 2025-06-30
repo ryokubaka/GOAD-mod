@@ -19,8 +19,8 @@
     mode: '0750'
 
 - name: "Install Linux Client | Copy velociraptor client config"
-  ansible.builtin.copy:
-    src: client.config.yaml
+  ansible.builtin.template:
+    src: client.config.yaml.j2
     dest: "{{ velociraptor_config_dir }}/client.config.yaml"
     owner: root
     group: root
