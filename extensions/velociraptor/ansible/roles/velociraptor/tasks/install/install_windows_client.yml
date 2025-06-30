@@ -3,7 +3,7 @@
   win_shell: |
     $ip = (Get-NetIPConfiguration | Where-Object { $_.IPv4DefaultGateway -ne $null } | Select-Object -ExpandProperty IPv4Address).IPv4Address
     if ($ip) {
-      ($ip.Split('.')[0..2] -join '.') + '.52:8000'
+      ($ip.Split('.')[0..2] -join '.') + '.52:8000/'
     }
   register: client_ip_port
 
