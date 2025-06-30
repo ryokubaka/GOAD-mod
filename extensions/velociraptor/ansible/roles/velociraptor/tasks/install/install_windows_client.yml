@@ -15,8 +15,8 @@
     state: present
 
 - name: "Windows Client | Copy velociraptor client config"
-  ansible.windows.win_copy:
-    src: client.config.yaml
+  ansible.builtin.template:
+    src: client.config.yaml.j2
     dest: "{{ _velociraptor_windows_dir }}client.config.yaml"
   notify:
     - Restart velociraptor windows client
