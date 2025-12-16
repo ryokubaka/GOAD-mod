@@ -1,0 +1,11 @@
+{
+    "name": "kali-ops",
+    "description": "Add the kali-ops machine into the lab",
+    "machines": [
+        "kali-ops"
+    ],
+    "compatibility": [
+        "*"
+    ],
+    "impact": "add a kali-ops machine for conducting offensive operations"
+}

@@ -64,9 +64,9 @@
   ansible.builtin.reboot:
     msg: "Rebooting ELK server before elastic agent installation"
 
-- name: Wait 1 minute
+- name: Wait 2 minutes
   ansible.builtin.pause:
-    minutes: 1
+    minutes: 2
 
 - name: Check for cluster health; wait 120 seconds for health status
   shell: |
@@ -145,6 +145,12 @@
     regexp: '"blocklist": false'
     replace: '"blocklist": true'
 
+- name: Fix usb lines in integration file
+  replace:
+    path: /tmp/endpoint_integration.json
+    regexp: '"usb_storage": "audit"'
+    replace: '"usb_storage": "deny_all"'
+
 - name: Remove bad lines
   lineinfile:
     path: /tmp/endpoint_integration.json
@@ -192,7 +198,19 @@
 
 - name: Block for Detection Rule enablement
   block:
-    - name: Query the API for all detetion rules
+    - name: Install all prepackaged detection rules (note - takes a while to complete)
+      uri:
+        url: "http://{{ fleet_server }}:5601/api/detection_engine/rules/prepackaged"
+        method: POST
+        user: "{{ es_api_basic_auth_username }}"
+        password: "{{ es_api_basic_auth_password }}"
+        headers:
+          kbn-xsrf: "true"
+        force_basic_auth: yes
+      no_log: true
+      ignore_errors: true # sometimes it gives a 500 even though it's successful
+
+    - name: Query the API for all detection rules
       uri:
         url: "http://{{ fleet_server }}:5601/api/detection_engine/rules/_find?per_page={{ page_size }}&page={{ current_page }}&filter=alert.attributes.enabled:false"
         method: GET

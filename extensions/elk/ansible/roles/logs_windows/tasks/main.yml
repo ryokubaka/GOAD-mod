@@ -69,14 +69,14 @@
     'http://{{ elk_host }}:5601/api/fleet/package_policies' -H 'Content-Type: application/json' \
     -H 'kbn-xsrf: true'
   register: result
-  until: result.stdout.find("Kibana server is not ready yet") == -1
-  retries: 5
+  until: result.rc == 0 and (result.stdout | default('')) != '' and ('Kibana server is not ready yet' not in (result.stdout | default('')))
+  retries: 10
   delay: 10
 
 - name: Fetch enrollment API keys
   win_shell: |
     curl.exe -XGET -u {{ es_api_basic_auth_username }}:{{ es_api_basic_auth_password }} \
-    'http://{{ elk_host }}:5601/api/fleet/enrollment-api-keys' -H 'Content-Type: application/json' \
+    'http://{{ elk_host }}:5601/api/fleet/enrollment_api_keys' -H 'Content-Type: application/json' \
     -H 'kbn-xsrf: true'
   register: enrollment_key
   run_once: true
@@ -87,7 +87,7 @@
 
 - name: Extract api_key for specific policy_id
   set_fact:
-    api_key: "{{ parsed_enrollment_key.list | selectattr('policy_id', 'equalto', 'agent-policy') | map(attribute='api_key') | first }}"
+    api_key: "{{ parsed_enrollment_key | json_query(\"items[?policy_id == 'agent-policy'].api_key | [0]\") }}"
   run_once: true
 
 - name: Install Elastic Agent
