@@ -3,5 +3,6 @@
   register: disable_adapter_interface
   until: "disable_adapter_interface is not failed"
   retries: 3
-  delay: 120
-  #when: two_adapters
+  delay: 5
+  when: (two_adapters | default('no') | bool) and not (ludus | default(false))
+  ignore_errors: true

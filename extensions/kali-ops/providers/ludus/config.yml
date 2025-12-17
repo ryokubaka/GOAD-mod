@@ -1,0 +1,8 @@
+  - vm_name: "{{ range_id }}-KALI-OPS"
+    hostname: "{{ range_id }}-KALI-OPS"
+    template: KaliOps
+    vlan: 10
+    ip_last_octet: 60
+    ram_gb: 16
+    cpus: 1
+    linux: true

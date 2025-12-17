@@ -19,7 +19,7 @@ ludus:
       sysprep: true
   - vm_name: "{{ range_id }}-GOAD-DC03"
     hostname: "{{ range_id }}-DC03"
-    template: win2016-server-x64-template
+    template: win2019-server-x64-template
     vlan: 10
     ip_last_octet: 12
     ram_gb: 4

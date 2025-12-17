@@ -7,7 +7,7 @@
   "force": "true",
   "package": {
     "name": "endpoint",
-    "version": "{{ elastic_agent_version }}",
+    "version": "{{ elastic_defend_version }}",
   },
   "enabled": true,
   "policy_id": "agent-policy",
@@ -452,19 +452,19 @@
                 "security": true
               },
               "malware": {
-                "mode": "prevent",
+                "mode": "detect",
                 "blocklist": true
               },
               "ransomware": {
-                "mode": "prevent",
+                "mode": "detect",
                 "supported": true
               },
               "memory_protection": {
-                "mode": "prevent",
+                "mode": "detect",
                 "supported": true
               },
               "behavior_protection": {
-                "mode": "prevent",
+                "mode": "detect",
                 "supported": true
               },
               "popup": {
@@ -504,15 +504,15 @@
                 "network": true
               },
               "malware": {
-                "mode": "prevent",
+                "mode": "detect",
                 "blocklist": true
               },
               "behavior_protection": {
-                "mode": "prevent",
+                "mode": "detect",
                 "supported": true
               },
               "memory_protection": {
-                "mode": "prevent",
+                "mode": "detect",
                 "supported": true
               },
               "popup": {
@@ -542,15 +542,15 @@
                 "tty_io": true
               },
               "malware": {
-                "mode": "prevent",
+                "mode": "detect",
                 "blocklist": true
               },
               "behavior_protection": {
-                "mode": "prevent",
+                "mode": "detect",
                 "supported": true
               },
               "memory_protection": {
-                "mode": "prevent",
+                "mode": "detect",
                 "supported": true
               },
               "popup": {

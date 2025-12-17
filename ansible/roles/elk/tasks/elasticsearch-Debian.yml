@@ -112,12 +112,12 @@
 
 - name: Install kibana
   apt:
-    name: kibana
+    name: "kibana={{ es_version }}"
     state: present
 
 - name: copy kibana config
-  copy:
-    src: kibana.yml
+  template:
+    src: kibana.yml.j2
     dest: /etc/kibana/kibana.yml
     owner: "root"
     group: "kibana"

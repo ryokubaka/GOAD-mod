@@ -1,0 +1,6 @@
+- name: Install log agent on windows vms and disable the NAT adapter
+  hosts: elk_log
+  roles:
+    - { role: 'settings/enable_nat_adapter' , tags: 'enable_nat_adapter'}
+    - { role: 'extensions/elk/ansible/roles/logs_windows', tags: 'agent' }
+    - { role: 'settings/disable_nat_adapter' , tags: 'disable_nat_adapter'}

@@ -1,11 +1,11 @@
-- name: Prepare jumpbox to connect
-  hosts: localhost
-  become: true
-  tasks:
-    - name: Install sshpass
-      apt:
-        name: sshpass
-        state: latest
+# - name: Prepare jumpbox to connect
+#   hosts: localhost
+#   become: true
+#   tasks:
+#     - name: Install sshpass
+#       apt:
+#         name: sshpass
+#         state: latest
 
 - name: Install ELK #and RITA
   hosts: elk_server
@@ -13,12 +13,6 @@
   roles:
     - { role: 'elk', tags: 'elk' }
    # - { role: 'rita', tags: 'rita' }
-  pre_tasks:
-    - name: Enable NAT interface
-      shell: 'ip link set eth0 up'
-  tasks:
-    - name: Disable NAT interface
-      shell: 'ip link set eth0 down'
 
 - name: Install log agent on windows vms and disable the NAT adapter
   hosts: elk_log

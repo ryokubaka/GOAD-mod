@@ -18,10 +18,34 @@
     group: root
     mode: '0750'
 
+- name: "Install MacOS Client | Fetch velociraptor client config from server (.yaml)"
+  ansible.builtin.slurp:
+    src: /etc/velociraptor/client.config.yaml
+  delegate_to: "{{ groups['velociraptor_server'][0] }}"
+  become: yes
+  register: client_config_content_yaml
+  ignore_errors: yes
+
+- name: "Install MacOS Client | Fetch velociraptor client config from server (.yml)"
+  ansible.builtin.slurp:
+    src: /etc/velociraptor/client.config.yml
+  delegate_to: "{{ groups['velociraptor_server'][0] }}"
+  become: yes
+  register: client_config_content_yml
+  when: client_config_content_yaml.failed | default(false)
+  ignore_errors: yes
+
+- name: "Install MacOS Client | Set client config content"
+  ansible.builtin.set_fact:
+    client_config_content: "{{ client_config_content_yml if (client_config_content_yaml.failed | default(false)) and not (client_config_content_yml.failed | default(true)) else client_config_content_yaml }}"
+  failed_when: >
+    (client_config_content_yaml.failed | default(false)) and
+    (client_config_content_yml.failed | default(true) or client_config_content_yml is not defined)
+
 - name: "Install MacOS Client | Copy velociraptor client config"
   ansible.builtin.copy:
+    content: "{{ client_config_content.content | b64decode }}"
     dest: "{{ velociraptor_config_dir }}/client.config.yaml"
-    src: client.config.yaml
     owner: root
     group: root
     mode: '0640'

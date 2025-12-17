@@ -191,6 +191,7 @@ class Command:
         try:
             command = 'ansible-playbook '
             command += args
+            command += ' -vv'
             Log.info('CWD: ' + Utils.get_relative_path(str(path)))
             Log.cmd(command)
             result = subprocess.run(command, cwd=path, stderr=sys.stderr, stdout=sys.stdout, shell=True)

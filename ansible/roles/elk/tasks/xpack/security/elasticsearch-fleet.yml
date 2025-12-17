@@ -9,6 +9,10 @@
     curl -XGET -u {{ es_api_basic_auth_username }}:{{ es_api_basic_auth_password }} \
     'http://{{ fleet_server }}:9200/_cluster/health?wait_for_status=yellow&timeout=120s' -H 'kbn-xsrf: true'
 
+- name: Wait 2 minutes because ELK is a pain
+  ansible.builtin.pause:
+    minutes: 2
+
 - name: Create service token
   uri:
     url: "http://{{ fleet_server }}:5601/api/fleet/service-tokens"
@@ -60,14 +64,22 @@
   when: agentinstall_stat.stat.exists
   register: uninstall_stat
 
-- name: Pause for 15 seconds
+- name: Reboot ELK server before elastic agent installation
+  ansible.builtin.reboot:
+    msg: "Rebooting ELK server before elastic agent installation"
+
+- name: Wait 2 minutes
   ansible.builtin.pause:
-    seconds: 15
-  when: uninstall_stat
+    minutes: 2
+
+- name: Check for cluster health; wait 120 seconds for health status
+  shell: |
+    curl -XGET -u {{ es_api_basic_auth_username }}:{{ es_api_basic_auth_password }} \
+    'http://{{ fleet_server }}:9200/_cluster/health?wait_for_status=yellow&timeout=120s' -H 'kbn-xsrf: true'
 
 - name: Install Elastic Agent
   # Since I am using self-signed certificate, I have added "--insecure" flag at the end.
-  shell: "echo 'Y' | sudo {{ install_dir }}/elastic-agent-{{ elastic_agent_version }}-linux-x86_64/elastic-agent install --fleet-server-es=http://{{ fleet_server }}:{{ fleet_port }} --fleet-server-host={{ fleet_server }} --fleet-server-service-token={{ fleet_enrollment_token.json.value }} --fleet-server-policy=fleet-server-policy --fleet-server-port=8220 --fleet-server-insecure-http -f"
+  shell: "echo 'Y' | sudo {{ install_dir }}/elastic-agent-{{ elastic_agent_version }}-linux-x86_64/elastic-agent install --fleet-server-es=http://{{ fleet_server }}:{{ fleet_port }} --fleet-server-host={{ fleet_server }} --fleet-server-service-token={{ fleet_enrollment_token.json.value }} --fleet-server-policy=fleet-server-policy --fleet-server-port=8220 --fleet-server-insecure-http -f --insecure"
   when: not agentinstall_stat.stat.exists or uninstall_stat
 
 - name: Find existing policies
@@ -123,7 +135,7 @@
   replace:
     path: /tmp/endpoint_integration.json
     regexp: '"mode": "off"'
-    replace: '"mode": "prevent"'
+    replace: '"mode": "detect"'
 
 - name: Fix enabled lines in integration file
   replace:
@@ -136,6 +148,12 @@
     path: /tmp/endpoint_integration.json
     regexp: '"blocklist": false'
     replace: '"blocklist": true'
+
+- name: Fix usb lines in integration file
+  replace:
+    path: /tmp/endpoint_integration.json
+    regexp: '"usb_storage": "audit"'
+    replace: '"usb_storage": "deny_all"'
 
 - name: Remove bad lines
   lineinfile:
@@ -184,7 +202,19 @@
 
 - name: Block for Detection Rule enablement
   block:
-    - name: Query the API for all detetion rules
+    - name: Install all prepackaged detection rules (note - takes a while to complete)
+      uri:
+        url: "http://{{ fleet_server }}:5601/api/detection_engine/rules/prepackaged"
+        method: POST
+        user: "{{ es_api_basic_auth_username }}"
+        password: "{{ es_api_basic_auth_password }}"
+        headers:
+          kbn-xsrf: "true"
+        force_basic_auth: yes
+      no_log: true
+      ignore_errors: true # sometimes it gives a 500 even though it's successful
+
+    - name: Query the API for all detection rules
       uri:
         url: "http://{{ fleet_server }}:5601/api/detection_engine/rules/_find?per_page={{ page_size }}&page={{ current_page }}&filter=alert.attributes.enabled:false"
         method: GET

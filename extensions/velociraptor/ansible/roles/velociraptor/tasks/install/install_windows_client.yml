@@ -1,4 +1,12 @@
 ---
+- name: Get 3 octets and append .52
+  win_shell: |
+    $ip = (Get-NetIPConfiguration | Where-Object { $_.IPv4DefaultGateway -ne $null } | Select-Object -ExpandProperty IPv4Address).IPv4Address
+    if ($ip) {
+      ($ip.Split('.')[0..2] -join '.') + '.52:8000/'
+    }
+  register: client_ip_port
+
 - name: "Windows Client | Create directory"
   ansible.windows.win_file:
     path: "{{ _velociraptor_windows_dir }}"
@@ -14,9 +22,33 @@
     path: "{{ _velociraptor_windows_dir }}{{ velociraptor_msi }}"
     state: present
 
+- name: "Windows Client | Fetch velociraptor client config from server (.yaml)"
+  ansible.builtin.slurp:
+    src: /etc/velociraptor/client.config.yaml
+  delegate_to: "{{ groups['velociraptor_server'][0] }}"
+  become: yes
+  register: client_config_content_yaml
+  ignore_errors: yes
+
+- name: "Windows Client | Fetch velociraptor client config from server (.yml)"
+  ansible.builtin.slurp:
+    src: /etc/velociraptor/client.config.yml
+  delegate_to: "{{ groups['velociraptor_server'][0] }}"
+  become: yes
+  register: client_config_content_yml
+  when: client_config_content_yaml.failed | default(false)
+  ignore_errors: yes
+
+- name: "Windows Client | Set client config content"
+  ansible.builtin.set_fact:
+    client_config_content: "{{ client_config_content_yml if (client_config_content_yaml.failed | default(false)) and not (client_config_content_yml.failed | default(true)) else client_config_content_yaml }}"
+  failed_when: >
+    (client_config_content_yaml.failed | default(false)) and
+    (client_config_content_yml.failed | default(true) or client_config_content_yml is not defined)
+
 - name: "Windows Client | Copy velociraptor client config"
-  ansible.windows.win_copy:
-    src: client.config.yaml
+  ansible.builtin.copy:
+    content: "{{ client_config_content.content | b64decode }}"
     dest: "{{ _velociraptor_windows_dir }}client.config.yaml"
   notify:
     - Restart velociraptor windows client

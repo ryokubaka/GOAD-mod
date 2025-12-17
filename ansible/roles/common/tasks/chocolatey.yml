@@ -15,6 +15,27 @@
   - name: Reboot the host to complete .NET Framework 4.8 install
     ansible.windows.win_reboot:
 
+  - name: Check if 192.0.2.2:8081 is reachable
+    win_wait_for:
+      host: 192.0.2.2
+      port: 8081
+      timeout: 5
+      state: started
+    register: repo_check
+    ignore_errors: yes
+
+  - name: Set variable if repo is reachable
+    set_fact:
+      repo_reachable: true
+    when: repo_check is not failed
+
+  - name: Add new internal source
+    win_chocolatey_source:
+      name: internal repo
+      state: present
+      source: http://192.0.2.2:8081/repository/chocolatey-proxy/
+    when: repo_reachable is defined and repo_reachable
+
   - name: install Chocolatey CLI v2.0.0+ when .NET Framework 4.8 dependency is met
     win_chocolatey:
       name: chocolatey
@@ -29,6 +50,7 @@
   win_chocolatey:
     name: '{{ item }}'
     state: present
+    ignore_checksums: true
   with_items:
   - notepadplusplus
   - putty
@@ -42,3 +64,20 @@
   - microsoft-teams
   - wireshark
   ignore_errors: yes
+
+- name: Make sure C:\Temp exists
+  win_file:
+    path: C:\Temp
+    state: directory
+
+- name: Download spice-guest-tools
+  win_get_url:
+    url: https://www.spice-space.org/download/binaries/spice-guest-tools/spice-guest-tools-latest.exe
+    dest: C:\Temp\spice-guest-tools.exe
+  register: spice_guest_tools
+
+- name: Install SPICE guest tools (Windows example)
+  ansible.windows.win_package:
+    path: C:\Temp\spice-guest-tools.exe
+    arguments: "/S"
+    state: present

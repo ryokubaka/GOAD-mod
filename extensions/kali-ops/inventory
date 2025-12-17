@@ -1,0 +1,9 @@
+[default]
+kali-ops ansible_host={{ip_range}}.60 ansible_connection=ssh ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+
+[extensions]
+kali-ops
+
+; Recipe associations -------------------
+[kali-ops]
+kali-ops
