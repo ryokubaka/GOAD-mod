@@ -9,6 +9,10 @@
     curl -XGET -u {{ es_api_basic_auth_username }}:{{ es_api_basic_auth_password }} \
     'http://{{ fleet_server }}:9200/_cluster/health?wait_for_status=yellow&timeout=120s' -H 'kbn-xsrf: true'
 
+- name: Wait 2 minutes because ELK is a pain
+  ansible.builtin.pause:
+    minutes: 2
+
 - name: Create service token
   uri:
     url: "http://{{ fleet_server }}:5601/api/fleet/service-tokens"
