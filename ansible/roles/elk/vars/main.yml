@@ -4,10 +4,9 @@ reserved_xpack_users: ["elastic","kibana","logstash_system"]
 sysd_config_file: "/etc/systemd/system/elasticsearch.service.d/override.conf"
 
 fleet_port: 9200
-#elastic_agent_version: "7.17.23"
-es_version: "8.15.1"
-#elastic_agent_version: "7.17.0"
-elastic_agent_version: "8.15.1"
+es_version: "9.2.2"
+elastic_agent_version: "9.2.2"
+elastic_defend_version: "9.2.0"
 es_xpack_trial: true
 es_api_basic_auth_username: elastic
 es_api_basic_auth_password: MeowMeow123

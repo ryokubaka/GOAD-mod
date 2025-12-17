@@ -13,20 +13,6 @@
   roles:
     - { role: 'elk', tags: 'elk' }
    # - { role: 'rita', tags: 'rita' }
-  pre_tasks:
-    - name: NAT interface check
-      block:
-        - name: Find NAT interface
-          set_fact:
-            target_interface: "{{ ansible_facts.interfaces[1] }}"
-          register: interface_result  
-
-        - name: Enable NAT interface
-          shell: 'ip link set {{ target_interface }} up'
-
-        - name: Disable NAT interface
-          shell: 'ip link set {{ target_interface }} down'
-      when: (two_adapters | default(false)) == true
 
 - name: Install log agent on windows vms and disable the NAT adapter
   hosts: elk_log

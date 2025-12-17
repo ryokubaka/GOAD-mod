@@ -10,6 +10,12 @@
     path: "{{ elastic_agent_zip }}"
   register: agentzip_stat
 
+- name: Create elastic agent zip directory if it doesn't exist
+  win_file:
+    path: "C:\\tmp"
+    state: directory
+    mode: '0755'
+
 - name: Download Elastic Agent
   win_get_url:
     url: "{{ elastic_agent_url }}"
@@ -20,11 +26,6 @@
   win_stat:
     path: "{{ install_dir }}/elastic_agent.exe"
   register: agent_stat
-
-# - name: Get agent onto target
-#   win_copy:
-#     src: "{{ elastic_agent_zip }}"
-#     dest: "{{ install_dir }}/"
 
 - name: Extract Elastic Agent
   win_unzip:
@@ -50,7 +51,7 @@
 
 - name: Set two_adapters fact based on adapter count
   set_fact:
-    two_adapters: "{{ adapter_count | int > 1 }}"
+    two_adapters: "{{ adapter_count | int > 2 }}"
 
 - name: Define elk_server IP address where no NAT is used
   set_fact:
@@ -64,24 +65,29 @@
 
 - name: Check for cluster health; wait 120 seconds for health status
   win_shell: |
-    Invoke-RestMethod -Uri "http://{{ elk_host }}:9200/_cluster/health?wait_for_status=yellow&timeout=120s" -Method Get \
-    -Headers @{"kbn-xsrf"="true"; Authorization = "Basic $([Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes('{{ es_api_basic_auth_username }}:{{ es_api_basic_auth_password }}')))"}
-  run_once: true
+    curl.exe -XGET -u {{ es_api_basic_auth_username }}:{{ es_api_basic_auth_password }} \
+    'http://{{ elk_host }}:5601/api/fleet/package_policies' -H 'Content-Type: application/json' \
+    -H 'kbn-xsrf: true'
+  register: result
+  until: result.rc == 0 and (result.stdout | default('')) != '' and ('Kibana server is not ready yet' not in (result.stdout | default('')))
+  retries: 10
+  delay: 10
 
 - name: Fetch enrollment API keys
-  win_uri:
-    url: "http://{{ elk_host }}:5601/api/fleet/enrollment-api-keys"
-    method: GET
-    user: "{{ es_api_basic_auth_username }}"
-    password: "{{ es_api_basic_auth_password }}"
-    force_basic_auth: yes
-    return_content: yes
-  register: result
+  win_shell: |
+    curl.exe -XGET -u {{ es_api_basic_auth_username }}:{{ es_api_basic_auth_password }} \
+    'http://{{ elk_host }}:5601/api/fleet/enrollment_api_keys' -H 'Content-Type: application/json' \
+    -H 'kbn-xsrf: true'
+  register: enrollment_key
   run_once: true
+
+- name: Convert enrollment_key to proper data structure
+  set_fact:
+    parsed_enrollment_key: "{{ enrollment_key.stdout | from_json }}"
 
 - name: Extract api_key for specific policy_id
   set_fact:
-    api_key: "{{ result.json.list | selectattr('policy_id', 'equalto', 'agent-policy') | map(attribute='api_key') | first }}"
+    api_key: "{{ parsed_enrollment_key | json_query(\"items[?policy_id == 'agent-policy'].api_key | [0]\") }}"
   run_once: true
 
 - name: Install Elastic Agent
@@ -89,8 +95,3 @@
   win_shell: | 
     echo Y | & "{{ install_dir }}\elastic-agent-{{ elastic_agent_version }}-windows-x86_64\elastic-agent.exe" install --url=http://"{{ elk_host }}":8220 --enrollment-token="{{ api_key }}" --insecure -f
   when: not agentinstall_stat.stat.exists or uninstall_stat
-
-# - name: Clean up the downloaded zip file
-#   win_file:
-#     path: "{{ elastic_agent_zip }}"
-#     state: absent

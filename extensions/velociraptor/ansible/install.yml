@@ -6,7 +6,7 @@
       block:
         - name: Find NAT interface
           set_fact:
-            target_interface: "{{ ansible_facts.interface[1] }}"
+            target_interface: "{{ ansible_facts.interfaces[1] }}"
           register: interface_result
 
         - name: Enable NAT interface
