@@ -15,7 +15,7 @@
 
 - name: Create service token
   uri:
-    url: "http://{{ fleet_server }}:5601/api/fleet/service-tokens"
+    url: "http://{{ fleet_server }}:5601/api/fleet/service_tokens"
     method: POST
     user: "{{ es_api_basic_auth_username }}"
     password: "{{ es_api_basic_auth_password }}"
