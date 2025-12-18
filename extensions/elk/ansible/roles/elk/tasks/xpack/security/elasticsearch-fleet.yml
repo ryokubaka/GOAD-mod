@@ -15,7 +15,7 @@
 
 - name: Create service token
   uri:
-    url: "http://{{ fleet_server }}:5601/api/fleet/service-tokens"
+    url: "http://{{ fleet_server }}:5601/api/fleet/service_tokens"
     method: POST
     user: "{{ es_api_basic_auth_username }}"
     password: "{{ es_api_basic_auth_password }}"
@@ -205,7 +205,7 @@
     - name: Install all prepackaged detection rules (note - takes a while to complete)
       uri:
         url: "http://{{ fleet_server }}:5601/api/detection_engine/rules/prepackaged"
-        method: POST
+        method: PUT
         user: "{{ es_api_basic_auth_username }}"
         password: "{{ es_api_basic_auth_password }}"
         headers:
