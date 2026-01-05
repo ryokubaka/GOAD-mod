@@ -214,6 +214,10 @@
       no_log: true
       ignore_errors: true # sometimes it gives a 500 even though it's successful
 
+    - name: Pause for 1 minute to give time for all rules to be installed because ELK is a pain
+      ansible.builtin.pause:
+        minutes: 1
+
     - name: Query the API for all detection rules
       uri:
         url: "http://{{ fleet_server }}:5601/api/detection_engine/rules/_find?per_page={{ page_size }}&page={{ current_page }}&filter=alert.attributes.enabled:false"
