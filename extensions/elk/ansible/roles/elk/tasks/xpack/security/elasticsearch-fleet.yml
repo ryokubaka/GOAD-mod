@@ -28,7 +28,7 @@
 
 - name: Add fleet server host URL
   shell: |
-    curl -u {{ es_api_basic_auth_username }}:{{ es_api_basic_auth_password }} -XPUT -H "kbn-xsrf: kibana" -H "Content-type: application/json" "http://{{ fleet_server }}:5601/api/fleet/settings" -d '{"fleet_server_hosts": ["http://{{ fleet_server }}:8220"]}'
+    curl -u {{ es_api_basic_auth_username }}:{{ es_api_basic_auth_password }} -XPOST -H "kbn-xsrf: kibana" -H "Content-type: application/json" "http://{{ fleet_server }}:5601/api/fleet/fleet_server_hosts" -d '{"name": "fleet-server-host", "host_urls": ["http://{{ fleet_server }}:8220"], "is_default": true}'
   
 - name: Ensure installation directory exists
   file:
