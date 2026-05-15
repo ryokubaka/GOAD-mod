@@ -1,0 +1,97 @@
+{
+  "lab": {
+    "hosts": {
+      "dc01": {
+        "hostname": "DC01",
+        "type": "dc",
+        "local_admin_password": "password",
+        "domain": "ludus.nuketown",
+        "path": "DC=ludus,DC=nuketown",
+        "local_groups": {
+          "Administrators": [
+            "LUDUS\\Domain Admins"
+          ]
+        },
+        "scripts": [],
+        "vulns": []
+      },
+      "adfs": {
+        "hostname": "ADFS",
+        "type": "server",
+        "local_admin_password": "password",
+        "domain": "ludus.nuketown",
+        "path": "DC=ludus,DC=nuketown",
+        "local_groups": {
+          "Administrators": [
+            "LUDUS\\Domain Admins"
+          ]
+        },
+        "scripts": [],
+        "vulns": []
+      },
+      "entraconnect": {
+        "hostname": "EntraConnect",
+        "type": "server",
+        "local_admin_password": "password",
+        "domain": "ludus.nuketown",
+        "path": "DC=ludus,DC=nuketown",
+        "local_groups": {
+          "Administrators": [
+            "LUDUS\\Domain Admins"
+          ]
+        },
+        "scripts": [],
+        "vulns": []
+      },
+      "ws01": {
+        "hostname": "Workstation",
+        "type": "workstation",
+        "local_admin_password": "password",
+        "domain": "ludus.nuketown",
+        "path": "DC=ludus,DC=nuketown",
+        "local_groups": {
+          "Administrators": [
+            "LUDUS\\Domain Admins"
+          ]
+        },
+        "scripts": [],
+        "vulns": []
+      }
+    },
+    "domains": {
+      "ludus.nuketown": {
+        "dc": "dc01",
+        "domain_password": "password",
+        "netbios_name": "LUDUS",
+        "organisation_units": {},
+        "groups": {
+          "universal": {},
+          "global": {},
+          "domainlocal": {}
+        },
+        "multi_domain_groups_member": {},
+        "acls": {},
+        "users": {
+          "adfs_svc": {
+            "firstname": "ADFS",
+            "surname": "Service",
+            "password": "password",
+            "city": "",
+            "description": "ADFS service account",
+            "groups": [],
+            "path": "CN=Users,DC=ludus,DC=nuketown"
+          },
+          "entra_svc": {
+            "firstname": "Entra",
+            "surname": "Service",
+            "password": "password",
+            "city": "",
+            "description": "Entra Connect service account",
+            "groups": [],
+            "path": "CN=Users,DC=ludus,DC=nuketown"
+          }
+        }
+      }
+    }
+  }
+}

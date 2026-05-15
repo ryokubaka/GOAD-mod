@@ -1,0 +1,9 @@
+---
+  dns_zone: "sevenkingdoms.local"
+  dns_name: gitlab
+  dns_ip: "{{ hostvars['adfs-gitlab'].ansible_host | default('') }}"
+  adfs_service_account: "SEVENKINGDOMS\\adfs_svc"
+  adfs_fqdn: adfs.sevenkingdoms.local
+  gpo_name: "ADFS - Local Intranet Zone"
+  adfs_url: "https://{{ adfs_fqdn }}"
+  target_ou_dn: "DC=sevenkingdoms,DC=local" 

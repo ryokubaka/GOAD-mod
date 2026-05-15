@@ -1,0 +1,43 @@
+; EXTENSION : ADFS ------------------------------------------
+[default]
+{% if provider_name == 'aws' or provider_name == 'azure' %}
+adfs-adfs         ansible_host={{ip_range}}.70  dns_domain=dc01 dict_key=adfs-adfs ansible_user=ansible ansible_password=EP+xh7Rk6j90
+adfs-entraconnect ansible_host={{ip_range}}.71  dns_domain=dc01 dict_key=adfs-entraconnect ansible_user=ansible ansible_password=EP+xh7Rk6j90
+adfs-ws01         ansible_host={{ip_range}}.72  dns_domain=dc01 dict_key=adfs-ws01 ansible_user=ansible ansible_password=EP+xh7Rk6j90
+adfs-gitlab       ansible_host={{ip_range}}.73  dict_key=adfs-gitlab ansible_user=debian ansible_password=debian ansible_connection=ssh ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+{% elif provider_name == 'ludus' %}
+adfs-adfs         ansible_host={{ip_range}}.70  dns_domain=dc01 dict_key=adfs-adfs ludus=true
+adfs-entraconnect ansible_host={{ip_range}}.71  dns_domain=dc01 dict_key=adfs-entraconnect ludus=true
+adfs-ws01         ansible_host={{ip_range}}.72  dns_domain=dc01 dict_key=adfs-ws01 ludus=true
+adfs-gitlab       ansible_host={{ip_range}}.73  dict_key=adfs-gitlab ansible_user=debian ansible_password=debian ansible_connection=ssh ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+{% else %}
+adfs-adfs         ansible_host={{ip_range}}.70  dns_domain=dc01 dict_key=adfs-adfs
+adfs-entraconnect ansible_host={{ip_range}}.71  dns_domain=dc01 dict_key=adfs-entraconnect
+adfs-ws01         ansible_host={{ip_range}}.72  dns_domain=dc01 dict_key=adfs-ws01
+adfs-gitlab       ansible_host={{ip_range}}.73  dict_key=adfs-gitlab ansible_connection=ssh ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+{% endif %}
+
+; Empty group so core data.yml (hosts: domain:linux_domain:extensions) does not warn
+[linux_domain]
+
+; ADFS / Entra / GitLab role targets ----
+[adfs_dc:children]
+dc
+
+[adfs_server]
+adfs-adfs
+
+[entra]
+adfs-entraconnect
+
+[adfs_workstation]
+adfs-ws01
+
+[gitlab]
+adfs-gitlab
+
+[extensions]
+adfs-adfs
+adfs-entraconnect
+adfs-ws01
+adfs-gitlab

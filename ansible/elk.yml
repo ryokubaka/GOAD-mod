@@ -1,19 +1,11 @@
-- name: Install ELK and RITA
+# LOGS and Monitoring ==========================================================================================
+- name: Install ELK
   hosts: elk_server
   become: yes
   roles:
     - { role: 'elk', tags: 'elk' }
-    - { role: 'rita', tags: 'rita' }
-  pre_tasks:
-    - name: Enable NAT interface
-      shell: 'ip link set eth0 up'
-  tasks:
-    - name: Disable NAT interface
-      shell: 'ip link set eth0 down'
 
-- name: Install log agent on windows vms and disable the NAT adapter
+- name: Install log agent on windows vms
   hosts: elk_log
   roles:
-    - { role: '../../../ansible/roles/settings/enable_nat_adapter' , tags: 'enable_nat_adapter'}
     - { role: 'logs_windows', tags: 'agent' }
-    - { role: '../../../ansible/roles/settings/disable_nat_adapter' , tags: 'disable_nat_adapter'}

@@ -1,0 +1,18 @@
+[default]
+; ------------------------------------------------
+; ludus.nuketown
+; ------------------------------------------------
+dc01 ansible_host={{ip_range}}.10 dns_domain=dc01 dict_key=dc01
+adfs ansible_host={{ip_range}}.11 dns_domain=dc01 dict_key=adfs
+entraconnect ansible_host={{ip_range}}.12 dns_domain=dc01 dict_key=entraconnect
+ws01 ansible_host={{ip_range}}.13 dns_domain=dc01 dict_key=ws01
+
+[all:vars]
+force_dns_server=no
+dns_server={{ip_range}}.254
+
+dns_server_forwarder={{ip_range}}.254
+
+ansible_user=localuser
+ansible_password=password
+

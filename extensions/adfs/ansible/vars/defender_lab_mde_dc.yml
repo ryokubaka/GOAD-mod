@@ -1,0 +1,12 @@
+---
+# DC-only MDE overrides (merge on top of defender_lab_mde_shared.yml for adfs_dc)
+mde_enable_high_performance_power_plan: true
+mde_enable_ntlm_auditing: true
+mde_enable_adcs_ca_auditing: true
+mde_enable_ldap_diagnostic_logging: true
+mde_ldap_diagnostic_level: 5
+mde_enable_dc_log_channels: true
+mde_ds_log_size_mb: 256
+mde_ntlm_op_log_size_mb: 64
+mde_enable_kerberos_auditing: true
+mde_enable_dns_diagnostic_logging: true

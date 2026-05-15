@@ -1,0 +1,123 @@
+---
+- name: Enable update service
+  ansible.windows.win_service:
+    name: Windows Update
+    state: started
+    start_mode: auto
+
+- name: Disable Domain firewall
+  community.windows.win_firewall:
+    state: disabled
+    profiles:
+      - Domain
+      - Public
+      - Private
+
+- name: Install ADFS Federation role
+  win_feature:
+    name: ADFS-Federation, RSAT, RSAT-AD-PowerShell
+    state: present
+    include_management_tools: yes
+
+- name: Create ADFS Service Account (on DC via AD cmdlets)
+  ansible.windows.win_shell: |
+    $userName = '{{ adfs_service_account }}'
+    if ($userName -match '\\') { $userName = ($userName -split '\\')[-1] }
+    $userPass = ConvertTo-SecureString '{{ adfs_service_account_password }}' -AsPlainText -Force
+    $adminPass = ConvertTo-SecureString '8dCT-DJjgScp' -AsPlainText -Force
+    $adminCred = New-Object PSCredential('SEVENKINGDOMS\administrator', $adminPass)
+    $server = 'kingslanding.sevenkingdoms.local'
+
+    Import-Module ActiveDirectory
+
+    try {
+      $existing = Get-ADUser -Identity $userName -Server $server -Credential $adminCred -ErrorAction Stop
+    } catch [Microsoft.ActiveDirectory.Management.ADIdentityNotFoundException] {
+      $existing = $null
+    } catch {
+      throw
+    }
+
+    if (-not $existing) {
+      New-ADUser -Name $userName -SamAccountName $userName -AccountPassword $userPass -Enabled $true -Path 'CN=Users,DC=sevenkingdoms,DC=local' -Server $server -Credential $adminCred
+      Write-Output "Created user $userName"
+    } else {
+      Set-ADAccountPassword -Identity $userName -NewPassword $userPass -Reset -Server $server -Credential $adminCred
+      Enable-ADAccount -Identity $userName -Server $server -Credential $adminCred
+      Write-Output "User $userName already exists, password updated and enabled"
+    }
+  run_once: true
+  delegate_to: dc01
+
+- name: Add ADFS Service Account to Domain Admins group (on DC via AD cmdlets)
+  ansible.windows.win_shell: |
+    $userName = '{{ adfs_service_account }}'
+    if ($userName -match '\\') { $userName = ($userName -split '\\')[-1] }
+    $server = 'kingslanding.sevenkingdoms.local'
+    $adminPass = ConvertTo-SecureString '8dCT-DJjgScp' -AsPlainText -Force
+    $adminCred = New-Object PSCredential('SEVENKINGDOMS\administrator', $adminPass)
+    Add-ADGroupMember -Identity 'Domain Admins' -Members $userName -Server $server -Credential $adminCred -ErrorAction SilentlyContinue
+    Write-Output "Ensured $userName is member of Domain Admins"
+  run_once: true
+  delegate_to: dc01
+
+- name: Ensure ADFS SSL certificate exists (self-signed)
+  win_shell: |
+    $dnsName = "{{ adfs_hostname }}"
+    $existing = Get-ChildItem -Path Cert:\LocalMachine\My | Where-Object { $_.Subject -like "CN=$dnsName*" }
+    if (-not $existing) {
+      New-SelfSignedCertificate -DnsName $dnsName -CertStoreLocation "Cert:\LocalMachine\My" -FriendlyName "ADFS Service"
+    }
+
+- name: Import the ADFS module in PowerShell
+  win_shell: |
+    Import-Module ADFS
+  register: adfs_module_import
+
+- name: Install ADFS Role
+  win_shell: |
+    $username = "SEVENKINGDOMS\{{ adfs_service_account }}"
+    $password = "{{ adfs_service_account_password }}"
+    $securePassword = ConvertTo-SecureString $password -AsPlainText -Force
+    $serviceAccountCredential = New-Object System.Management.Automation.PSCredential ($username, $securePassword)
+
+    $dnsName = "{{ adfs_hostname }}"
+    $cert = Get-ChildItem -Path Cert:\LocalMachine\My | Where-Object { $_.Subject -like "CN=$dnsName*" } | Select-Object -First 1
+    if (-not $cert) {
+      throw "No certificate found in LocalMachine\My with subject CN=$dnsName. Ensure the self-signed certificate task succeeded."
+    }
+
+    $CertFingerprint = $cert.Thumbprint
+    Install-AdfsFarm -CertificateThumbprint $CertFingerprint -FederationServiceDisplayName '{{ adfs_service_display_name }}' -FederationServiceName '{{ adfs_hostname }}' -ServiceAccountCredential $serviceAccountCredential -OverwriteConfiguration
+  register: install_adfs_output
+  vars:
+    ansible_become: true
+    ansible_become_method: runas
+    ansible_become_user: 'SEVENKINGDOMS\administrator'
+    ansible_become_password: '8dCT-DJjgScp'
+    ansible_become_flags: "logon_type=interactive logon_flags=with_profile"
+
+- name: Run Set-AdfsProperties to enable IdP initiated sign-on page
+  win_shell: |
+    Import-Module ADFS
+
+    $maxRetries = 3
+    for ($i = 0; $i -lt $maxRetries; $i++) {
+      try {
+        Set-AdfsProperties -EnableIdPIn $True
+        Write-Output "Set-AdfsProperties succeeded on attempt $($i+1)"
+        break
+      } catch {
+        if ($_.Exception.GetType().Name -eq 'StorageStaleDataException' -and $i -lt $maxRetries - 1) {
+          Start-Sleep -Seconds 5
+          continue
+        }
+        throw
+      }
+    }
+  vars:
+    ansible_become: true
+    ansible_become_method: runas
+    ansible_become_user: 'SEVENKINGDOMS\administrator'
+    ansible_become_password: '8dCT-DJjgScp'
+    ansible_become_flags: "logon_type=interactive logon_flags=with_profile"

@@ -1,0 +1,11 @@
+---
+# GOAD-Smoke: no lab-VM Ansible. Ludus `range deploy` already creates the range/VMs.
+# Use this lab to exercise GOAD install + extension wiring without WinRM/SSH to guests.
+- name: GOAD-Smoke — noop provision
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Smoke provision complete (no guest connectivity)
+      ansible.builtin.debug:
+        msg: "GOAD-Smoke — skipped guest playbooks; extensions may still run their own Ansible."

@@ -13,7 +13,6 @@ boxes.append(
       :ip => "{{ip_range}}.3",
       :box => "bento/ubuntu-22.04",
       :os => "linux",
-      :distro => "ubuntu",
       :cpus => 2,
       :mem => 2000,
       :forwarded_port => [ {:guest => 22, :host => 2210, :id => "ssh"} ]
@@ -33,6 +32,7 @@ boxes.append(
   config.vm.graceful_halt_timeout = 600
   config.winrm.retry_limit = 30
   config.winrm.retry_delay = 10
+  config.winrm.ssl_peer_verification = false
 
   boxes.each do |box|
     config.vm.define box[:name] do |target|
@@ -71,8 +71,6 @@ boxes.append(
 
       else
         target.vm.communicator = "ssh"
-        target.vm.provision :shell, inline: "sudo apt install -y dos2unix"
-        target.vm.provision :shell, inline: "sudo apt install -y sshpass"
       end
 
       if box.has_key?(:forwarded_port)

@@ -26,7 +26,6 @@ class LocalJumpBox(JumpBox):
             self.run_command("sudo apt update && sudo apt install -y dos2unix", '~')
             self.run_command("dos2unix setup.sh", '~')
         self.run_command('bash setup.sh', '~')
-        self.run_command('bash setup.sh', '~') # run again because reasons
 
     def get_jumpbox_key(self, creation=False):
         if not creation:
@@ -46,6 +45,8 @@ class LocalJumpBox(JumpBox):
         :return:
         """
         if Utils.is_valid_ipv4(self.ip):
+            # Copy the globalsettings.ini file to the jumpbox
+            self.command.scp(GoadPath.get_global_inventory_path(), f'{self.username}@{self.ip}:~/GOAD/globalsettings.ini', self.ssh_key, self.instance_path)
             # create workspace dir if not exist
             self.run_command('mkdir -p ~/GOAD/workspace/' + self.instance_id, '~')
             # workspace inventory files (no need -r as it will copy all the provider folder)
