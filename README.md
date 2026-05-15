@@ -11,10 +11,6 @@
 GOAD is a pentest active directory LAB project.
 The purpose of this lab is to give pentesters a vulnerable Active directory environment ready to use to practice usual attack techniques.
 
-### Ludus provider (this fork)
-
-When deploying through **Ludus**, `provide` / `install()` waits on Ludus `rangeState` until `SUCCESS`. If Ansible finishes but Ludus never leaves `DEPLOYING`, configure **Ludus UX** (root API key + PocketBase reconcile) or set optional env vars — see **[PARITY-AUDIT.md](./PARITY-AUDIT.md)** (`GOAD_LUDUS_INSTALL_TIMEOUT_SEC`, `GOAD_LUDUS_DEPLOY_POLL_SEC`, `GOAD_LUDUS_TRUST_RANGE_LOG_RECAP`).
-
 > [!CAUTION]
 > This lab is extremely vulnerable, do not reuse recipe to build your environment and do not deploy this environment on internet without isolation (this is a recommendation, use it as your own risk).<br>
 > This repository was build for pentest practice.
