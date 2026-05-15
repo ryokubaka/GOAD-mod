@@ -10,14 +10,14 @@ Missing scenarios:
 - ESC4, ESC2/3
 
 ### Servers
-This lab is actually composed of five virtual machines:
+This lab is actually composed of three virtual machines:
 - **kingslanding** : DC01  running on Windows Server 2019 (with windefender enabled by default)
 - **winterfell**   : DC02  running on Windows Server 2019 (with windefender enabled by default)
-- **castleblack**  : SRV02 running on Windows Server 2019 (with windefender **disabled** by default)
+- **castelblack**  : SRV02 running on Windows Server 2019 (with windefender **disabled** by default)
 
 #### domain : north.sevenkingdoms.local
 - **winterfell**     : DC01
-- **castleblack**    : SRV02 : MSSQL / IIS
+- **castelblack**    : SRV02 : MSSQL / IIS
 
 #### domain : sevenkingdoms.local
 - **kingslanding**   : DC02
@@ -32,7 +32,7 @@ You can change the vm version in the Vagrantfile according to Stefan Scherer vag
 - You can find a lot of the available scenarios on [https://mayfly277.github.io/categories/ad/](https://mayfly277.github.io/categories/ad/)
 
 NORTH.SEVENKINGDOMS.LOCAL
-- STARKS:              RDP on WINTERFELL AND castleblack
+- STARKS:              RDP on WINTERFELL AND CASTELBLACK
   - arya.stark:        Execute as user on mssql
   - eddard.stark:      DOMAIN ADMIN NORTH/ (bot 5min) LLMRN request to do NTLM relay with responder
   - catelyn.stark:     
@@ -43,12 +43,12 @@ NORTH.SEVENKINGDOMS.LOCAL
   - theon.greyjoy:
   - jon.snow:          mssql admin / KERBEROASTING / group cross domain / mssql trusted link
   - hodor:             PASSWORD SPRAY (user=password)
-- NIGHT WATCH:         RDP on castleblack
+- NIGHT WATCH:         RDP on CASTELBLACK
   - samwell.tarly:     Password in ldap description / mssql execute as login
                        GPO abuse (Edit Settings on "STARKWALLPAPER" GPO)
   - jon.snow:          (see starks)
   - jeor.mormont:      (see mormont)
-- MORMONT:             RDP on castleblack
+- MORMONT:             RDP on CASTELBLACK
   - jeor.mormont:      ACL writedacl-writeowner on group Night Watch
 - AcrossTheSea :       cross forest group
 
@@ -84,7 +84,7 @@ SEVENKINGDOMS.LOCAL
     - Admins : eddard.stark (U), catelyn.stark (U), robb.stark (U)
     - RDP: Stark(G)
 
-  - SRV02 : castleblack.essos.local (Windows Server 2019) (IIS, MSSQL, SMB share)
+  - SRV02 : castelblack.essos.local (Windows Server 2019) (IIS, MSSQL, SMB share)
     - Admins: jeor.mormont (U)
     - RDP: Night Watch (G), Mormont (G), Stark (G)
     - IIS : allow asp upload, run as NT Authority/network

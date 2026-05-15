@@ -28,8 +28,9 @@
 
 - name: Add fleet server host URL
   shell: |
-    curl -u {{ es_api_basic_auth_username }}:{{ es_api_basic_auth_password }} -XPOST -H "kbn-xsrf: kibana" -H "Content-type: application/json" "http://{{ fleet_server }}:5601/api/fleet/fleet_server_hosts" -d '{"name": "fleet-server-host", "host_urls": ["http://{{ fleet_server }}:8220"], "is_default": true}'
-  
+    curl -sS -u {{ es_api_basic_auth_username }}:{{ es_api_basic_auth_password }} -XPOST -H "kbn-xsrf: kibana" -H "Content-type: application/json" "http://{{ fleet_server }}:5601/api/fleet/fleet_server_hosts" -d '{"name": "fleet-server-host", "host_urls": ["http://{{ fleet_server }}:8220"], "is_default": true}'
+  register: fleet_server_host_result
+
 - name: Ensure installation directory exists
   file:
     path: "{{ install_dir }}"
@@ -79,7 +80,7 @@
 
 - name: Install Elastic Agent
   # Since I am using self-signed certificate, I have added "--insecure" flag at the end.
-  shell: "echo 'Y' | sudo {{ install_dir }}/elastic-agent-{{ elastic_agent_version }}-linux-x86_64/elastic-agent install --fleet-server-es=http://{{ fleet_server }}:{{ fleet_port }} --fleet-server-host={{ fleet_server }} --fleet-server-service-token={{ fleet_enrollment_token.json.value }} --fleet-server-policy=fleet-server-policy --fleet-server-port=8220 --fleet-server-insecure-http -f --insecure"
+  shell: "echo 'Y' | sudo {{ install_dir }}/elastic-agent-{{ elastic_agent_version }}-linux-x86_64/elastic-agent install --fleet-server-es=http://{{ fleet_server }}:{{ fleet_port }} --fleet-server-service-token={{ fleet_enrollment_token.json.value }} --fleet-server-policy=fleet-server-policy --fleet-server-port=8220 --install-servers -f"
   when: not agentinstall_stat.stat.exists or uninstall_stat
 
 - name: Find existing policies
@@ -199,7 +200,6 @@
   shell: |
     curl -XGET -u {{ es_api_basic_auth_username }}:{{ es_api_basic_auth_password }} \
     'http://{{ fleet_server }}:9200/_cluster/health?wait_for_status=yellow&timeout=120s' -H 'kbn-xsrf: true'
-
 - name: Block for Detection Rule enablement
   block:
     - name: Install all prepackaged detection rules (note - takes a while to complete)
@@ -211,12 +211,12 @@
         headers:
           kbn-xsrf: "true"
         force_basic_auth: yes
-      no_log: true
+#      no_log: true
       ignore_errors: true # sometimes it gives a 500 even though it's successful
 
-    - name: Pause for 1 minute to give time for all rules to be installed because ELK is a pain
+    - name: Pause for 2 minutes to give time for all rules to be installed because ELK is a pain
       ansible.builtin.pause:
-        minutes: 1
+        minutes: 2
 
     - name: Query the API for all detection rules
       uri:

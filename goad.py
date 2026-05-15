@@ -301,7 +301,9 @@ class Goad(cmd.Cmd):
                     # enable and create files
                     self.lab_manager.get_current_instance().enable_extension(extension_name)
                     # # start lab with extensions files (vagrant up / terraform plan)
-                    self.lab_manager.get_current_instance_provider().install()
+                    if not self.lab_manager.get_current_instance_provider().install():
+                        Log.error('Provider install failed; skipping extension provision')
+                        return
                     # # provision extension
                     self.do_provision_extension(extension_name)
                 else:

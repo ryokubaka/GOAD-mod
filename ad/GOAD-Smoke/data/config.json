@@ -1,0 +1,38 @@
+{
+  "lab": {
+    "hosts": {
+      "dc01": {
+        "hostname": "smokedc",
+        "type": "dc",
+        "local_admin_password": "SmokePass1!",
+        "domain": "smoke.lab",
+        "path": "DC=smoke,DC=lab",
+        "local_groups": {
+          "Administrators": [],
+          "Remote Desktop Users": []
+        },
+        "scripts": [],
+        "vulns": [],
+        "security": []
+      }
+    },
+    "domains": {
+      "smoke.lab": {
+        "dc": "dc01",
+        "domain_password": "SmokePass1!",
+        "netbios_name": "SMOKE",
+        "trust": "",
+        "laps_path": "CN=Users,DC=smoke,DC=lab",
+        "organisation_units": {},
+        "groups": {
+          "global": {},
+          "domainlocal": {},
+          "universal": {}
+        },
+        "multi_domain_groups_member": {},
+        "acls": {},
+        "users": {}
+      }
+    }
+  }
+}

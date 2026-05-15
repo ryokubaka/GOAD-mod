@@ -1,10 +1,3 @@
-Vagrant.configure(2) do |config|
-  config.vm.provider :vmware_desktop do |vmware|
-    vmware.vmx["ethernet0.pcislotnumber"] = "192"
-    vmware.vmx["ethernet1.pcislotnumber"] = "224"
-  end
-end
-
 Vagrant.configure("2") do |config|
 
 ENV['VAGRANT_DEFAULT_PROVIDER'] = 'vmware_desktop'
@@ -17,7 +10,6 @@ ENV['VAGRANT_DEFAULT_PROVIDER'] = 'vmware_desktop'
 boxes.append(
     { :name => "PROVISIONING",
       :ip => "{{ip_range}}.3",
-      :natip => "192.168.120.3",
       :box => "bento/ubuntu-22.04",
       :box_version => "202401.31.0",
       :os => "linux",
@@ -30,7 +22,7 @@ boxes.append(
 
   config.vm.provider "vmware_desktop" do |v|
     v.force_vmware_license = "workstation"  # force the licence for fix some vagrant plugin issue
-    v.gui = true
+    # v.gui = true
   end
 
   # disable rdp forwarded port inherited from StefanScherer box
@@ -43,9 +35,6 @@ boxes.append(
 
   config.vm.boot_timeout = 600
   config.vm.graceful_halt_timeout = 600
-
-  config.winrm.transport = "plaintext"
-  config.winrm.basic_auth_only = true
   config.winrm.retry_limit = 30
   config.winrm.retry_delay = 10
 
@@ -68,12 +57,11 @@ boxes.append(
 
       # IP
       target.vm.network :private_network, ip: box[:ip]
-      
+
       # OS specific
       if box[:os] == "windows"
         target.vm.guest = :windows
         target.vm.communicator = "winrm"
-        target.winrm.host = "127.0.0.1"
         target.vm.provision :shell, :path => "../../../vagrant/Install-WMF3Hotfix.ps1", privileged: false
         target.vm.provision :shell, :path => "../../../vagrant/ConfigureRemotingForAnsible.ps1", privileged: false
 
@@ -81,18 +69,8 @@ boxes.append(
         if ENV['VAGRANT_DEFAULT_PROVIDER'] == "vmware_desktop"
           target.vm.provision :shell, :path => "../../../vagrant/fix_ip.ps1", privileged: false, args: box[:ip]
         end
-      elsif box[:os] == "ubuntu"
-          #target.vm.network :private_network, ip: box[:natip]
-          #target.vm.provider "vmware_desktop" do |v|
-          #  v.vmx["ethernet2.connectiontype"] = "nat"
-          #end
-          target.vm.communicator = "ssh"
-          target.vm.provision "shell", inline: "sudo apt install -y dos2unix"
-          target.vm.provision "shell", inline: "sudo apt install -y sshpass"
-      elsif box[:distro] == "kali"
-          target.vm.provision :shell, inline: <<-EOF
-            sudo apt update -y
-          EOF
+      else
+        target.vm.communicator = "ssh"
       end
 
       if box.has_key?(:forwarded_port)

@@ -1,0 +1,15 @@
+ludus:
+  - vm_name: "{{ range_id }}-GOAD-DC01"
+    hostname: "{{ range_id }}-DC01"
+    template: win2019-server-x64-template
+    vlan: 10
+    ip_last_octet: 10
+    ram_gb: 4
+    cpus: 2
+    windows:
+      sysprep: true
+    # Ludus range deploy uses this to route the VM into DC-tagged plays (Deploy DC VMs,
+    # collect primary DC, etc.). Without it, the box is only cloned as a generic Windows VM.
+    domain:
+      fqdn: smoke.lab
+      role: primary-dc

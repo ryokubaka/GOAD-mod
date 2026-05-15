@@ -1,0 +1,10 @@
+---
+# No guest VMs — exercises GOAD extension wiring + LUX catalog only.
+- name: smoke-ci extension — localhost only
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Marker (no inventory merge required for this play)
+      ansible.builtin.debug:
+        msg: "smoke-ci extension OK — localhost only"
