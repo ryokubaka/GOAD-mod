@@ -1,0 +1,174 @@
+---
+# read global configuration file and set up adapters (same model as core GOAD/exts)
+- import_playbook: "../../../ansible/data.yml"
+  vars:
+    data_path: "../ad/{{domain_name}}/data/"
+  tags: 'data'
+
+- name: "Join ADFS extension servers to sevenkingdoms.local"
+  hosts:
+    - adfs_server
+    - entra
+  roles:
+    - { role: 'member_server', tags: 'server' }
+  vars:
+    member_domain: "sevenkingdoms.local"
+    domain_username: "{{member_domain}}\\{{admin_user}}"
+    domain_password: "{{lab.domains[member_domain].domain_password}}"
+
+- name: "Join ADFS extension workstation to sevenkingdoms.local"
+  hosts: adfs_workstation
+  roles:
+    - { role: 'commonwkstn', tags: 'workstation' }
+  vars:
+    member_domain: "sevenkingdoms.local"
+    domain_username: "{{member_domain}}\\{{admin_user}}"
+    domain_password: "{{lab.domains[member_domain].domain_password}}"
+
+- name: Configure AD CS and ADFS prerequisites on DC
+  hosts: adfs_dc
+  vars:
+    dns_name: gitlab
+    dns_zone: "sevenkingdoms.local"
+    dns_ip: "{{ hostvars['adfs-gitlab'].ansible_host }}"
+    adfs_service_account: "SEVENKINGDOMS\\adfs_svc"
+    adfs_fqdn: "adfs.sevenkingdoms.local"
+    target_ou_dn: "DC=sevenkingdoms,DC=local"
+  roles:
+    - { role: 'install_adcs', tags: ['adcs'] }
+    - { role: 'adfs_kerberos_auth', tags: ['adfs_kerberos_auth'] }
+
+# ─── Defender / MDE-MDI lab (ZephrFish ludus-defender-lab) ─────────────────
+# Config: vars/defender_lab.yml (sevenkingdoms.local / GOAD). Passwords from lab
+# or defender_admin_pass; full x-admin-pass / x-mde-shared style vars.
+# See: https://github.com/ZephrFish/ludus-defender-lab
+
+- name: MDE/MDI prerequisites and WEF collector on DC
+  hosts: adfs_dc
+  vars_files:
+    - vars/defender_lab.yml
+    - vars/defender_lab_mde_shared.yml
+    - vars/defender_lab_mde_dc.yml
+  vars:
+    member_domain: "{{ defender_domain }}"
+    domain_name: "{{ defender_domain }}"
+    domain_netbios: "{{ defender_netbios }}"
+    domain_admin_password: "{{ lab.domains[member_domain].domain_password | default(defender_admin_pass) }}"
+    wef_mode: collector
+    wef_create_gpo: true
+    wef_collector_server: "{{ defender_wef_collector }}"
+    adcs_domain: "{{ defender_domain }}"
+    adcs_configure_dc_settings: true
+    adcs_enable_web_enrollment: true
+    adcs_test_user: jsmith
+    smb_domain: "{{ defender_netbios }}"
+    smb_shares_base: "C:\\Shares"
+    smb_create_honeypot: true
+    sysmon_install_dir: "C:\\Tools\\Sysmon"
+    sysmon_force_reinstall: false
+    # AD population from defender_lab.yml (x-admin-pass → domain_admin_password above)
+    organizational_units: "{{ defender_organizational_units }}"
+    security_groups: "{{ defender_security_groups }}"
+    standard_users: "{{ defender_standard_users }}"
+    kerberoastable_accounts: "{{ defender_kerberoastable_accounts }}"
+    asrep_roastable_accounts: "{{ defender_asrep_roastable_accounts }}"
+    high_value_accounts: "{{ defender_high_value_accounts }}"
+    ad_configure_lockout: "{{ defender_ad_configure_lockout }}"
+    ad_lockout_threshold: "{{ defender_ad_lockout_threshold }}"
+    ad_lockout_duration_mins: "{{ defender_ad_lockout_duration_mins }}"
+    ad_lockout_observation_window_mins: "{{ defender_ad_lockout_observation_window_mins }}"
+  roles:
+    - { role: 'mde_prereqs', tags: ['defender', 'mde_prereqs'] }
+    - { role: 'wef', tags: ['defender', 'wef'] }
+    - { role: 'sysmon', tags: ['defender', 'sysmon'] }
+    - { role: 'adcs_lab', tags: ['defender', 'adcs_lab'] }
+    - { role: 'ad_population', tags: ['defender', 'ad_population'] }
+    - { role: 'smb_shares', tags: ['defender', 'smb_shares'] }
+    - { role: 'enable_mdi_gpo', tags: ['defender', 'enable_mdi_gpo'] }
+
+- name: MDE/MDI prerequisites and WEF forwarder on ADFS server and Entra
+  hosts:
+    - adfs_server
+    - entra
+  vars_files:
+    - vars/defender_lab.yml
+    - vars/defender_lab_mde_shared.yml
+  vars:
+    domain_name: "{{ defender_domain }}"
+    wef_mode: forwarder
+    wef_collector_server: "{{ defender_wef_collector }}"
+    smb_domain: "{{ defender_netbios }}"
+    smb_shares_base: "C:\\Shares"
+    smb_create_honeypot: false
+    sysmon_install_dir: "C:\\Tools\\Sysmon"
+    sysmon_force_reinstall: false
+  roles:
+    - { role: 'mde_prereqs', tags: ['defender', 'mde_prereqs'] }
+    - { role: 'sysmon', tags: ['defender', 'sysmon'] }
+    - { role: 'wef', tags: ['defender', 'wef'] }
+    - { role: 'smb_shares', tags: ['defender', 'smb_shares'] }
+
+- name: MDE/MDI prerequisites, WEF forwarder, ASR and RSAT on workstation
+  hosts: adfs_workstation
+  vars_files:
+    - vars/defender_lab.yml
+    - vars/defender_lab_mde_shared.yml
+  vars:
+    domain_name: "{{ defender_domain }}"
+    wef_mode: forwarder
+    wef_collector_server: "{{ defender_wef_collector }}"
+    smb_domain: "{{ defender_netbios }}"
+    smb_shares_base: "C:\\Shares"
+    smb_create_honeypot: true
+    sysmon_install_dir: "C:\\Tools\\Sysmon"
+    sysmon_force_reinstall: false
+  roles:
+    - { role: 'rsat', tags: ['defender', 'rsat'] }
+    - { role: 'smb_shares', tags: ['defender', 'smb_shares'] }
+    - { role: 'sysmon', tags: ['defender', 'sysmon'] }
+    - { role: 'wef', tags: ['defender', 'wef'] }
+    - { role: 'enable_asr', tags: ['defender', 'enable_asr'] }
+    - { role: 'mde_prereqs', tags: ['defender', 'mde_prereqs'] }
+
+- name: Install and configure ADFS server
+  hosts: adfs_server
+  vars:
+    adfs_service_account: "adfs_svc"
+    adfs_service_account_password: "password"
+    adfs_service_display_name: "ADFS Service"
+    adfs_hostname: "adfs.sevenkingdoms.local"
+    adfs_FQDN_CA: "kingslanding.sevenkingdoms.local\\SEVENKINGDOMS-CA"
+    adfs_CA: "SEVENKINGDOMS-CA"
+    adfs_certificate_subject: "CN=adfs.sevenkingdoms.local, O=SEVENKINGDOMS, C=US"
+  roles:
+    - { role: 'install_adfs', tags: ['install_adfs'] }
+
+- name: Prepare Entra Connect server
+  hosts: entra
+  vars:
+    adfs_CA: "SEVENKINGDOMS-CA"
+    ludus_entra_join_svc_account: "entra_svc"
+    ludus_entra_join_svc_account_password: "password"
+    ludus_entra_join_alt_upn: ""
+  roles:
+    - { role: 'entra_prep', tags: ['entra_prep'] }
+
+- name: Trust ADFS root CA on workstation
+  hosts: adfs_workstation
+  vars:
+    adfs_CA: "SEVENKINGDOMS-CA"
+  roles: []
+
+- name: Install and integrate GitLab with ADFS
+  hosts: gitlab
+  become: true
+  vars:
+    gitlab_domain: "gitlab.sevenkingdoms.local"
+    adfs_fqdn: "adfs.sevenkingdoms.local"
+    adfs_service_account: "SEVENKINGDOMS\\adfs_svc"
+    adfs_host: "adfs-adfs"
+    dc_host: "dc01"
+    gitlab_ip: "{{ ansible_host }}"
+    gitlab_version: "18.6.2"
+  roles:
+    - { role: 'install_gitlab', tags: ['install_gitlab'] }

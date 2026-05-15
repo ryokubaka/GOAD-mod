@@ -1,0 +1,16 @@
+{
+    "name": "adfs",
+    "description": "Add an ADFS / Entra Connect / GitLab SAML environment to the current lab",
+    "machines": [
+        "adfs-adfs",
+        "adfs-entraconnect",
+        "adfs-ws01",
+        "adfs-gitlab"
+    ],
+    "compatibility": [
+        "GOAD",
+        "GOAD-Light",
+        "GOAD-Mini"
+    ],
+    "impact": "add a new domain controller, ADFS server, Entra Connect server, workstation, and GitLab instance integrated with ADFS"
+}

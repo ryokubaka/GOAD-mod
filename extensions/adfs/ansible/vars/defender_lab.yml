@@ -1,0 +1,139 @@
+---
+# Defender / MDE-MDI lab config for ADFS extension (sevenkingdoms.local / GOAD)
+# Based on ZephrFish/ludus-defender-lab zsec-mde-mdi-lab.yml
+# Passwords: domain_admin_password is overridden at play time from lab.domains; others are defaults for ad_population.
+
+# ─── Environment (sevenkingdoms.local / GOAD) ─────────────────────────────────
+defender_domain: "sevenkingdoms.local"
+defender_netbios: "SEVENKINGDOMS"
+defender_dc_hostname: "dc01"
+defender_wks_hostname: "wks01"
+defender_ca_name: "SEVENKINGDOMS-CA"
+defender_wef_collector: "dc01.sevenkingdoms.local"
+defender_timezone: "America/New_York"
+
+# Passwords — admin is overridden from lab in install.yml; these are defaults for ad_population users/svc accounts
+defender_admin_pass: "D0main@dmin2026"
+defender_user_pass: "Welcome2026!"
+defender_safemode_pass: "S@feM0de2026!"
+
+# ─── MDE shared (base for all hosts; DC plays override DC-only keys) ───────────
+defender_mde_shared:
+  mde_enable_high_performance_power_plan: false
+  mde_enable_cloud_protection: true
+  mde_cloud_block_level: High
+  mde_submit_samples_consent: NeverSend
+  mde_enable_network_protection: true
+  mde_network_protection_mode: Enabled
+  mde_enforce_tls12: true
+  mde_set_telemetry_level: true
+  mde_telemetry_level: 2
+  mde_ensure_diagtrack: true
+  mde_enable_pua_protection: true
+  mde_set_controlled_folder_access: true
+  mde_controlled_folder_access: AuditMode
+  mde_enable_exploit_protection: true
+  mde_enable_firewall: true
+  mde_fix_disable_antispyware: true
+  mde_enable_ps_scriptblock_logging: true
+  mde_enable_ps_module_logging: true
+  mde_enable_ps_transcription: true
+  mde_ps_transcription_path: "C:\\PSTranscripts"
+  mde_security_log_size_mb: 1024
+  mde_system_log_size_mb: 512
+  mde_application_log_size_mb: 512
+  mde_enable_additional_log_channels: true
+  mde_defender_log_size_mb: 64
+  mde_ps_operational_log_size_mb: 128
+  mde_wmi_log_size_mb: 64
+  mde_task_log_size_mb: 64
+  mde_dns_log_size_mb: 32
+  mde_enable_process_cmdline_audit: true
+  mde_enable_advanced_audit_policy: true
+  mde_enable_ntlm_auditing: false
+  mde_enable_adcs_ca_auditing: false
+  mde_update_signatures: true
+  mde_verify_defender_services: true
+  mde_ensure_health_services: true
+  mde_configure_restrict_remote_sam: true
+  mde_enable_ldap_diagnostic_logging: false
+  mde_run_readiness_check: true
+  mde_enable_lsa_hardening: true
+  mde_lsa_run_as_ppl: 1
+  mde_lm_compat_level: 5
+  mde_wdigest_use_logon_cred: 0
+  mde_disable_restricted_admin: 0
+  mde_configure_scanning_fidelity: true
+  mde_enable_file_hash_computation: true
+  mde_disable_email_scanning: false
+  mde_disable_removable_drive_scanning: false
+  mde_signature_update_interval: 1
+  mde_enable_firewall_logging: true
+  mde_firewall_log_size_kb: 32767
+  mde_enable_extended_audit_subcategories: true
+  mde_enable_dc_log_channels: false
+
+# DC-only overrides (merged in install.yml for adfs_dc)
+defender_mde_dc_overrides:
+  mde_enable_high_performance_power_plan: true
+  mde_enable_ntlm_auditing: true
+  mde_enable_adcs_ca_auditing: true
+  mde_enable_ldap_diagnostic_logging: true
+  mde_ldap_diagnostic_level: 5
+  mde_enable_dc_log_channels: true
+  mde_ds_log_size_mb: 256
+  mde_ntlm_op_log_size_mb: 64
+  mde_enable_kerberos_auditing: true
+  mde_enable_dns_diagnostic_logging: true
+
+# ─── AD population (OUs, groups, users — sevenkingdoms.local / dc01) ───────────
+defender_organizational_units:
+  - name: Staff
+    description: "Lab staff accounts"
+    sub_ous: [IT, Finance, HR]
+  - name: Service Accounts
+    description: "Service account OU"
+  - name: Servers
+    description: "Server OU"
+  - name: Workstations
+    description: "Workstation OU"
+
+defender_security_groups:
+  - name: IT-Admins
+    description: "IT Department Administrators"
+  - name: Server-Operators
+    description: "Server management group"
+  - name: Backup-Operators
+    description: "Backup service group"
+  - name: MDI-Excluded
+    description: "Accounts excluded from MDI monitoring (honeytoken bait)"
+
+defender_standard_users:
+  - { first: John, last: Smith, username: jsmith, password: "Welcome2026!", department: IT, groups: [IT-Admins] }
+  - { first: Alice, last: Brown, username: abrown, password: "Welcome2026!", department: IT, groups: [IT-Admins] }
+  - { first: Bob, last: Wilson, username: bwilson, password: "Welcome2026!", department: IT, groups: [IT-Admins] }
+  - { first: Carol, last: Davis, username: cdavis, password: "Welcome2026!", department: IT, groups: [IT-Admins, Server-Operators] }
+  - { first: Dave, last: Miller, username: dmiller, password: "Welcome2026!", department: IT, groups: [Server-Operators] }
+  - { first: Sarah, last: Connor, username: sconnor, password: "Welcome2026!", department: Finance }
+  - { first: Mike, last: Chen, username: mchen, password: "Password123!", department: HR }
+  - { first: Tanya, last: Lee, username: tlee, password: "Welcome2026!", department: IT }
+  - { first: Maria, last: Garcia, username: mgarcia, password: "Welcome2026!", department: HR }
+  - { first: James, last: OBrien, username: jobrien, password: "Welcome2026!", department: Finance }
+  - { first: Lisa, last: Nakamura, username: lnakamura, password: "Welcome2026!", department: IT, groups: [IT-Admins] }
+
+defender_kerberoastable_accounts:
+  - { name: svc_backup, spn: "backup/dc01.sevenkingdoms.local", password: "SvcBackup2026!" }
+  - { name: svc_sql, spn: "MSSQLSvc/dc01.sevenkingdoms.local:1433", password: "SqlService2026!" }
+
+defender_asrep_roastable_accounts:
+  - { name: svc_legacy, password: "Legacy2026!" }
+
+defender_high_value_accounts:
+  - { name: svc_deploy, password: "D3pl0y@utomation!", groups: [Backup-Operators] }
+  - { name: svc_mdi, password: "MdiSensor2026!@", groups: [] }
+
+# ad_population lockout policy
+defender_ad_configure_lockout: true
+defender_ad_lockout_threshold: 10
+defender_ad_lockout_duration_mins: 30
+defender_ad_lockout_observation_window_mins: 30

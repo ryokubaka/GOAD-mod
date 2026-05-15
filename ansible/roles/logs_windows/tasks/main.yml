@@ -1,97 +1,71 @@
----
-- name: Ensure installation directory exists
+- name: Install winlogbeat
+  import_tasks: winlogbeat.yml
+
+- name: Set winlogbeat config file
+  win_copy:
+    src: winlogbeat.yml
+    dest: C:\ProgramData\chocolatey\lib\winlogbeat\tools\
+
+# sysmon install (https://github.com/NVISOsecurity/ansible-sysmon)
+- name: Create directory
   win_file:
-    path: "{{ install_dir }}"
+    path: "{{ sysmon_install_location }}"
     state: directory
-    mode: '0755'
-
-- name: Check if elastic agent zip is already downloaded
-  win_stat:
-    path: "{{ elastic_agent_zip }}"
-  register: agentzip_stat
-
-- name: Create elastic agent zip directory if it doesn't exist
-  win_file:
-    path: "C:\\tmp"
-    state: directory
-    mode: '0755'
-
-- name: Download Elastic Agent
-  win_get_url:
-    url: "{{ elastic_agent_url }}"
-    dest: "{{ elastic_agent_zip }}"
-  when: not agentzip_stat.stat.exists
-
-- name: Check if elastic agent is present
-  win_stat:
-    path: "{{ install_dir }}/elastic_agent.exe"
-  register: agent_stat
-
-- name: Extract Elastic Agent
-  win_unzip:
-    src: "{{ elastic_agent_zip }}"
-    dest: "{{ install_dir }}"
-    remote_src: yes
-  when: not agent_stat.stat.exists
-
-- name: Check if elastic agent is already installed
-  win_stat:
-    path: "C:\\Program Files\\Elastic\\Agent\\elastic-agent.exe"
-  register: agentinstall_stat
-
-- name: Uninstall Elastic Agent
-  win_shell: | 
-    echo Y | & "C:\\Program Files\\Elastic\\Agent\\elastic-agent.exe" uninstall
-  when: agentinstall_stat.stat.exists
-  register: uninstall_stat
-
-- name: Count network adapters
-  set_fact:
-    adapter_count: "{{ ansible_facts.interfaces | length }}"
-
-- name: Set two_adapters fact based on adapter count
-  set_fact:
-    two_adapters: "{{ adapter_count | int > 2 }}"
-
-- name: Define elk_server IP address where no NAT is used
-  set_fact:
-    elk_host: "{{ ansible_facts.interfaces[0].ipv4.address.split('.')[0:3] | join('.') }}.50"
-  when: two_adapters == false
-
-- name: Define fleet_server IP address where NAT is used
-  set_fact:
-    elk_host: "{{ ansible_facts.interfaces[1].ipv4.address.split('.')[0:3] | join('.') }}.50"
-  when: two_adapters == true
-
-- name: Check for cluster health; wait 120 seconds for health status
-  win_shell: |
-    curl.exe -XGET -u {{ es_api_basic_auth_username }}:{{ es_api_basic_auth_password }} \
-    'http://{{ elk_host }}:5601/api/fleet/package_policies' -H 'Content-Type: application/json' \
-    -H 'kbn-xsrf: true'
   register: result
-  until: result.rc == 0 and (result.stdout | default('')) != '' and ('Kibana server is not ready yet' not in (result.stdout | default('')))
-  retries: 10
-  delay: 10
 
-- name: Fetch enrollment API keys
-  win_shell: |
-    curl.exe -XGET -u {{ es_api_basic_auth_username }}:{{ es_api_basic_auth_password }} \
-    'http://{{ elk_host }}:5601/api/fleet/enrollment_api_keys' -H 'Content-Type: application/json' \
-    -H 'kbn-xsrf: true'
-  register: enrollment_key
-  run_once: true
+- name: Get sysmon zip
+  win_copy:
+    src: "{{ sysmon_download_file }}{{ file_ext }}"
+    dest: "{{ sysmon_install_location }}/{{ sysmon_download_file }}{{ file_ext }}"
 
-- name: Convert enrollment_key to proper data structure
-  set_fact:
-    parsed_enrollment_key: "{{ enrollment_key.stdout | from_json }}"
+- name: Unzip sysmon
+  win_unzip:
+    src: "{{ sysmon_install_location }}/{{ sysmon_download_file }}{{ file_ext }}"
+    dest: "{{ sysmon_install_location }}"
 
-- name: Extract api_key for specific policy_id
-  set_fact:
-    api_key: "{{ parsed_enrollment_key | json_query(\"items[?policy_id == 'agent-policy'].api_key | [0]\") }}"
-  run_once: true
+- name: Copy sysmon config
+  win_copy:
+    src: sysmonconfig-export.xml
+    dest: c:\sysmon\sysmonconfig-export.xml
 
-- name: Install Elastic Agent
-  # Since I am using self-signed certificate, I have added "--insecure" flag at the end.
-  win_shell: | 
-    echo Y | & "{{ install_dir }}\elastic-agent-{{ elastic_agent_version }}-windows-x86_64\elastic-agent.exe" install --url=http://"{{ elk_host }}":8220 --enrollment-token="{{ api_key }}" --insecure -f
-  when: not agentinstall_stat.stat.exists or uninstall_stat
+# RUN sysmon
+- name: check sysmon service
+  win_service:
+    name: sysmon64
+  register: result
+  failed_when: result is not defined
+  ignore_errors: yes
+
+- name: Run sysmon
+  win_command: "{{ sysmon_install_location }}\\sysmon64.exe -accepteula -i {{ sysmon_install_location }}\\sysmonconfig-export.xml"
+  args:
+    chdir: "{{ sysmon_install_location }}"
+  when: result.state is not defined or result.name is not defined
+
+# RUN winlogbeat
+- name: check winlogbeat service
+  win_service:
+    name: winlogbeat
+  register: resultwlb
+  failed_when: resultwlb is not defined
+  ignore_errors: yes
+
+- name: Reboot before launch setup
+  win_reboot:
+    reboot_timeout: 600
+    post_reboot_delay: 100
+  when: resultwlb.state is defined and resultwlb.state != 'running'
+
+- name: Run winlogbeat setup
+  win_command: "winlogbeat setup -e"
+  args:
+    chdir: "{{ winlogbeat_service.install_path_64 }}\\winlogbeat-{{ winlogbeat_service.version }}-windows-x86_64\\"
+  when: resultwlb.state is defined and resultwlb.state != 'running'
+
+# RUN winlogbeat
+- name: check winlogbeat service
+  win_service:
+    name: winlogbeat
+    start_mode: auto
+    state: started
+  when: resultwlb.state is defined and resultwlb.state != 'running'

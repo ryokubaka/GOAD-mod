@@ -1,0 +1,5 @@
+---
+# Optional: original ludus-defender-lab uses badsectorlabs.ludus_adcs for AD CS.
+# This extension uses install_adcs + adcs_lab (ESC1-15) instead; install if you need the Galaxy role for other playbooks.
+# roles:
+#   - name: badsectorlabs.ludus_adcs

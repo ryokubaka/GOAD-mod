@@ -1,0 +1,37 @@
+#Used from https://github.com/badsectorlabs/ludus_adcs/blob/main/tasks/main.yml and https://github.com/Synzack/ludus_sccm/tree/main/roles/install_adcs/tasks
+---
+- name: Install ADCS
+  ansible.windows.win_feature:
+    name: AD-Certificate
+    state: present
+    include_sub_features: true
+    include_management_tools: true
+  register: adcs_feature
+
+- name: Install-ADCSCertificationAuthority-PS
+  ansible.windows.win_powershell:
+    script: |
+      [CmdletBinding()]
+      param (
+          [String]
+          $ca_common_name
+      )
+      try {
+        Install-AdcsCertificationAuthority -CAType EnterpriseRootCA -CryptoProviderName "RSA#Microsoft Software Key Storage Provider" -KeyLength 2048 -HashAlgorithmName SHA256 -ValidityPeriod Years -ValidityPeriodUnits 5 -CACommonName $ca_common_name -Force
+        $Ansible.Changed = $true
+      } catch {
+        $Ansible.Changed = $false
+      }
+    error_action: stop
+    parameters:
+      ca_common_name: '{{ adfs_CA | default("SEVENKINGDOMS-CA") }}'
+  register: adcs_ca_install
+  
+- name: Reboot after ADCS Installation
+  ansible.windows.win_reboot:
+  when: adcs_feature is changed or adcs_ca_install is changed
+
+- name: Ensure WebServer certificate template is issued on CA
+  ansible.windows.win_shell: |
+    certutil.exe -setcatemplates +WebServer
+  when: inventory_hostname == 'dc01'

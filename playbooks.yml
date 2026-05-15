@@ -45,6 +45,9 @@ SCCM:
   # replay client install fix some issue in enrollment for CLIENT
   - sccm-client.yml
 
+GOAD-Smoke:
+  - smoke.yml
+
 GOAD-Mini:
   - build.yml
   - ad-servers.yml
@@ -55,6 +58,22 @@ GOAD-Mini:
   - ad-acl.yml
   - security.yml
   - vulnerabilities.yml
+
+DRACARYS:
+  - build.yml
+  - ad-servers.yml
+  - ad-parent_domain.yml
+  - ad-members.yml
+  - ad-enroll_linux.yml
+  - ad-data.yml
+  - ad-relations.yml
+  - ad-acl.yml
+  - klink.yml
+  - keepass.yml
+  - security.yml
+  - vulnerabilities.yml
+  - reboot.yml
+  - glpi.yml
 
 default:
   - build.yml

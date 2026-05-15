@@ -1,8 +1,7 @@
 boxes.append(
   { :name => "{{lab_name}}-WS01",
     :ip => "{{ip_range}}.31",
-#    :box => "mayfly/windows10",
-    :box => "stromweld/windows-11",
+    :box => "mayfly/windows10",
     :os => "windows",
     :cpus => 2,
     :mem => 4000

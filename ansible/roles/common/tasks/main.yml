@@ -62,7 +62,3 @@
     metric: 1
     state: present
   when: add_route == "yes"
-
-- name: Import chocolate application install tasks
-  import_tasks:
-    file: chocolatey.yml

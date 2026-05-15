@@ -61,10 +61,16 @@
 - [X] extension elk
 - [X] extension ws01
 - [X] extension exchange add a bot to read mails
-- [ ] extension guacamole
+- [X] extension guacamole
+- [X] extension linux VM enrolled
+- [X] ADCS add vulns
+
+## maybe one day if i get the time
+- [ ] new training lab
+- [ ] extension "life", add some bots in the lab
+- [ ] extension Xworkstations, to add multiple workstations
 - [ ] extension attackbox
 - [ ] extension VPN
-- [ ] extension linux VM enrolled
 - [ ] Add Applocker to ws01
 - [ ] Wsus (to add on sccm)
-- [ ] ADCS add vulns
+

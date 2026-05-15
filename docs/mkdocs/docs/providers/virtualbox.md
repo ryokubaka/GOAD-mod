@@ -17,7 +17,6 @@
         - winrm
         - winrm-fs
         - winrm-elevated
-        - vagrant-scp
 
 - Provisioning
     - Python3 >=3.8

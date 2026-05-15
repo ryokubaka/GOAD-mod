@@ -22,12 +22,16 @@ nav:
     - GOAD: labs/GOAD.md
     - GOAD-Light: labs/GOAD-Light.md
     - GOAD-Mini: labs/GOAD-Mini.md
+    - GOAD-Smoke: labs/GOAD-Smoke.md
     - NHA: labs/NHA.md
+    - DRACARYS: labs/DRACARYS.md
     - SCCM: labs/SCCM.md
     - MINILAB: labs/MINILAB.md
   - 📈 Extensions:
     - index: extensions/index.md
+    - guacamole: extensions/guacamole.md
     - exchange: extensions/exchange.md
+    - lx01: extensions/lx01.md
     - ws01: extensions/ws01.md
     - elk: extensions/elk.md
     - wazuh: extensions/wazuh.md

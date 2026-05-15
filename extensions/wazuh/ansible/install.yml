@@ -1,27 +1,5 @@
 #Aleem Ladha @LadhaAleem
 #Credits to SOCFortress and Mayfly277
-- name: Enable nat interface (server)
-  hosts: wazuh_server
-  gather_facts: false
-  tasks:
-    - name: NAT interface check
-      block:
-        - name: Find NAT interface
-          set_fact:
-            target_interface: "{{ ansible_facts.interfaces[1] }}"
-          register: interface_result
-
-        - name: Enable NAT interface
-          shell: 'ip link set {{ target_interface }} up'
-          become: true
-      when: (two_adapters | default(false)) == true
-
-- name: Enable nat interface (windows)
-  hosts: wazuh_agents
-  gather_facts: false
-  roles:
-    - { role: 'settings/enable_nat_adapter' , tags: 'enable_nat_adapter'}
-
 - name: Install and configure Wazuh Manager
   hosts: wazuh_server
   become: yes
@@ -35,24 +13,10 @@
   vars:
     wazuh_manager_host: "{{ hostvars['wazuh']['ansible_host'] }}"
 
-- name: Disable nat interface (windows)
-  hosts: wazuh_agents
-  gather_facts: false
+- name: Install Wazuh Agent
+  hosts: wazuh_agents_linux
+  become: yes
   roles:
-    - { role: 'settings/disable_nat_adapter' , tags: 'disable_nat_adapter'}
-
-- name: Disable nat interface (server)
-  hosts: wazuh_server
-  gather_facts: false
-  tasks:
-    - name: NAT interface check
-      block:
-        - name: Find NAT interface
-          set_fact:
-            target_interface: "{{ ansible_facts.interfaces[1] }}"
-          register: interface_result
-
-        - name: Disable NAT interface
-          shell: 'ip link set {{ target_interface }} down'
-          become: true
-      when: (two_adapters | default(false)) == true
+    - { role: 'wazuh_agent_linux', tags: 'wazuh_agent_linux' }
+  vars:
+    wazuh_manager_host: "{{ hostvars['wazuh']['ansible_host'] }}"

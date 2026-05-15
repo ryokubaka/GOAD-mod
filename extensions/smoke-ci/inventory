@@ -1,0 +1,1 @@
+# smoke-ci declares no extension VMs. The install playbook targets localhost only.

@@ -10,9 +10,3 @@ winlogbeat_service:
   install_path_32: "C:\\Program Files (x86)\\Elastic\\winlogbeat"
   version: "7.17.6"
   download: true
-
-###
-
-elastic_agent_url: "https://artifacts.elastic.co/downloads/beats/elastic-agent/elastic-agent-{{ elastic_agent_version }}-windows-x86_64.zip"
-elastic_agent_zip: "C:\\tmp\\elastic-agent-{{ elastic_agent_version }}-windows-x86_64.zip"
-install_dir: "C:\\Program Files\\Elastic"
