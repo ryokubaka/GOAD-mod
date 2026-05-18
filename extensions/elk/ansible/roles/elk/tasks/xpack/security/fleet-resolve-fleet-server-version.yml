@@ -1,0 +1,25 @@
+---
+# EPR returns 400 for .../package/fleet_server/latest/ — use concrete semver; prefer Kibana EPM.
+- name: Initialize Fleet Server integration package version
+  ansible.builtin.set_fact:
+    elastic_fleet_server_resolved_version: "{{ elastic_fleet_server_package_version }}"
+
+- name: Query Fleet EPM for fleet_server package
+  ansible.builtin.uri:
+    url: "http://{{ fleet_server }}:5601/api/fleet/epm/packages/fleet_server"
+    method: GET
+    user: "{{ es_api_basic_auth_username }}"
+    password: "{{ es_api_basic_auth_password }}"
+    force_basic_auth: true
+    status_code: [200]
+  register: fleet_server_epm_lookup
+  failed_when: false
+
+- name: Override Fleet Server package version from Kibana EPM
+  ansible.builtin.set_fact:
+    elastic_fleet_server_resolved_version: "{{ fleet_server_epm_lookup.json.item.version }}"
+  when:
+    - fleet_server_epm_lookup is defined
+    - not (fleet_server_epm_lookup.failed | default(false))
+    - (fleet_server_epm_lookup.status | default(0)) == 200
+    - (fleet_server_epm_lookup.json.item.version | default('') | length) > 0

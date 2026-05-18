@@ -65,7 +65,7 @@ xpack.fleet.packages:
   - name: security_detection_engine
     version: latest
   - name: fleet_server
-    version: latest
+    version: "{{ elastic_fleet_server_package_version }}"
   - name: windows
     version: "3.8.3"
 # Endpoint/Elastic Defend cannot be preconfigured here (Elastic limitation). Use Fleet API after Fleet Server is up.
@@ -79,7 +79,9 @@ xpack.fleet.agentPolicies:
       - logs
       - metrics
     package_policies:
-      - name: fleet_server-1
+      # Preconfig schema: package_policies need id; package only allows name (no version — pin under xpack.fleet.packages).
+      - id: fleet-server-policy-fleet_server-1
+        name: fleet_server-1
         package:
           name: fleet_server
   - name: agent-policy
@@ -90,7 +92,8 @@ xpack.fleet.agentPolicies:
       - logs
       - metrics
     package_policies:
-      - name: system-1
+      - id: agent-policy-system-1
+        name: system-1
         package:
           name: system
 

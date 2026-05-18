@@ -84,3 +84,5 @@ elastic_agent_install_insecure: false
 # EPR rejects "latest" in package_policies POST; use a semver or set elastic_windows_integration_version: latest to resolve via Fleet EPM GET.
 elastic_windows_integration_version: "3.8.3"
 elastic_windows_integration_version_epm_fallback: "3.8.3"
+# Fleet Server integration package (fleet-server-policy). EPR rejects fleet_server/latest; pin semver (see fleet-resolve-fleet-server-version.yml).
+elastic_fleet_server_package_version: "9.4.0"

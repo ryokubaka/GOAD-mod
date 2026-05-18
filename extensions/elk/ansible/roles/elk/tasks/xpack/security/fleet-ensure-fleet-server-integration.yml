@@ -1,6 +1,9 @@
 ---
 # fleet-server-policy can exist with package_policies: [] after bad Kibana/ES startup.
 # Preconfig does not always repair; attach Fleet Server integration via API when missing.
+- name: Resolve Fleet Server package version for Fleet API
+  ansible.builtin.include_tasks: fleet-resolve-fleet-server-version.yml
+
 - name: Refresh Fleet Server agent policy from API
   uri:
     url: "http://{{ fleet_server }}:5601/api/fleet/agent_policies/fleet-server-policy"
@@ -40,7 +43,7 @@
       force: true
       package:
         name: fleet_server
-        version: latest
+        version: "{{ elastic_fleet_server_resolved_version | default(elastic_fleet_server_package_version) }}"
       inputs:
         - type: fleet-server
           policy_template: fleet_server
