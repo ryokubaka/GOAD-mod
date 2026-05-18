@@ -163,6 +163,15 @@
     name: elasticsearch
     state: started
 
+# Kibana starts fast; ES often is not listening yet → ECONNREFUSED spam and broken Fleet preconfig.
+- name: Wait for Elasticsearch TCP before starting Kibana
+  wait_for:
+    host: "{{ fleet_server }}"
+    port: 9200
+    delay: 5
+    timeout: 600
+    state: started
+
 - name: start kibana
   service:
     name: kibana

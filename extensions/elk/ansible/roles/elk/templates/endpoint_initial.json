@@ -2,12 +2,11 @@
   "name": "endpoint-1",
   "namespace": "default",
   "description": "",
-  "force": "true",
+  "force": true,
   "package": {
     "name": "endpoint",
-    "version": "{{ elastic_defend_version }}",
+    "version": "{{ elastic_defend_resolved_version | default(elastic_defend_version) }}"
   },
-  "enabled": true,
   "policy_id": "agent-policy",
   "inputs": [
     {

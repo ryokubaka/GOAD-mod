@@ -97,6 +97,11 @@
     become: yes
     shell: printf "y\n{{ es_api_basic_auth_password }}\n{{ es_api_basic_auth_password }}" | /usr/share/elasticsearch/bin/elasticsearch-reset-password --username kibana_system -i
 
+  - name: Restart Kibana after Elasticsearch security bootstrap
+    become: yes
+    service:
+      name: kibana
+      state: restarted
 
 ### END BLOCK elasticsearch keystore ###
 

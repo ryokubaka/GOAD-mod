@@ -1,0 +1,103 @@
+---
+# Add Windows integration with Sysmon Operational log channel to agent-policy (no Endpoint here).
+# Skips if a windows package policy already exists on this agent policy.
+- name: Refresh agent-policy from Fleet API
+  uri:
+    url: "http://{{ fleet_server }}:5601/api/fleet/agent_policies/agent-policy"
+    method: GET
+    user: "{{ es_api_basic_auth_username }}"
+    password: "{{ es_api_basic_auth_password }}"
+    force_basic_auth: true
+    status_code: [200]
+  register: agent_policy_refresh
+
+- name: List package names on agent-policy
+  set_fact:
+    _agent_policy_pkg_names: >-
+      {{
+        agent_policy_refresh.json.item.package_policies | default([])
+        | selectattr('package', 'defined')
+        | map(attribute='package')
+        | map(attribute='name')
+        | list
+      }}
+
+# Package registry returns 400 for .../package/windows/latest/ — must use a concrete semver (or resolve below).
+- name: Initialize Windows package version for Fleet API
+  set_fact:
+    _windows_pkg_version: "{{ elastic_windows_integration_version }}"
+
+- name: Query Fleet EPM for Windows package version when var is latest
+  uri:
+    url: "http://{{ fleet_server }}:5601/api/fleet/epm/packages/windows"
+    method: GET
+    user: "{{ es_api_basic_auth_username }}"
+    password: "{{ es_api_basic_auth_password }}"
+    force_basic_auth: true
+    status_code: [200]
+  register: windows_epm_pkg
+  when: elastic_windows_integration_version | lower == 'latest'
+  failed_when: false
+
+- name: Override Windows package version from EPM response
+  set_fact:
+    _windows_pkg_version: "{{ windows_epm_pkg.json.item.version | default(elastic_windows_integration_version_epm_fallback, true) }}"
+  when:
+    - elastic_windows_integration_version | lower == 'latest'
+    - windows_epm_pkg is defined
+    - not (windows_epm_pkg.failed | default(true))
+    - (windows_epm_pkg.status | default(0)) == 200
+    - (windows_epm_pkg.json.item.version | default('') | length) > 0
+
+- name: Fallback Windows package version when EPM lookup skipped or failed
+  set_fact:
+    _windows_pkg_version: "{{ elastic_windows_integration_version_epm_fallback }}"
+  when: _windows_pkg_version | lower == 'latest'
+
+- name: Assert Windows package version is a concrete semver for Fleet API
+  assert:
+    that:
+      - _windows_pkg_version | default('') | length > 0
+      - _windows_pkg_version | lower != 'latest'
+    fail_msg: >-
+      Could not resolve Windows integration version (EPR rejects package/windows/latest).
+      Set elastic_windows_integration_version to a semver (e.g. 3.8.3) or fix Fleet EPM connectivity.
+
+- name: Install Windows integration (Sysmon Operational) on agent-policy via Fleet API
+  uri:
+    url: "http://{{ fleet_server }}:5601/api/fleet/package_policies"
+    method: POST
+    user: "{{ es_api_basic_auth_username }}"
+    password: "{{ es_api_basic_auth_password }}"
+    force_basic_auth: true
+    headers:
+      kbn-xsrf: "true"
+      Content-Type: "application/json"
+    body_format: json
+    body:
+      name: windows-sysmon
+      namespace: default
+      policy_id: agent-policy
+      force: true
+      package:
+        name: windows
+        version: "{{ _windows_pkg_version }}"
+      inputs:
+        - type: winlog
+          policy_template: windows
+          enabled: true
+          streams:
+            - enabled: true
+              data_stream:
+                type: logs
+                dataset: windows.sysmon_operational
+              vars:
+                preserve_original_event:
+                  type: bool
+                  value: false
+                ignore_older:
+                  type: text
+                  value: 72h
+    status_code: [200]
+  when: "'windows' not in (_agent_policy_pkg_names | default([]))"
+  register: windows_sysmon_pp_install

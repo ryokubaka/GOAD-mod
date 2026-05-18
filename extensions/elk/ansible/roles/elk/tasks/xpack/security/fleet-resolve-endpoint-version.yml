@@ -1,0 +1,25 @@
+---
+# Elastic Defend package version != stack version (e.g. agent 9.4.1 but endpoint package 9.4.0). Prefer EPM via Kibana.
+- name: Initialize Elastic Defend endpoint package version
+  set_fact:
+    elastic_defend_resolved_version: "{{ elastic_defend_version }}"
+
+- name: Query Fleet EPM for endpoint (Elastic Defend) package
+  uri:
+    url: "http://{{ fleet_server }}:5601/api/fleet/epm/packages/endpoint"
+    method: GET
+    user: "{{ es_api_basic_auth_username }}"
+    password: "{{ es_api_basic_auth_password }}"
+    force_basic_auth: true
+    status_code: [200]
+  register: endpoint_epm_lookup
+  failed_when: false
+
+- name: Override Elastic Defend version from Kibana EPM
+  set_fact:
+    elastic_defend_resolved_version: "{{ endpoint_epm_lookup.json.item.version }}"
+  when:
+    - endpoint_epm_lookup is defined
+    - not (endpoint_epm_lookup.failed | default(false))
+    - (endpoint_epm_lookup.status | default(0)) == 200
+    - (endpoint_epm_lookup.json.item.version | default('') | length) > 0

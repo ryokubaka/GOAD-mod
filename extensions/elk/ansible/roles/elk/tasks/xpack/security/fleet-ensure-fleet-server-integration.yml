@@ -1,0 +1,69 @@
+---
+# fleet-server-policy can exist with package_policies: [] after bad Kibana/ES startup.
+# Preconfig does not always repair; attach Fleet Server integration via API when missing.
+- name: Refresh Fleet Server agent policy from API
+  uri:
+    url: "http://{{ fleet_server }}:5601/api/fleet/agent_policies/fleet-server-policy"
+    method: GET
+    user: "{{ es_api_basic_auth_username }}"
+    password: "{{ es_api_basic_auth_password }}"
+    force_basic_auth: true
+    status_code: [200]
+  register: fleet_policy_refresh
+
+- name: Detect package names on fleet-server-policy
+  set_fact:
+    _fleet_server_pkg_names: >-
+      {{
+        fleet_policy_refresh.json.item.package_policies | default([])
+        | selectattr('package', 'defined')
+        | map(attribute='package')
+        | map(attribute='name')
+        | list
+      }}
+
+- name: Install Fleet Server integration on fleet-server-policy via Fleet API
+  uri:
+    url: "http://{{ fleet_server }}:5601/api/fleet/package_policies"
+    method: POST
+    user: "{{ es_api_basic_auth_username }}"
+    password: "{{ es_api_basic_auth_password }}"
+    force_basic_auth: true
+    headers:
+      kbn-xsrf: "true"
+      Content-Type: "application/json"
+    body_format: json
+    body:
+      name: fleet_server-1
+      namespace: default
+      policy_id: fleet-server-policy
+      force: true
+      package:
+        name: fleet_server
+        version: latest
+      inputs:
+        - type: fleet-server
+          policy_template: fleet_server
+          enabled: true
+          streams: []
+    status_code: [200]
+  when: "'fleet_server' not in (_fleet_server_pkg_names | default([]))"
+  register: fleet_server_pp_install
+
+- name: Final refresh Fleet Server agent policy
+  uri:
+    url: "http://{{ fleet_server }}:5601/api/fleet/agent_policies/fleet-server-policy"
+    method: GET
+    user: "{{ es_api_basic_auth_username }}"
+    password: "{{ es_api_basic_auth_password }}"
+    force_basic_auth: true
+    status_code: [200]
+  register: fleet_policy_final
+
+- name: Assert fleet-server-policy has package policies
+  assert:
+    that:
+      - (fleet_policy_final.json.item.package_policies | default([]) | length) > 0
+    fail_msg: >-
+      fleet-server-policy has no package_policies after ensure step (Fleet API may have failed);
+      check Kibana logs, package registry, and fleet_server package version.

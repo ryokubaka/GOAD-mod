@@ -76,3 +76,11 @@ es_delete_unmanaged_native: true
 elastic_agent_url: "https://artifacts.elastic.co/downloads/beats/elastic-agent/elastic-agent-{{ elastic_agent_version }}-linux-x86_64.tar.gz"
 elastic_agent_tar: "elastic-agent-{{ elastic_agent_version }}-linux-x86_64.tar.gz"
 install_dir: "/opt/Elastic"
+# Full OS reboot before Fleet Server elastic-agent install (often unnecessary; can race Kibana/Fleet startup).
+elastic_agent_reboot_before_install: false
+# Passes through to elastic-agent install when Elasticsearch uses TLS with untrusted certs (not needed for http://).
+elastic_agent_install_insecure: false
+# Windows Fleet package version for Sysmon (Operational) on agent-policy.
+# EPR rejects "latest" in package_policies POST; use a semver or set elastic_windows_integration_version: latest to resolve via Fleet EPM GET.
+elastic_windows_integration_version: "3.8.3"
+elastic_windows_integration_version_epm_fallback: "3.8.3"

@@ -1,4 +1,6 @@
 ---
+# Fleet Server + Elastic Defend: Kibana preconfig supplies fleet-server-policy (fleet_server integration only).
+# Endpoint is added via API after Fleet Server is running (Elastic does not support Endpoint in kibana.yml preconfig).
 - name: Ensure jq is installed
   apt:
     name: jq
@@ -6,30 +8,101 @@
 
 - name: Check for cluster health; wait 120 seconds for health status
   shell: |
-    curl -XGET -u {{ es_api_basic_auth_username }}:{{ es_api_basic_auth_password }} \
+    curl -sS -XGET -u {{ es_api_basic_auth_username }}:{{ es_api_basic_auth_password }} \
     'http://{{ fleet_server }}:9200/_cluster/health?wait_for_status=yellow&timeout=120s' -H 'kbn-xsrf: true'
 
-- name: Wait 2 minutes because ELK is a pain
-  ansible.builtin.pause:
-    minutes: 2
+- name: Wait for Kibana port
+  wait_for:
+    host: "{{ fleet_server }}"
+    port: 5601
+    delay: 5
+    timeout: 600
+    state: started
 
-- name: Create service token
+- name: Wait for Kibana HTTP API
+  uri:
+    url: "http://{{ fleet_server }}:5601/api/status"
+    method: GET
+    user: "{{ es_api_basic_auth_username }}"
+    password: "{{ es_api_basic_auth_password }}"
+    force_basic_auth: true
+    status_code: [200]
+  register: kibana_api_wait
+  until: kibana_api_wait.status == 200
+  retries: 60
+  delay: 5
+
+- name: Wait for Fleet Server agent policy object (preconfig shell may have empty package_policies)
+  uri:
+    url: "http://{{ fleet_server }}:5601/api/fleet/agent_policies/fleet-server-policy"
+    method: GET
+    user: "{{ es_api_basic_auth_username }}"
+    password: "{{ es_api_basic_auth_password }}"
+    force_basic_auth: true
+    status_code: [200, 404]
+  register: fleet_server_policy_wait
+  until: >
+    fleet_server_policy_wait.status == 200
+    and fleet_server_policy_wait.json.item.id | default('') == 'fleet-server-policy'
+  retries: 36
+  delay: 10
+
+- name: Ensure Fleet Server integration exists on fleet-server-policy
+  ansible.builtin.include_tasks: fleet-ensure-fleet-server-integration.yml
+
+- name: List Fleet Server hosts
+  uri:
+    url: "http://{{ fleet_server }}:5601/api/fleet/fleet_server_hosts"
+    method: GET
+    user: "{{ es_api_basic_auth_username }}"
+    password: "{{ es_api_basic_auth_password }}"
+    force_basic_auth: true
+    status_code: [200]
+  register: fleet_server_hosts_list
+
+- name: Add fleet server host URL when not already present
+  uri:
+    url: "http://{{ fleet_server }}:5601/api/fleet/fleet_server_hosts"
+    method: POST
+    user: "{{ es_api_basic_auth_username }}"
+    password: "{{ es_api_basic_auth_password }}"
+    force_basic_auth: true
+    headers:
+      kbn-xsrf: "true"
+      Content-Type: "application/json"
+    body_format: json
+    body:
+      name: fleet-server-host
+      host_urls: ["http://{{ fleet_server }}:8220"]
+      is_default: true
+    status_code: [200]
+  when: (fleet_server_hosts_list.json['items'] | default([]) | length) == 0
+
+- name: Create Fleet Server service token
   uri:
     url: "http://{{ fleet_server }}:5601/api/fleet/service_tokens"
     method: POST
     user: "{{ es_api_basic_auth_username }}"
     password: "{{ es_api_basic_auth_password }}"
-    force_basic_auth: yes
+    force_basic_auth: true
     headers:
       Content-Type: "application/json"
       kbn-xsrf: "true"
-    status_code: 200
+    body_format: json
+    body: {}
+    status_code: [200]
   register: fleet_enrollment_token
 
-- name: Add fleet server host URL
-  shell: |
-    curl -sS -u {{ es_api_basic_auth_username }}:{{ es_api_basic_auth_password }} -XPOST -H "kbn-xsrf: kibana" -H "Content-type: application/json" "http://{{ fleet_server }}:5601/api/fleet/fleet_server_hosts" -d '{"name": "fleet-server-host", "host_urls": ["http://{{ fleet_server }}:8220"], "is_default": true}'
-  register: fleet_server_host_result
+- name: Set Fleet Server service token string
+  set_fact:
+    fleet_server_service_token: "{{ fleet_enrollment_token.json.item.value | default(fleet_enrollment_token.json.value, true) }}"
+
+- name: Assert Fleet Server service token was returned
+  assert:
+    that:
+      - fleet_server_service_token is defined
+      - fleet_server_service_token | length > 10
+    fail_msg: "Fleet service token missing from Kibana response; check /api/fleet/service_tokens and credentials."
 
 - name: Ensure installation directory exists
   file:
@@ -64,24 +137,85 @@
   shell: "echo 'Y' | sudo /usr/bin/elastic-agent uninstall"
   when: agentinstall_stat.stat.exists
   register: uninstall_stat
+  failed_when: false
+
+- name: Stat Elastic Agent after uninstall attempt
+  stat:
+    path: "/usr/bin/elastic-agent"
+  register: agent_after_uninstall
 
 - name: Reboot ELK server before elastic agent installation
   ansible.builtin.reboot:
     msg: "Rebooting ELK server before elastic agent installation"
+  when: elastic_agent_reboot_before_install | bool
 
-- name: Wait 2 minutes
-  ansible.builtin.pause:
-    minutes: 2
+- name: Wait for Elasticsearch after reboot
+  wait_for:
+    host: "{{ fleet_server }}"
+    port: 9200
+    delay: 5
+    timeout: 600
+    state: started
+  when: elastic_agent_reboot_before_install | bool
+
+- name: Wait for Kibana port after reboot
+  wait_for:
+    host: "{{ fleet_server }}"
+    port: 5601
+    delay: 5
+    timeout: 600
+    state: started
+  when: elastic_agent_reboot_before_install | bool
+
+- name: Wait for Fleet policy object after reboot
+  uri:
+    url: "http://{{ fleet_server }}:5601/api/fleet/agent_policies/fleet-server-policy"
+    method: GET
+    user: "{{ es_api_basic_auth_username }}"
+    password: "{{ es_api_basic_auth_password }}"
+    force_basic_auth: true
+    status_code: [200, 404]
+  register: fleet_server_policy_wait2
+  until: >
+    fleet_server_policy_wait2.status == 200
+    and fleet_server_policy_wait2.json.item.id | default('') == 'fleet-server-policy'
+  retries: 36
+  delay: 10
+  when: elastic_agent_reboot_before_install | bool
+
+- name: Ensure Fleet Server integration after reboot
+  ansible.builtin.include_tasks: fleet-ensure-fleet-server-integration.yml
+  when: elastic_agent_reboot_before_install | bool
 
 - name: Check for cluster health; wait 120 seconds for health status
   shell: |
-    curl -XGET -u {{ es_api_basic_auth_username }}:{{ es_api_basic_auth_password }} \
+    curl -sS -XGET -u {{ es_api_basic_auth_username }}:{{ es_api_basic_auth_password }} \
     'http://{{ fleet_server }}:9200/_cluster/health?wait_for_status=yellow&timeout=120s' -H 'kbn-xsrf: true'
 
-- name: Install Elastic Agent
-  # Since I am using self-signed certificate, I have added "--insecure" flag at the end.
-  shell: "echo 'Y' | sudo {{ install_dir }}/elastic-agent-{{ elastic_agent_version }}-linux-x86_64/elastic-agent install --fleet-server-es=http://{{ fleet_server }}:{{ fleet_port }} --fleet-server-service-token={{ fleet_enrollment_token.json.value }} --fleet-server-policy=fleet-server-policy --fleet-server-port=8220 --install-servers -f"
-  when: not agentinstall_stat.stat.exists or uninstall_stat
+- name: Install Elastic Agent as Fleet Server
+  shell: >-
+    echo 'Y' | sudo {{ install_dir }}/elastic-agent-{{ elastic_agent_version }}-linux-x86_64/elastic-agent install
+    --fleet-server-es=http://{{ fleet_server }}:{{ fleet_port }}
+    --fleet-server-service-token={{ fleet_server_service_token }}
+    --fleet-server-policy=fleet-server-policy
+    --fleet-server-port=8220
+    --install-servers{% if elastic_agent_install_insecure | bool %} --insecure{% endif %} -f
+  when: not agent_after_uninstall.stat.exists
+  register: elastic_agent_install_result
+
+- name: Stat Elastic Agent after install
+  stat:
+    path: "/usr/bin/elastic-agent"
+  register: agent_installed_check
+
+- name: Assert Elastic Agent installed
+  assert:
+    that:
+      - agent_installed_check.stat.exists
+    fail_msg: "elastic-agent install failed or was skipped; check elastic_agent_install_result and Fleet policy/token."
+
+- name: Ensure Windows integration (Sysmon Operational) on agent-policy
+  ansible.builtin.include_tasks: fleet-ensure-windows-sysmon.yml
 
 - name: Find existing policies
   shell: |
@@ -93,19 +227,30 @@
 - name: Set fact for policies
   set_fact:
     policy_list_1: "{{ package_policies.stdout | from_json }}"
-  
+
 - name: Delete endpoint package policy if it already exists
   block:
-    - name: Find package policy ID for endpoint
+    - name: Find package policy ID for endpoint (by package name)
       set_fact:
-        endpoint_policy_id: "{{ policy_list_1 | json_query(\"items[?package.title == 'Elastic Defend'].id | [0]\") | replace('\"', '') }}"
+        endpoint_policy_id: "{{ policy_list_1 | json_query(\"items[?package.name=='endpoint'].id | [0]\") | default('', true) }}"
 
     - name: Delete endpoint package policy
-      command: |
-        curl -X POST -u {{ es_api_basic_auth_username }}:{{ es_api_basic_auth_password }} \
-        'http://{{ fleet_server }}:5601/api/fleet/package_policies/delete' -H 'kbn-xsrf: true' -H 'Content-Type: application/json' \
-        -d '{"packagePolicyIds": ["{{ endpoint_policy_id }}"], "force": true}' 
-  when: "'Elastic Defend' in policy_list_1 | json_query('items[*].package.title')"
+      uri:
+        url: "http://{{ fleet_server }}:5601/api/fleet/package_policies/delete"
+        method: POST
+        user: "{{ es_api_basic_auth_username }}"
+        password: "{{ es_api_basic_auth_password }}"
+        force_basic_auth: true
+        headers:
+          kbn-xsrf: "true"
+          Content-Type: "application/json"
+        body_format: json
+        body:
+          packagePolicyIds: ["{{ endpoint_policy_id }}"]
+          force: true
+        status_code: [200]
+      when: endpoint_policy_id | default('') | length > 0
+  when: (policy_list_1 | json_query("items[?package.name=='endpoint']") | default([], true) | length) > 0
 
 # - name: Install windows package policy
 #   shell: |
@@ -114,16 +259,30 @@
 #     -H 'kbn-xsrf: true' -d '{{ lookup("template", "windows_initial.json") | to_nice_json }}'
 #   register: windows_install
 
-- name: Install endpoint package policy
-  shell: |
-    curl -XPOST -u {{ es_api_basic_auth_username }}:{{ es_api_basic_auth_password }} \
-    'http://{{ fleet_server }}:5601/api/fleet/package_policies' -H 'Content-Type: application/json' \
-    -H 'kbn-xsrf: true' -d '{{ lookup("template", "endpoint_initial.json") | to_nice_json }}'
+- name: Resolve Elastic Defend package version for Fleet API
+  ansible.builtin.include_tasks: fleet-resolve-endpoint-version.yml
+
+- name: Install endpoint package policy (Elastic Defend on agent-policy)
+  vars:
+    _endpoint_install_body: "{{ lookup('template', 'endpoint_initial.json') }}"
+  uri:
+    url: "http://{{ fleet_server }}:5601/api/fleet/package_policies"
+    method: POST
+    user: "{{ es_api_basic_auth_username }}"
+    password: "{{ es_api_basic_auth_password }}"
+    force_basic_auth: true
+    headers:
+      kbn-xsrf: "true"
+      Content-Type: "application/json"
+    body_format: json
+    body: "{{ (_endpoint_install_body | from_json) if (_endpoint_install_body is string) else _endpoint_install_body }}"
+    status_code: [200]
   register: endpoint_install
 
 - name: Set fact for endpoint package policy
   set_fact:
-    endpoint_package: "{{ endpoint_install.stdout | from_json }}"
+    endpoint_package: "{{ endpoint_install.json }}"
+  when: endpoint_install is succeeded
 
 - name: Create modified endpoint package
   copy:
@@ -187,14 +346,15 @@
 
 - name: Find package policy ID for endpoint
   set_fact:
-    endpoint_policy_id: "{{ policy_list_2 | json_query(\"items[?package.title == 'Elastic Defend'].id | [0]\") | replace('\"', '') }}"
+    endpoint_policy_id: "{{ policy_list_2 | json_query(\"items[?package.name=='endpoint'].id | [0]\") | default('', true) }}"
 
 - name: Update endpoint package policy to enable rules
   shell: |
-    curl -XPUT -u {{ es_api_basic_auth_username }}:{{ es_api_basic_auth_password }} \
+    curl -fsS -XPUT -u {{ es_api_basic_auth_username }}:{{ es_api_basic_auth_password }} \
     'http://{{ fleet_server }}:5601/api/fleet/package_policies/{{ endpoint_policy_id }}' -H 'Content-Type: application/json' \
     -H 'kbn-xsrf: true' -d '{{ endpoint_integration["content"] | b64decode | to_nice_json }}'
-  register: endpoint_package
+  register: endpoint_put_result
+  when: endpoint_policy_id | default('') | length > 0
 
 - name: Check for cluster health; wait 120 seconds for health status
   shell: |
