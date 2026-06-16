@@ -32,6 +32,9 @@
   retries: 60
   delay: 5
 
+- name: Patch Kibana fleet_server package version when config is stale or wrong
+  ansible.builtin.include_tasks: fleet-patch-kibana-fleet-server-version.yml
+
 - name: Wait for Fleet Server agent policy object (preconfig shell may have empty package_policies)
   uri:
     url: "http://{{ fleet_server }}:5601/api/fleet/agent_policies/fleet-server-policy"
@@ -73,10 +76,30 @@
     body_format: json
     body:
       name: fleet-server-host
-      host_urls: ["http://{{ fleet_server }}:8220"]
+      host_urls: ["https://{{ fleet_server }}:8220"]
       is_default: true
     status_code: [200]
   when: (fleet_server_hosts_list.json['items'] | default([]) | length) == 0
+
+- name: Fix Fleet Server host URLs still using http on port 8220
+  uri:
+    url: "http://{{ fleet_server }}:5601/api/fleet/fleet_server_hosts/{{ item.id }}"
+    method: PUT
+    user: "{{ es_api_basic_auth_username }}"
+    password: "{{ es_api_basic_auth_password }}"
+    force_basic_auth: true
+    headers:
+      kbn-xsrf: "true"
+      Content-Type: "application/json"
+    body_format: json
+    body:
+      name: "{{ item.name }}"
+      host_urls: ["https://{{ fleet_server }}:8220"]
+      is_default: "{{ item.is_default | default(false) }}"
+      is_internal: "{{ item.is_internal | default(false) }}"
+    status_code: [200]
+  loop: "{{ fleet_server_hosts_list.json['items'] | default([]) }}"
+  when: "'http://' in (item.host_urls | default([]) | join(' '))"
 
 - name: Create Fleet Server service token
   uri:
@@ -199,7 +222,8 @@
     --fleet-server-service-token={{ fleet_server_service_token }}
     --fleet-server-policy=fleet-server-policy
     --fleet-server-port=8220
-    --install-servers{% if elastic_agent_install_insecure | bool %} --insecure{% endif %} -f
+    --fleet-server-host={{ elastic_fleet_server_bind_host }}
+    --install-servers{% if elastic_fleet_server_es_insecure | bool %} --fleet-server-es-insecure{% endif %}{% if elastic_agent_install_insecure | bool %} --insecure{% endif %} -f
   when: not agent_after_uninstall.stat.exists
   register: elastic_agent_install_result
 

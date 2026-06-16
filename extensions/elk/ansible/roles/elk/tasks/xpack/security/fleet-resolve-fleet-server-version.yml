@@ -2,7 +2,12 @@
 # EPR returns 400 for .../package/fleet_server/latest/ — use concrete semver; prefer Kibana EPM.
 - name: Initialize Fleet Server integration package version
   ansible.builtin.set_fact:
-    elastic_fleet_server_resolved_version: "{{ elastic_fleet_server_package_version }}"
+    elastic_fleet_server_resolved_version: >-
+      {%- if elastic_fleet_server_package_version is version('2.0.0', '>=') -%}
+      1.6.1
+      {%- else -%}
+      {{ elastic_fleet_server_package_version }}
+      {%- endif -%}
 
 - name: Query Fleet EPM for fleet_server package
   ansible.builtin.uri:

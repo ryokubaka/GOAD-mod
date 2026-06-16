@@ -324,6 +324,6 @@
   vars:
     ansible_become: true
     ansible_become_method: runas
-    ansible_become_user: 'SEVENKINGDOMS\administrator'
-    ansible_become_password: '8dCT-DJjgScp'
+    ansible_become_user: "{{ adfs_domain_admin_user }}"
+    ansible_become_password: "{{ adfs_domain_admin_password }}"
     ansible_become_flags: "logon_type=interactive logon_flags=with_profile"

@@ -1,0 +1,13 @@
+{
+    "name": "ws02",
+    "description": "Legacy alias for w11-24h2 — hardened Windows 11 24H2 workstation (TPM)",
+    "machines": [
+        "ws02 (catrock.sevenkingdoms.local)"
+    ],
+    "compatibility": [
+        "GOAD",
+        "GOAD-Light",
+        "GOAD-Mini"
+    ],
+    "impact": "aws doesn't provide windows11 ami. you can still install ws02 with aws but a windows server 2019 will be used instead"
+}

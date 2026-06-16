@@ -1,48 +1,17 @@
-# WS01 extension (Workstation 01)
+# ws01 extension (legacy shim → w11-23h2)
 
-- Extension Name: ws01
-- Description: Add a Windows 10 workstation to the lab GOAD or GOAD Light in the domain sevenkingdoms.local
-- Machine name : {{lab_name}}-WS01
-- Compatible with labs :
-  - GOAD
-  - GOAD-Light
+Backward-compatible extension name for instances that still list `ws01`.
+Same Ludus template, IP (`.31`), and AD host as `w11-23h2`.
 
-- Lab infos:
-  - hostname: casterlyrock 
-  - Users:
-    - Administrators :
-      - tywin.lannister
-      - jaime.lannister
-    - RDP Users:
-      - Lannister group
-
-- Features :
-  - run_as_ppl
-  - powershell restricted
-  - asr rules :
-    - block lsass stealing
-    - block PSExec and WMI
-
-- Providers:
-  - aws doesn't provide windows10 ami. you can still install ws01 but a windows server 2019 will be used instead
-
-## prerequisites
-
-On ludus prepare template :
-```
-ludus templates add -d win10-21h1-x64-enterprise
-ludus templates build
-```
-
-## Install
+- **Preferred name for new installs:** `w11-23h2`
+- **Ludus template:** `win11-23h2-x64-enterprise-template`
+- **AD hostname:** casterlyrock
+- **IP:** `{{ip_range}}.31`
 
 ```
-instance_id> install_extension ws01
+install_extension ws01
+# or
+install_extension w11-23h2
 ```
 
-## Uninstall
-
-- Not implemented yet
-
-## credits:
-- asr rules implementation : https://github.com/zuesdevil (https://github.com/Orange-Cyberdefense/GOAD/pull/172)
+Do not enable both on the same instance (same IP).

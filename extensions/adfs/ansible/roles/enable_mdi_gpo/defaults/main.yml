@@ -9,6 +9,10 @@ mdi_force_reconfigure: false
 # Must match the prefix used during initial configuration if reconfiguring.
 mdi_gpo_prefix: "MDI"
 
+# MDI sensor service account (samAccountName) created by ad_population.
+# Required when using -Configuration All (DeletedObjects, EntraConnect, RemoteSAM).
+mdi_identity: svc_mdi
+
 # Offline module installation:
 # Run files/Save-MDIModule.ps1 on an internet-connected machine to pre-stage
 # the DefenderForIdentity module. The role detects files/DefenderForIdentity/

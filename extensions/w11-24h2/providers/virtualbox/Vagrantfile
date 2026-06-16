@@ -1,0 +1,10 @@
+# add windows box
+boxes.append(
+  { :name => "{{lab_name}}-W11-24H2",
+    :ip => "{{ip_range}}.34",
+    :box => "mayfly/windows10",
+    :os => "windows",
+    :cpus => 2,
+    :mem => 4000
+  }
+)

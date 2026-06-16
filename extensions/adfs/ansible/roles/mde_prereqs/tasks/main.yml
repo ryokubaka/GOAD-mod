@@ -154,15 +154,19 @@
 - name: Enable Windows Defender cloud protection and real-time monitoring
   ansible.windows.win_powershell:
     script: |
-      Set-MpPreference `
-        -MAPSReporting Advanced `
-        -SubmitSamplesConsent {{ mde_submit_samples_consent | default('NeverSend') }} `
-        -CloudBlockLevel {{ mde_cloud_block_level | default('High') }} `
-        -CloudExtendedTimeout 50 `
-        -DisableRealtimeMonitoring $false `
-        -DisableBehaviorMonitoring $false `
-        -DisableIOAVProtection $false
-      Write-Output "Defender cloud protection configured ({{ mde_cloud_block_level | default('High') }}, samples={{ mde_submit_samples_consent | default('NeverSend') }})"
+      $consent = '{{ mde_submit_samples_consent | default("Never") }}'
+      if ($consent -eq 'NeverSend') { $consent = 'Never' }
+      $params = @{
+        MAPSReporting              = 'Advanced'
+        SubmitSamplesConsent       = $consent
+        CloudBlockLevel            = '{{ mde_cloud_block_level | default("High") }}'
+        CloudExtendedTimeout       = 50
+        DisableRealtimeMonitoring  = $false
+        DisableBehaviorMonitoring  = $false
+        DisableIOAVProtection      = $false
+      }
+      Set-MpPreference @params
+      Write-Output "Defender cloud protection configured ({{ mde_cloud_block_level | default('High') }}, samples=$consent)"
   when: mde_enable_cloud_protection | default(true)
   changed_when: true
   ignore_errors: true
@@ -195,8 +199,13 @@
 - name: Enable Network Protection
   ansible.windows.win_powershell:
     script: |
-      Set-MpPreference -EnableNetworkProtection {{ mde_network_protection_mode | default('Enabled') }}
-      Write-Output "Network Protection: {{ mde_network_protection_mode | default('Enabled') }}"
+      $setMp = Get-Command Set-MpPreference -ErrorAction SilentlyContinue
+      if ($setMp -and $setMp.Parameters.Keys -contains 'EnableNetworkProtection') {
+        Set-MpPreference -EnableNetworkProtection {{ mde_network_protection_mode | default('Enabled') }}
+        Write-Output "Network Protection: {{ mde_network_protection_mode | default('Enabled') }}"
+      } else {
+        Write-Output "SKIP: EnableNetworkProtection not supported on this Defender build"
+      }
   when: mde_enable_network_protection | default(true)
   changed_when: true
   ignore_errors: true
@@ -219,8 +228,13 @@
 - name: Set Controlled Folder Access to AuditMode
   ansible.windows.win_powershell:
     script: |
-      Set-MpPreference -EnableControlledFolderAccess {{ mde_controlled_folder_access | default('AuditMode') }}
-      Write-Output "Controlled Folder Access: {{ mde_controlled_folder_access | default('AuditMode') }}"
+      $setMp = Get-Command Set-MpPreference -ErrorAction SilentlyContinue
+      if ($setMp -and $setMp.Parameters.Keys -contains 'EnableControlledFolderAccess') {
+        Set-MpPreference -EnableControlledFolderAccess {{ mde_controlled_folder_access | default('AuditMode') }}
+        Write-Output "Controlled Folder Access: {{ mde_controlled_folder_access | default('AuditMode') }}"
+      } else {
+        Write-Output "SKIP: EnableControlledFolderAccess not supported on this Defender build"
+      }
   when: mde_set_controlled_folder_access | default(true)
   changed_when: true
   ignore_errors: true
@@ -249,8 +263,12 @@
         '</MitigationPolicy>'
       ) -join "`r`n"
       $xml | Out-File -FilePath $xmlPath -Encoding UTF8 -Force
-      Set-ProcessMitigation -PolicyFilePath $xmlPath
-      Write-Output "Exploit Protection applied: ASLR ForceRelocate=true, SEHOP=true, Heap TerminateOnError=true"
+      if (Get-Command Set-ProcessMitigation -ErrorAction SilentlyContinue) {
+        Set-ProcessMitigation -PolicyFilePath $xmlPath
+        Write-Output "Exploit Protection applied: ASLR ForceRelocate=true, SEHOP=true, Heap TerminateOnError=true"
+      } else {
+        Write-Output "SKIP: Set-ProcessMitigation not available on this OS build"
+      }
   when: mde_enable_exploit_protection | default(true)
   changed_when: true
   ignore_errors: true

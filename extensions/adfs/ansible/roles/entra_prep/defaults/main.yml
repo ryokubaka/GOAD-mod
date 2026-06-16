@@ -1,3 +1,12 @@
 ---
-ludus_install_directory: /opt/ludus
-
+adfs_dc_host: dc01
+adfs_delegate_to: "{{ adfs_dc_host }}"
+adfs_member_domain: sevenkingdoms.local
+adfs_domain_netbios: SEVENKINGDOMS
+adfs_dc_fqdn: "{{ lab.hosts[adfs_dc_host].hostname | default('kingslanding') }}.{{ adfs_member_domain }}"
+adfs_domain_admin_password: "{{ lab.domains[adfs_member_domain].domain_password | default('8dCT-DJjgScp') }}"
+adfs_domain_admin_user: "{{ adfs_domain_netbios }}\\{{ admin_user | default('administrator') }}"
+adfs_users_ou: "CN=Users,{{ lab.hosts[adfs_dc_host].path | default('DC=sevenkingdoms,DC=local') }}"
+ludus_entra_join_svc_account: entra_svc
+ludus_entra_join_svc_account_password: password
+ludus_entra_join_alt_upn: ""

@@ -1,0 +1,14 @@
+[default]
+{% if provider_name == 'aws' or provider_name == 'azure' %}
+commando ansible_host={{ip_range}}.61 dns_domain=commando dict_key=commando ansible_user=localuser ansible_password=password
+{% elif provider_name == 'ludus' %}
+commando ansible_host={{ip_range}}.61 dns_domain=commando dict_key=commando ludus=true
+{% else %}
+commando ansible_host={{ip_range}}.61 dns_domain=commando dict_key=commando
+{% endif %}
+
+[domain]
+commando
+
+[extensions]
+commando

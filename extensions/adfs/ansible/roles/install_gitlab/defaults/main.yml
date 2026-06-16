@@ -1,19 +1,24 @@
 ---
-  gitlab_domain: gitlab.sevenkingdoms.local
-  adfs_fqdn: adfs.sevenkingdoms.local
-  adfs_service_account: 'SEVENKINGDOMS\adfs_svc'
-  adfs_host: ADFS-WinServer2022
-  dc_host: DC01-WinServer2022
-  gitlab_ip: "{{ ansible_host }}"
-  gitlab_ssl_dir: /etc/gitlab/ssl
-  gitlab_ssl_key: /etc/gitlab/ssl/{{ gitlab_domain }}.key
-  gitlab_ssl_crt: /etc/gitlab/ssl/{{ gitlab_domain }}.crt
-  gitlab_template_src: gitlab.rb.template
-  gitlab_template_dest: /etc/gitlab/gitlab.rb
-  gitlab_external_url: "http://{{ gitlab_domain }}"
-  adfs_temp_dir: C:\Temp
-  adfs_gitlab_cert_path: C:\Temp\gitlab.crt
-  adfs_gitlab_metadata_path: C:\Temp\gitlab.xml
-  gitlab_metadata_url: "https://{{ gitlab_domain }}/users/auth/saml/metadata"
-  adfs_rp_name: "GitLab - {{ gitlab_domain }}"
-  ludus_dns_server: "{{ ansible_host.split('.')[0:2] | join('.') }}.10.254"
+adfs_dc_host: dc01
+adfs_member_domain: sevenkingdoms.local
+adfs_domain_netbios: SEVENKINGDOMS
+adfs_domain_admin_password: "{{ lab.domains[adfs_member_domain].domain_password | default('8dCT-DJjgScp') }}"
+adfs_domain_admin_user: "{{ adfs_domain_netbios }}\\{{ admin_user | default('administrator') }}"
+gitlab_domain: "gitlab.{{ adfs_member_domain }}"
+adfs_fqdn: "adfs.{{ adfs_member_domain }}"
+adfs_service_account: "{{ adfs_domain_netbios }}\\adfs_svc"
+adfs_host: ADFS-WinServer2022
+dc_host: dc01
+gitlab_ip: "{{ ansible_host }}"
+gitlab_ssl_dir: /etc/gitlab/ssl
+gitlab_ssl_key: /etc/gitlab/ssl/{{ gitlab_domain }}.key
+gitlab_ssl_crt: /etc/gitlab/ssl/{{ gitlab_domain }}.crt
+gitlab_template_src: gitlab.rb.template
+gitlab_template_dest: /etc/gitlab/gitlab.rb
+gitlab_external_url: "http://{{ gitlab_domain }}"
+adfs_temp_dir: C:\Temp
+adfs_gitlab_cert_path: C:\Temp\gitlab.crt
+adfs_gitlab_metadata_path: C:\Temp\gitlab.xml
+gitlab_metadata_url: "https://{{ gitlab_domain }}/users/auth/saml/metadata"
+adfs_rp_name: "GitLab - {{ gitlab_domain }}"
+ludus_dns_server: "{{ ansible_host.split('.')[0:2] | join('.') }}.10.254"

@@ -1,6 +1,6 @@
 <!--
   ZSEC Lab Sysmon Configuration
-  Schema: 4.90  (Sysmon 14.x / 15.x)
+  Schema: 4.91  (Sysmon 15.x)
   Licensed for personal use - ZephrSec Ltd
 
   Coverage:
@@ -23,9 +23,9 @@
   Tuned to reduce noise from normal Windows and lab operations
   while catching common red team TTPs.
 -->
-<Sysmon schemaversion="4.90">
+<Sysmon schemaversion="4.91">
   <HashAlgorithms>sha256</HashAlgorithms>
-  <CheckRevocation/>
+  <CheckRevocation>false</CheckRevocation>
   <EventFiltering>
 
     <!-- ================================================================
@@ -59,7 +59,6 @@
       <FileCreateTime onmatch="exclude">
         <!-- Exclude update/installer noise -->
         <Image condition="begin with">C:\Windows\system32\msiexec.exe</Image>
-        <Image condition="begin with">C:\Windows\SoftwareDistribution</Image>
       </FileCreateTime>
     </RuleGroup>
 
@@ -81,14 +80,7 @@
       </NetworkConnect>
     </RuleGroup>
 
-    <!-- ================================================================
-         EVENT 4: Sysmon Service State Changed — always log
-         ================================================================ -->
-    <RuleGroup name="" groupRelation="or">
-      <ServiceStateChange onmatch="include">
-        <State condition="is">Stopped</State>
-      </ServiceStateChange>
-    </RuleGroup>
+    <!-- Event 4 (ServiceStateChange): not filterable — always logged by Sysmon -->
 
     <!-- ================================================================
          EVENT 5: Process Terminated — exclude all (too noisy for lab)
@@ -105,9 +97,7 @@
          ================================================================ -->
     <RuleGroup name="" groupRelation="or">
       <DriverLoad onmatch="include">
-        <!-- Unsigned drivers -->
-        <Signed condition="is">false</Signed>
-        <!-- Known malicious / BYOVD driver names -->
+        <SignatureStatus condition="is">Unsigned</SignatureStatus>
         <ImageLoaded condition="contains">gmer</ImageLoaded>
         <ImageLoaded condition="contains">capcom</ImageLoaded>
         <ImageLoaded condition="contains">dbutil</ImageLoaded>
@@ -131,8 +121,6 @@
         <ImageLoaded condition="begin with">C:\Windows\Temp\</ImageLoaded>
         <!-- Mimikatz artefacts -->
         <ImageLoaded condition="contains">mimikatz</ImageLoaded>
-        <!-- AMSI bypass / CLM bypass DLLs -->
-        <ImageLoaded condition="contains">amsi.dll</ImageLoaded>
       </ImageLoad>
     </RuleGroup>
 
@@ -244,6 +232,20 @@
     </RuleGroup>
 
     <!-- ================================================================
+         EVENT 15: FileCreateStreamHash (Alternate Data Streams)
+         Detects payload hiding via NTFS ADS (e.g. Zone.Identifier writes
+         and attacker-created streams). Exclude high-frequency Zone.Identifier
+         writes from browsers/downloads which are benign.
+         ================================================================ -->
+    <RuleGroup name="" groupRelation="or">
+      <FileCreateStreamHash onmatch="exclude">
+        <!-- Contents is not a valid filter field; use TargetFilename for MOTW streams -->
+        <TargetFilename condition="contains">Zone.Identifier</TargetFilename>
+        <Image condition="is">C:\Windows\System32\svchost.exe</Image>
+      </FileCreateStreamHash>
+    </RuleGroup>
+
+    <!-- ================================================================
          EVENTS 17/18: Pipe Events
          Common C2 framework named pipes (Cobalt Strike, Metasploit, etc.)
          ================================================================ -->
@@ -284,21 +286,8 @@
          ================================================================ -->
     <RuleGroup name="" groupRelation="or">
       <WmiEvent onmatch="exclude">
+        <!-- exclude with no rules = log all WMI activity -->
       </WmiEvent>
-    </RuleGroup>
-
-    <!-- ================================================================
-         EVENT 15: FileCreateStreamHash (Alternate Data Streams)
-         Detects payload hiding via NTFS ADS (e.g. Zone.Identifier writes
-         and attacker-created streams). Exclude high-frequency Zone.Identifier
-         writes from browsers/downloads which are benign.
-         ================================================================ -->
-    <RuleGroup name="" groupRelation="or">
-      <FileCreateStreamHash onmatch="exclude">
-        <!-- Browser/download Zone.Identifier marks are expected -->
-        <Contents condition="contains">ZoneTransfer</Contents>
-        <Image condition="is">C:\Windows\System32\svchost.exe</Image>
-      </FileCreateStreamHash>
     </RuleGroup>
 
     <!-- ================================================================
@@ -334,16 +323,7 @@
       </FileDelete>
     </RuleGroup>
 
-    <!-- ================================================================
-         EVENT 25: ProcessTampering
-         Detects process hollowing, doppelganging, and herpaderping —
-         techniques that replace legitimate process memory with malicious
-         code. Log all (very low noise, high fidelity).
-         ================================================================ -->
-    <RuleGroup name="" groupRelation="or">
-      <ProcessTampering onmatch="exclude">
-      </ProcessTampering>
-    </RuleGroup>
+    <!-- Event 25 (ProcessTampering): omitted — default Sysmon behavior is sufficient for lab -->
 
   </EventFiltering>
 </Sysmon>

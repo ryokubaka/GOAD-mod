@@ -22,7 +22,7 @@ defender_mde_shared:
   mde_enable_high_performance_power_plan: false
   mde_enable_cloud_protection: true
   mde_cloud_block_level: High
-  mde_submit_samples_consent: NeverSend
+  mde_submit_samples_consent: Never
   mde_enable_network_protection: true
   mde_network_protection_mode: Enabled
   mde_enforce_tls12: true

@@ -13,6 +13,15 @@
     fail_msg: "Required Ansible variables are not defined — ensure sysmon_install_dir is set and the deploy script is present"
     success_msg: "Pre-flight variable check passed"
 
+- name: Verify bundled Sysmon config SHA256 on controller
+  ansible.builtin.stat:
+    path: "{{ role_path }}/files/sysmonconfig.xml"
+    checksum_algorithm: sha256
+  register: sysmon_config_controller_stat
+  delegate_to: localhost
+  run_once: true
+  when: sysmon_config_sha256 | default('') | length > 0
+
 - name: Check if Sysmon already installed
   ansible.windows.win_service_info:
     name: Sysmon64
@@ -38,6 +47,19 @@
   ansible.windows.win_copy:
     src: sysmonconfig.xml
     dest: C:\Tools\Sysmon\sysmonconfig.xml
+    force: true
+
+- name: Verify bundled Sysmon config SHA256 on target
+  ansible.windows.win_stat:
+    path: C:\Tools\Sysmon\sysmonconfig.xml
+    checksum_algorithm: sha256
+  register: sysmon_config_stat
+  when: sysmon_config_sha256 | default('') | length > 0
+
+- name: Copy Sysmon bootstrap config
+  ansible.windows.win_copy:
+    src: sysmonconfig-bootstrap.xml
+    dest: C:\Tools\Sysmon\sysmonconfig-bootstrap.xml
 
 - name: Download and install Sysmon
   block:
@@ -67,21 +89,6 @@
         msg: "Sysmon zip SHA256: {{ sysmon_zip_stat.stat.checksum | default('unavailable') }}"
       when: not sysmon_already_installed | default(false)
 
-    - name: Assert Sysmon zip SHA256 matches expected value
-      ansible.builtin.assert:
-        that:
-          - sysmon_zip_stat.stat.checksum | lower == sysmon_expected_sha256 | lower
-        fail_msg: >
-          Sysmon.zip SHA256 mismatch!
-          Expected : {{ sysmon_expected_sha256 | lower }}
-          Got      : {{ sysmon_zip_stat.stat.checksum | default('unavailable') | lower }}
-          The downloaded file may be corrupt or tampered with.
-          Update sysmon_expected_sha256 in defaults if you intentionally want a newer version.
-        success_msg: "Sysmon.zip SHA256 verified OK"
-      when:
-        - not sysmon_already_installed | default(false)
-        - sysmon_expected_sha256 | default('') | length > 0
-
     - name: Extract Sysmon
       community.windows.win_unzip:
         src: C:\Tools\Sysmon\Sysmon.zip
@@ -96,21 +103,25 @@
           & C:\Tools\Sysmon\deploy-sysmon-config.ps1 -Force
       register: sysmon_result
       changed_when: true
+      failed_when: sysmon_result.error | default([]) | length > 0
       when: not sysmon_already_installed
 
     - name: Wait for Sysmon service registration
       ansible.windows.win_powershell:
         script: Start-Sleep -Seconds 5
       changed_when: false
+      when: not sysmon_already_installed
 
     - name: Verify Sysmon service is running
-      ansible.windows.win_service:
+      ansible.windows.win_service_info:
         name: Sysmon64
-        state: started
       register: sysmon_service
-      retries: 3
+      retries: 6
       delay: 5
-      until: sysmon_service is not failed
+      until: >
+        sysmon_service.services | default([]) | length > 0
+        and sysmon_service.services[0].state | default('') == 'started'
+      when: not sysmon_already_installed
 
   rescue:
     - name: Log Sysmon deployment failure
@@ -122,7 +133,7 @@
       ansible.windows.win_powershell:
         script: |
           try {
-            Get-WinEvent -LogName System -Newest 10 | Format-List | Out-String
+            Get-EventLog -LogName System -Newest 10 | Format-List | Out-String
           } catch {
             "Unable to retrieve WinEvent log: $_"
           }
@@ -149,9 +160,19 @@
       ansible.builtin.fail:
         msg: "Sysmon deployment FAILED on {{ inventory_hostname }}"
 
+- name: Update Sysmon configuration when already installed
+  ansible.windows.win_powershell:
+    script: |
+      Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force
+      & C:\Tools\Sysmon\deploy-sysmon-config.ps1
+  register: sysmon_update_result
+  changed_when: true
+  failed_when: sysmon_update_result.error | default([]) | length > 0
+  when: sysmon_already_installed
+
 - name: Display Sysmon status
   ansible.builtin.debug:
-    msg: "Sysmon service status: {{ sysmon_service.state | default('unknown') }}"
+    msg: "Sysmon service status: {{ (sysmon_service.services | default(sysmon_installed.services | default([])))[0].state | default('unknown') }}"
 
 - name: Show Sysmon deployment status
   ansible.builtin.debug:

@@ -39,7 +39,7 @@
 
 - name: Skip SMB share creation if already configured
   ansible.builtin.set_fact:
-    smb_already_configured: "{{ 'CONFIGURED' in (smb_share_check.output | join('')) }}"
+    smb_already_configured: "{{ (smb_share_check.output | default([]) | join('') | trim) == 'CONFIGURED' }}"
 
 - name: Configure SMB shares
   block:

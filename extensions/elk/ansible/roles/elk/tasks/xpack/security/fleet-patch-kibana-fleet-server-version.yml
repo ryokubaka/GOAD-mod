@@ -1,0 +1,44 @@
+---
+# Kibana may have started with a stale /etc/kibana/kibana.yml (e.g. fleet_server@9.4.0). Re-template after EPM resolve.
+- name: Resolve Fleet Server integration package version for Kibana config
+  ansible.builtin.include_tasks: fleet-resolve-fleet-server-version.yml
+
+- name: Re-apply Kibana config with resolved Fleet Server package version
+  ansible.builtin.template:
+    src: kibana.yml.j2
+    dest: /etc/kibana/kibana.yml
+    owner: root
+    group: kibana
+    mode: "0660"
+  vars:
+    elastic_fleet_server_package_version: "{{ elastic_fleet_server_resolved_version }}"
+  register: kibana_fleet_version_patch
+
+- name: Restart Kibana after Fleet Server package version patch
+  ansible.builtin.service:
+    name: kibana
+    state: restarted
+  when: kibana_fleet_version_patch.changed
+
+- name: Wait for Kibana port after Fleet Server config patch
+  ansible.builtin.wait_for:
+    host: "{{ fleet_server }}"
+    port: 5601
+    delay: 5
+    timeout: 600
+    state: started
+  when: kibana_fleet_version_patch.changed
+
+- name: Wait for Kibana HTTP API after Fleet Server config patch
+  ansible.builtin.uri:
+    url: "http://{{ fleet_server }}:5601/api/status"
+    method: GET
+    user: "{{ es_api_basic_auth_username }}"
+    password: "{{ es_api_basic_auth_password }}"
+    force_basic_auth: true
+    status_code: [200]
+  register: kibana_api_after_fleet_patch
+  until: kibana_api_after_fleet_patch.status == 200
+  retries: 60
+  delay: 5
+  when: kibana_fleet_version_patch.changed

@@ -1,10 +1,19 @@
 ---
 ludus_install_directory: /opt/ludus
 
-#adfs_service_account: "adfs_svc"
-#adfs_service_account_password: "password"
-#adfs_service_display_name: "ADFS Service"
-#adfs_hostname: "adfs.ludus.nuketown"
-#adfs_FQDN_CA: "DC01.ludus.nuketown\\ludus-CA"
-#adfs_certificate_subject: "CN=adfs.ludus.nuketown, O=Ludus, C=US"
+adfs_dc_host: dc01
+adfs_delegate_to: "{{ adfs_dc_host }}"
+adfs_member_domain: sevenkingdoms.local
+adfs_domain_netbios: SEVENKINGDOMS
+adfs_dc_fqdn: "{{ lab.hosts[adfs_dc_host].hostname | default('kingslanding') }}.{{ adfs_member_domain }}"
+adfs_domain_admin_password: "{{ lab.domains[adfs_member_domain].domain_password | default('8dCT-DJjgScp') }}"
+adfs_domain_admin_user: "{{ adfs_domain_netbios }}\\{{ admin_user | default('administrator') }}"
+adfs_users_ou: "CN=Users,{{ lab.hosts[adfs_dc_host].path | default('DC=sevenkingdoms,DC=local') }}"
 
+adfs_service_account: adfs_svc
+adfs_service_account_password: password
+adfs_service_display_name: ADFS Service
+adfs_hostname: "adfs.{{ adfs_member_domain }}"
+adfs_FQDN_CA: "{{ adfs_dc_fqdn }}\\{{ adfs_domain_netbios }}-CA"
+adfs_CA: "{{ adfs_domain_netbios }}-CA"
+adfs_certificate_subject: "CN=adfs.{{ adfs_member_domain }}, O={{ adfs_domain_netbios }}, C=US"

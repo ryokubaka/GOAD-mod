@@ -1,0 +1,13 @@
+{
+    "name": "w11-25h2",
+    "description": "Add a hardened Windows 11 25H2 workstation into the lab",
+    "machines": [
+        "w11-25h2 (highgarden.sevenkingdoms.local)"
+    ],
+    "compatibility": [
+        "GOAD",
+        "GOAD-Light",
+        "GOAD-Mini"
+    ],
+    "impact": "aws doesn't provide windows11 ami. you can still install w11-25h2 with aws but a windows server 2019 will be used instead"
+}

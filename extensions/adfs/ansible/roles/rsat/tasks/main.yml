@@ -1,24 +1,100 @@
 ---
-# Created by @ZephrFish 
+# Created by @ZephrFish
 # https://zephrsec.com | https://blog.zsec.uk
 # rsat - Install RSAT features on Windows domain members
-# Target: Windows Server / Workstation domain members (e.g. WKS01)
+# Target: Windows Server domain members and Windows 10/11 workstations
 
-- name: Install RSAT - Active Directory tools
-  ansible.windows.win_feature:
-    name: RSAT-AD-Tools
-    state: present
-    include_sub_features: true
-  register: rsat_ad_result
+- name: Detect Windows platform for RSAT installation
+  ansible.windows.win_powershell:
+    script: |
+      $os = Get-CimInstance Win32_OperatingSystem
+      [PSCustomObject]@{
+        IsWorkstation = ($os.ProductType -eq 1)
+      } | ConvertTo-Json -Compress
+  register: rsat_platform
+  changed_when: false
+  vars:
+    ansible_become: true
+    ansible_become_method: runas
+    ansible_become_user: "{{ rsat_become_user }}"
+    ansible_become_password: "{{ rsat_become_password }}"
+    ansible_become_flags: "logon_type=interactive logon_flags=with_profile"
 
-- name: Install RSAT - Certificate Services tools
-  ansible.windows.win_feature:
-    name: RSAT-ADCS
-    state: present
-  register: rsat_adcs_result
+- name: Install RSAT via Windows features on Server
+  when: not ((rsat_platform.output | default(['{}']) | first | from_json).IsWorkstation | default(false))
+  vars:
+    ansible_become: true
+    ansible_become_method: runas
+    ansible_become_user: "{{ rsat_become_user }}"
+    ansible_become_password: "{{ rsat_become_password }}"
+    ansible_become_flags: "logon_type=interactive logon_flags=with_profile"
+  block:
+    - name: Install RSAT - Active Directory tools
+      ansible.windows.win_feature:
+        name: RSAT-AD-Tools
+        state: present
+        include_sub_features: true
+      register: rsat_ad_result
 
-- name: Reboot if RSAT install requires it
-  ansible.windows.win_reboot:
-    reboot_timeout: 300
-    post_reboot_delay: 30
-  when: rsat_ad_result.reboot_required or rsat_adcs_result.reboot_required
+    - name: Install RSAT - Certificate Services tools
+      ansible.windows.win_feature:
+        name: RSAT-ADCS
+        state: present
+      register: rsat_adcs_result
+
+    - name: Reboot if RSAT install requires it
+      ansible.windows.win_reboot:
+        reboot_timeout: 300
+        post_reboot_delay: 30
+      when: rsat_ad_result.reboot_required or rsat_adcs_result.reboot_required
+
+- name: Install RSAT via Windows capabilities on workstation
+  when: (rsat_platform.output | default(['{}']) | first | from_json).IsWorkstation | default(false)
+  vars:
+    ansible_become: true
+    ansible_become_method: runas
+    ansible_become_user: "{{ rsat_become_user }}"
+    ansible_become_password: "{{ rsat_become_password }}"
+    ansible_become_flags: "logon_type=interactive logon_flags=with_profile"
+  block:
+    - name: Install RSAT optional features on workstation
+      ansible.windows.win_powershell:
+        script: |
+          $ErrorActionPreference = 'Stop'
+          $patterns = @(
+            'Rsat.ActiveDirectory*',
+            'Rsat.CertificateServices*'
+          )
+          $restartNeeded = $false
+          foreach ($pattern in $patterns) {
+            $caps = Get-WindowsCapability -Online |
+              Where-Object { $_.Name -like $pattern -and $_.State -ne 'Installed' }
+            foreach ($cap in $caps) {
+              Write-Host "Installing $($cap.Name)..."
+              $result = Add-WindowsCapability -Online -Name $cap.Name
+              if ($result.RestartNeeded) {
+                $restartNeeded = $true
+              }
+            }
+          }
+          if (-not $restartNeeded) {
+            $pending = Get-WindowsCapability -Online |
+              Where-Object {
+                ($_.Name -like 'Rsat.ActiveDirectory*' -or $_.Name -like 'Rsat.CertificateServices*') -and
+                $_.State -eq 'Installed'
+              }
+            if ($pending.Count -eq 0) {
+              throw 'No RSAT Active Directory or Certificate Services capabilities were found to install'
+            }
+          }
+          Write-Output ("RESTART_NEEDED={0}" -f ([int]$restartNeeded))
+      register: rsat_capability_result
+      changed_when: "'Installing ' in (rsat_capability_result.output | default([]) | join(' '))"
+
+    - name: Reboot workstation if RSAT capability install requires it
+      ansible.windows.win_reboot:
+        reboot_timeout: 300
+        post_reboot_delay: 30
+      when: >
+        rsat_capability_result.output | default([]) |
+        join(' ') is search('RESTART_NEEDED=1')
