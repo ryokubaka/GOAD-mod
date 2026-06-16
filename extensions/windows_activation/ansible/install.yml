@@ -1,0 +1,15 @@
+---
+# No extension VMs — activate existing Windows hosts in the lab (core domain + extension WinRM hosts).
+- import_playbook: "../../../ansible/data.yml"
+  vars:
+    data_path: "../ad/{{domain_name}}/data/"
+  tags: 'data'
+
+- name: Activate Windows when unlicensed (MAS)
+  hosts: domain:extensions
+  gather_facts: false
+  tasks:
+    - name: Run Windows activation on WinRM hosts
+      ansible.builtin.include_role:
+        name: windows_activation
+      when: ansible_connection | default('winrm') == 'winrm'

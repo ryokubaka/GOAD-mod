@@ -9,8 +9,8 @@ elasticsearch_version: "9.4.1"
 elastic_agent_version: "9.4.1"
 # Elastic Defend EPM package version (often 9.4.0 while stack/agent is 9.4.1 — see fleet-resolve-endpoint-version.yml).
 elastic_defend_version: "9.4.0"
-# Fleet Server integration package — EPR rejects fleet_server/latest in package_policies POST.
-elastic_fleet_server_package_version: "9.4.0"
+# Fleet Server integration package (1.x on EPR; do not use stack version like endpoint 9.4.x).
+elastic_fleet_server_package_version: "1.6.1"
 es_xpack_trial: true
 es_api_basic_auth_username: elastic
 es_api_basic_auth_password: MeowMeow123

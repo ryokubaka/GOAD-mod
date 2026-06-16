@@ -18,3 +18,6 @@ sysmon_verbose: false
 # Set this before deploying in security-sensitive environments.
 # Example: sysmon_expected_sha256: "ABC123..."
 sysmon_expected_sha256: ""
+
+# Expected SHA256 of bundled sysmonconfig.xml (leave empty to skip verification).
+sysmon_config_sha256: "9a3189ca84aa5902ed5bb30b6f94ab034f68960bd497fe700b0202e9f1696d19"

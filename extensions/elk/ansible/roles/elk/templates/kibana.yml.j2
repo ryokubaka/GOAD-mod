@@ -33,7 +33,8 @@ server.host: "0.0.0.0"
 
 # The URLs of the Elasticsearch instances to use for all your queries.
 elasticsearch.hosts: ["http://{{ fleet_server }}:9200"]
-xpack.fleet.agents.fleet_server.hosts: ["http://{{ fleet_server }}:8220"]
+# Fleet Server :8220 is HTTPS (elastic-agent --install-servers). http:// here causes fleet-server ping 400.
+xpack.fleet.agents.fleet_server.hosts: ["https://{{ fleet_server }}:8220"]
 xpack.fleet.agents.elasticsearch.hosts: ["http://{{ fleet_server }}:9200"]
 
 # Kibana uses an index in Elasticsearch to store saved searches, visualizations and
@@ -64,8 +65,9 @@ xpack.fleet.packages:
     version: latest
   - name: security_detection_engine
     version: latest
+  # Integration semver (1.x). Do not pin stack 9.x — EPR has no fleet_server@9.4.0 (see fleet-resolve-fleet-server-version.yml).
   - name: fleet_server
-    version: "{{ elastic_fleet_server_package_version }}"
+    version: latest
   - name: windows
     version: "3.8.3"
 # Endpoint/Elastic Defend cannot be preconfigured here (Elastic limitation). Use Fleet API after Fleet Server is up.

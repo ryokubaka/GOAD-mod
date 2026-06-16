@@ -48,9 +48,9 @@
     $userName = '{{ ludus_entra_join_svc_account }}'
     if ($userName -match '\\') { $userName = ($userName -split '\\')[-1] }
     $userPass = ConvertTo-SecureString '{{ ludus_entra_join_svc_account_password }}' -AsPlainText -Force
-    $adminPass = ConvertTo-SecureString '8dCT-DJjgScp' -AsPlainText -Force
-    $adminCred = New-Object PSCredential('SEVENKINGDOMS\administrator', $adminPass)
-    $server = 'kingslanding.sevenkingdoms.local'
+    $adminPass = ConvertTo-SecureString '{{ adfs_domain_admin_password }}' -AsPlainText -Force
+    $adminCred = New-Object PSCredential('{{ adfs_domain_admin_user }}', $adminPass)
+    $server = '{{ adfs_dc_fqdn }}'
 
     Import-Module ActiveDirectory
 
@@ -63,7 +63,7 @@
     }
 
     if (-not $existing) {
-      New-ADUser -Name $userName -SamAccountName $userName -AccountPassword $userPass -Enabled $true -Path 'CN=Users,DC=sevenkingdoms,DC=local' -Server $server -Credential $adminCred
+      New-ADUser -Name $userName -SamAccountName $userName -AccountPassword $userPass -Enabled $true -Path '{{ adfs_users_ou }}' -Server $server -Credential $adminCred
       Write-Output "Created user $userName"
     } else {
       Set-ADAccountPassword -Identity $userName -NewPassword $userPass -Reset -Server $server -Credential $adminCred
@@ -71,7 +71,7 @@
       Write-Output "User $userName already exists, password updated and enabled"
     }
   run_once: true
-  delegate_to: dc01
+  delegate_to: "{{ adfs_delegate_to | default('dc01') }}"
 
 - name: Download AzureADConnect installer to remote computer
   win_shell: |

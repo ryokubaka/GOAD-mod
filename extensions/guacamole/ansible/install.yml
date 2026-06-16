@@ -26,6 +26,10 @@
         - exchange
         - lx01
         - ws01
+        - ws02
+        - w11-23h2
+        - w11-24h2
+        - w11-25h2
       register: included_vars
 
     - name: Debug included configs

@@ -1,0 +1,3 @@
+; EXTENSION : windows_activation ------------------------------------------
+; No extension VMs. install.yml targets core [domain] plus [extensions] Windows
+; hosts (WinRM only; Linux extension VMs are skipped in the playbook).

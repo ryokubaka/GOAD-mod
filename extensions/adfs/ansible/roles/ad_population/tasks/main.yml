@@ -87,12 +87,13 @@
       ansible.windows.win_powershell:
         script: |
           Import-Module ActiveDirectory
-          Set-ADDefaultDomainPasswordPolicy -Identity "{{ domain_name }}" `
+          $domain = Get-ADDomain
+          Set-ADDefaultDomainPasswordPolicy -Identity $domain.DNSRoot `
             -LockoutThreshold          {{ ad_lockout_threshold | default(10) }} `
             -LockoutDuration           (New-TimeSpan -Minutes {{ ad_lockout_duration_mins | default(30) }}) `
             -LockoutObservationWindow  (New-TimeSpan -Minutes {{ ad_lockout_observation_window_mins | default(30) }})
-          $pol = Get-ADDefaultDomainPasswordPolicy -Identity "{{ domain_name }}"
-          Write-Output "Lockout policy set: threshold=$($pol.LockoutThreshold) duration=$($pol.LockoutDuration) window=$($pol.LockoutObservationWindow)"
+          $pol = Get-ADDefaultDomainPasswordPolicy -Identity $domain.DNSRoot
+          Write-Output "Lockout policy set on $($domain.DNSRoot): threshold=$($pol.LockoutThreshold) duration=$($pol.LockoutDuration) window=$($pol.LockoutObservationWindow)"
       when: ad_configure_lockout | default(true)
       changed_when: true
 

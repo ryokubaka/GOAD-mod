@@ -1,0 +1,13 @@
+{
+    "name": "commando",
+    "description": "Add the commando machine into the lab",
+    "machines": [
+        "commando"
+    ],
+    "compatibility": [
+        "GOAD",
+        "GOAD-Light",
+        "GOAD-Mini"
+    ],
+    "impact": "add a commando machine for developing and testing malicious tools"
+}

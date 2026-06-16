@@ -1,0 +1,9 @@
+  - vm_name: "{{ range_id }}-GOAD-ws02"
+    hostname: "{{ range_id }}-ws02"
+    template: win11-24h2-x64-enterprise-tpm-template
+    vlan: 10
+    ip_last_octet: 34
+    ram_gb: 4
+    cpus: 2
+    windows:
+      sysprep: true

@@ -114,7 +114,7 @@
       ansible.windows.win_powershell:
         script: |
           try {
-            Get-WinEvent -LogName System -Newest 10 | Format-List | Out-String
+            Get-EventLog -LogName System -Newest 10 | Format-List | Out-String
           } catch {
             "Unable to retrieve WinEvent log: $_"
           }

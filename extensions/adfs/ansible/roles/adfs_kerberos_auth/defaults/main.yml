@@ -1,9 +1,14 @@
 ---
-  dns_zone: "sevenkingdoms.local"
-  dns_name: gitlab
-  dns_ip: "{{ hostvars['adfs-gitlab'].ansible_host | default('') }}"
-  adfs_service_account: "SEVENKINGDOMS\\adfs_svc"
-  adfs_fqdn: adfs.sevenkingdoms.local
-  gpo_name: "ADFS - Local Intranet Zone"
-  adfs_url: "https://{{ adfs_fqdn }}"
-  target_ou_dn: "DC=sevenkingdoms,DC=local" 
+adfs_dc_host: dc01
+adfs_delegate_to: "{{ adfs_dc_host }}"
+gitlab_inventory_host: adfs-gitlab
+dns_zone: "sevenkingdoms.local"
+dns_name: gitlab
+dns_ip: "{{ hostvars[gitlab_inventory_host].ansible_host | default('') }}"
+adfs_service_account: "SEVENKINGDOMS\\adfs_svc"
+adfs_fqdn: "adfs.sevenkingdoms.local"
+adfs_url_host: adfs
+gpo_name: "ADFS - Local Intranet Zone"
+adfs_url: "https://{{ adfs_fqdn }}"
+target_ou_dn: "DC=sevenkingdoms,DC=local"
+adfs_intranet_zone_key: "HKCU\\Software\\Policies\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\\ZoneMap\\Domains\\{{ dns_zone }}\\{{ adfs_url_host }}"

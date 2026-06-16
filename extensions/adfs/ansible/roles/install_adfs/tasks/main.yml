@@ -24,9 +24,9 @@
     $userName = '{{ adfs_service_account }}'
     if ($userName -match '\\') { $userName = ($userName -split '\\')[-1] }
     $userPass = ConvertTo-SecureString '{{ adfs_service_account_password }}' -AsPlainText -Force
-    $adminPass = ConvertTo-SecureString '8dCT-DJjgScp' -AsPlainText -Force
-    $adminCred = New-Object PSCredential('SEVENKINGDOMS\administrator', $adminPass)
-    $server = 'kingslanding.sevenkingdoms.local'
+    $adminPass = ConvertTo-SecureString '{{ adfs_domain_admin_password }}' -AsPlainText -Force
+    $adminCred = New-Object PSCredential('{{ adfs_domain_admin_user }}', $adminPass)
+    $server = '{{ adfs_dc_fqdn }}'
 
     Import-Module ActiveDirectory
 
@@ -39,7 +39,7 @@
     }
 
     if (-not $existing) {
-      New-ADUser -Name $userName -SamAccountName $userName -AccountPassword $userPass -Enabled $true -Path 'CN=Users,DC=sevenkingdoms,DC=local' -Server $server -Credential $adminCred
+      New-ADUser -Name $userName -SamAccountName $userName -AccountPassword $userPass -Enabled $true -Path '{{ adfs_users_ou }}' -Server $server -Credential $adminCred
       Write-Output "Created user $userName"
     } else {
       Set-ADAccountPassword -Identity $userName -NewPassword $userPass -Reset -Server $server -Credential $adminCred
@@ -47,19 +47,19 @@
       Write-Output "User $userName already exists, password updated and enabled"
     }
   run_once: true
-  delegate_to: dc01
+  delegate_to: "{{ adfs_delegate_to }}"
 
 - name: Add ADFS Service Account to Domain Admins group (on DC via AD cmdlets)
   ansible.windows.win_shell: |
     $userName = '{{ adfs_service_account }}'
     if ($userName -match '\\') { $userName = ($userName -split '\\')[-1] }
-    $server = 'kingslanding.sevenkingdoms.local'
-    $adminPass = ConvertTo-SecureString '8dCT-DJjgScp' -AsPlainText -Force
-    $adminCred = New-Object PSCredential('SEVENKINGDOMS\administrator', $adminPass)
+    $server = '{{ adfs_dc_fqdn }}'
+    $adminPass = ConvertTo-SecureString '{{ adfs_domain_admin_password }}' -AsPlainText -Force
+    $adminCred = New-Object PSCredential('{{ adfs_domain_admin_user }}', $adminPass)
     Add-ADGroupMember -Identity 'Domain Admins' -Members $userName -Server $server -Credential $adminCred -ErrorAction SilentlyContinue
     Write-Output "Ensured $userName is member of Domain Admins"
   run_once: true
-  delegate_to: dc01
+  delegate_to: "{{ adfs_delegate_to }}"
 
 - name: Ensure ADFS SSL certificate exists (self-signed)
   win_shell: |
@@ -76,7 +76,7 @@
 
 - name: Install ADFS Role
   win_shell: |
-    $username = "SEVENKINGDOMS\{{ adfs_service_account }}"
+    $username = "{{ adfs_domain_netbios }}\{{ adfs_service_account | regex_replace('^.*\\\\', '') }}"
     $password = "{{ adfs_service_account_password }}"
     $securePassword = ConvertTo-SecureString $password -AsPlainText -Force
     $serviceAccountCredential = New-Object System.Management.Automation.PSCredential ($username, $securePassword)
@@ -93,8 +93,8 @@
   vars:
     ansible_become: true
     ansible_become_method: runas
-    ansible_become_user: 'SEVENKINGDOMS\administrator'
-    ansible_become_password: '8dCT-DJjgScp'
+    ansible_become_user: "{{ adfs_domain_admin_user }}"
+    ansible_become_password: "{{ adfs_domain_admin_password }}"
     ansible_become_flags: "logon_type=interactive logon_flags=with_profile"
 
 - name: Run Set-AdfsProperties to enable IdP initiated sign-on page
@@ -118,6 +118,6 @@
   vars:
     ansible_become: true
     ansible_become_method: runas
-    ansible_become_user: 'SEVENKINGDOMS\administrator'
-    ansible_become_password: '8dCT-DJjgScp'
+    ansible_become_user: "{{ adfs_domain_admin_user }}"
+    ansible_become_password: "{{ adfs_domain_admin_password }}"
     ansible_become_flags: "logon_type=interactive logon_flags=with_profile"

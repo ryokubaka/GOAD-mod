@@ -1,0 +1,13 @@
+{
+    "name": "w11-24h2",
+    "description": "Add a hardened Windows 11 24H2 workstation (TPM) into the lab",
+    "machines": [
+        "w11-24h2 (catrock.sevenkingdoms.local)"
+    ],
+    "compatibility": [
+        "GOAD",
+        "GOAD-Light",
+        "GOAD-Mini"
+    ],
+    "impact": "aws doesn't provide windows11 ami. you can still install w11-24h2 with aws but a windows server 2019 will be used instead"
+}

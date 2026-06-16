@@ -28,12 +28,21 @@
 - name: Configure AD CS and ADFS prerequisites on DC
   hosts: adfs_dc
   vars:
+    adfs_member_domain: "sevenkingdoms.local"
+    adfs_domain_netbios: "SEVENKINGDOMS"
+    adfs_dc_host: dc01
+    adfs_dc_fqdn: "{{ lab.hosts['dc01'].hostname }}.sevenkingdoms.local"
+    adfs_domain_admin_password: "{{ lab.domains['sevenkingdoms.local'].domain_password }}"
+    adfs_domain_admin_user: "SEVENKINGDOMS\\{{ admin_user }}"
+    adfs_users_ou: "CN=Users,{{ lab.hosts['dc01'].path }}"
+    gitlab_inventory_host: adfs-gitlab
     dns_name: gitlab
     dns_zone: "sevenkingdoms.local"
-    dns_ip: "{{ hostvars['adfs-gitlab'].ansible_host }}"
+    dns_ip: "{{ hostvars[gitlab_inventory_host].ansible_host }}"
     adfs_service_account: "SEVENKINGDOMS\\adfs_svc"
     adfs_fqdn: "adfs.sevenkingdoms.local"
     target_ou_dn: "DC=sevenkingdoms,DC=local"
+    adfs_CA: "SEVENKINGDOMS-CA"
   roles:
     - { role: 'install_adcs', tags: ['adcs'] }
     - { role: 'adfs_kerberos_auth', tags: ['adfs_kerberos_auth'] }
@@ -81,8 +90,10 @@
     - { role: 'mde_prereqs', tags: ['defender', 'mde_prereqs'] }
     - { role: 'wef', tags: ['defender', 'wef'] }
     - { role: 'sysmon', tags: ['defender', 'sysmon'] }
+    - role: ad_population
+      tags: ['defender', 'ad_population']
+      when: inventory_hostname == (defender_dc_hostname | default('dc01'))
     - { role: 'adcs_lab', tags: ['defender', 'adcs_lab'] }
-    - { role: 'ad_population', tags: ['defender', 'ad_population'] }
     - { role: 'smb_shares', tags: ['defender', 'smb_shares'] }
     - { role: 'enable_mdi_gpo', tags: ['defender', 'enable_mdi_gpo'] }
 
@@ -115,6 +126,9 @@
     - vars/defender_lab_mde_shared.yml
   vars:
     domain_name: "{{ defender_domain }}"
+    domain_admin_password: "{{ lab.domains[defender_domain].domain_password | default(defender_admin_pass) }}"
+    rsat_become_user: "{{ defender_netbios }}\\{{ admin_user }}"
+    rsat_become_password: "{{ domain_admin_password }}"
     wef_mode: forwarder
     wef_collector_server: "{{ defender_wef_collector }}"
     smb_domain: "{{ defender_netbios }}"
@@ -133,11 +147,18 @@
 - name: Install and configure ADFS server
   hosts: adfs_server
   vars:
+    adfs_member_domain: "sevenkingdoms.local"
+    adfs_domain_netbios: "SEVENKINGDOMS"
+    adfs_dc_host: dc01
+    adfs_dc_fqdn: "{{ lab.hosts['dc01'].hostname }}.sevenkingdoms.local"
+    adfs_domain_admin_password: "{{ lab.domains['sevenkingdoms.local'].domain_password }}"
+    adfs_domain_admin_user: "SEVENKINGDOMS\\{{ admin_user }}"
+    adfs_users_ou: "CN=Users,{{ lab.hosts['dc01'].path }}"
     adfs_service_account: "adfs_svc"
     adfs_service_account_password: "password"
     adfs_service_display_name: "ADFS Service"
     adfs_hostname: "adfs.sevenkingdoms.local"
-    adfs_FQDN_CA: "kingslanding.sevenkingdoms.local\\SEVENKINGDOMS-CA"
+    adfs_FQDN_CA: "{{ adfs_dc_fqdn }}\\SEVENKINGDOMS-CA"
     adfs_CA: "SEVENKINGDOMS-CA"
     adfs_certificate_subject: "CN=adfs.sevenkingdoms.local, O=SEVENKINGDOMS, C=US"
   roles:
@@ -146,6 +167,13 @@
 - name: Prepare Entra Connect server
   hosts: entra
   vars:
+    adfs_member_domain: "sevenkingdoms.local"
+    adfs_domain_netbios: "SEVENKINGDOMS"
+    adfs_dc_host: dc01
+    adfs_dc_fqdn: "{{ lab.hosts['dc01'].hostname }}.sevenkingdoms.local"
+    adfs_domain_admin_password: "{{ lab.domains['sevenkingdoms.local'].domain_password }}"
+    adfs_domain_admin_user: "SEVENKINGDOMS\\{{ admin_user }}"
+    adfs_users_ou: "CN=Users,{{ lab.hosts['dc01'].path }}"
     adfs_CA: "SEVENKINGDOMS-CA"
     ludus_entra_join_svc_account: "entra_svc"
     ludus_entra_join_svc_account_password: "password"
@@ -163,6 +191,10 @@
   hosts: gitlab
   become: true
   vars:
+    adfs_member_domain: "sevenkingdoms.local"
+    adfs_domain_netbios: "SEVENKINGDOMS"
+    adfs_domain_admin_password: "{{ lab.domains['sevenkingdoms.local'].domain_password }}"
+    adfs_domain_admin_user: "SEVENKINGDOMS\\{{ admin_user }}"
     gitlab_domain: "gitlab.sevenkingdoms.local"
     adfs_fqdn: "adfs.sevenkingdoms.local"
     adfs_service_account: "SEVENKINGDOMS\\adfs_svc"

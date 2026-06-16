@@ -1,0 +1,14 @@
+[default]
+{% if provider_name == 'aws' or provider_name == 'azure' %}
+ws02 ansible_host={{ip_range}}.34 dns_domain=dc01 dict_key=ws02 ansible_user=ansible ansible_password=EP+xh7Rk6j90
+{% elif provider_name == 'ludus' %}
+ws02 ansible_host={{ip_range}}.34 dns_domain=dc01 dict_key=ws02 ludus=true ansible_ssh_common_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o GlobalKnownHostsFile=/dev/null'
+{% else %}
+ws02 ansible_host={{ip_range}}.34 dns_domain=dc01 dict_key=ws02
+{% endif %}
+
+[domain]
+ws02
+
+[extensions]
+ws02

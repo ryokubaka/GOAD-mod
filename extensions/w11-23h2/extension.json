@@ -1,0 +1,13 @@
+{
+    "name": "w11-23h2",
+    "description": "Add a hardened Windows 11 23H2 workstation into the lab",
+    "machines": [
+        "w11-23h2 (casterlyrock.sevenkingdoms.local)"
+    ],
+    "compatibility": [
+        "GOAD",
+        "GOAD-Light",
+        "GOAD-Mini"
+    ],
+    "impact": "aws doesn't provide windows11 ami. you can still install w11-23h2 with aws but a windows server 2019 will be used instead"
+}

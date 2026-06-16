@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Sysmon schemaversion="4.91">
+  <HashAlgorithms>sha256</HashAlgorithms>
+  <CheckRevocation>false</CheckRevocation>
+  <EventFiltering>
+  </EventFiltering>
+</Sysmon>

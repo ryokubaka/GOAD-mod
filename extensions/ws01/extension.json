@@ -1,6 +1,6 @@
 {
     "name": "ws01",
-    "description": "Add an hardened workstation into the lab",
+    "description": "Legacy alias for w11-23h2 — hardened Windows 11 23H2 workstation",
     "machines": [
         "ws01 (casterlyrock.sevenkingdoms.local)"
     ],
@@ -9,5 +9,5 @@
         "GOAD-Light",
         "GOAD-Mini"
     ],
-    "impact": "aws doesn't provide windows10 ami. you can still install ws01 with aws but a windows server 2019 will be used instead"
+    "impact": "aws doesn't provide windows11 ami. you can still install ws01 with aws but a windows server 2019 will be used instead"
 }

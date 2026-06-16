@@ -1,0 +1,19 @@
+{
+  "lab_extension" : {
+      "hosts" : {
+          "commando" : {
+              "hostname" : "commando",
+              "type" : "workstation",
+              "local_admin_password": "commando",
+              "domain" : "sevenkingdoms.local",
+              "path" : "DC=sevenkingdoms,DC=local",
+              "local_groups" : {
+                  "Administrators" : [
+                      "sevenkingdoms\\tywin.lannister",
+                      "sevenkingdoms\\jaime.lannister"
+                  ]
+              }
+          }
+      }
+  }
+}

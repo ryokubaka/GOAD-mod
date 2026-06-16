@@ -80,9 +80,12 @@ install_dir: "/opt/Elastic"
 elastic_agent_reboot_before_install: false
 # Passes through to elastic-agent install when Elasticsearch uses TLS with untrusted certs (not needed for http://).
 elastic_agent_install_insecure: false
+# Required when --fleet-server-es uses http:// (plain HTTP Elasticsearch).
+elastic_fleet_server_es_insecure: true
+elastic_fleet_server_bind_host: "0.0.0.0"
 # Windows Fleet package version for Sysmon (Operational) on agent-policy.
 # EPR rejects "latest" in package_policies POST; use a semver or set elastic_windows_integration_version: latest to resolve via Fleet EPM GET.
 elastic_windows_integration_version: "3.8.3"
 elastic_windows_integration_version_epm_fallback: "3.8.3"
-# Fleet Server integration package (fleet-server-policy). EPR rejects fleet_server/latest; pin semver (see fleet-resolve-fleet-server-version.yml).
-elastic_fleet_server_package_version: "9.4.0"
+# Fleet Server *integration* package (EPR semver 1.x, not stack 9.x). EPR rejects fleet_server/latest in package_policies POST; pin semver (see fleet-resolve-fleet-server-version.yml).
+elastic_fleet_server_package_version: "1.6.1"

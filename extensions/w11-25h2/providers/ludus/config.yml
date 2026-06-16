@@ -1,0 +1,9 @@
+  - vm_name: "{{ range_id }}-GOAD-W11-25H2"
+    hostname: "{{ range_id }}-W1125H2"
+    template: win11-25h2-x64-enterprise-template
+    vlan: 10
+    ip_last_octet: 35
+    ram_gb: 4
+    cpus: 2
+    windows:
+      sysprep: true

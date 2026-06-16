@@ -1,0 +1,12 @@
+{
+  "name": "windows_activation",
+  "description": "Activate unlicensed Windows lab VMs with Microsoft Activation Scripts (MAS). No extra VMs — runs against existing Windows hosts only.",
+  "machines": [],
+  "compatibility": [
+    "GOAD",
+    "GOAD-Light",
+    "GOAD-Mini",
+    "DRACARYS"
+  ],
+  "impact": "none"
+}

@@ -130,7 +130,6 @@
   run_once: true
 
 - name: Install Elastic Agent
-  # Since I am using self-signed certificate, I have added "--insecure" flag at the end.
-  win_shell: | 
-    echo Y | & "{{ install_dir }}\elastic-agent-{{ elastic_agent_version }}-windows-x86_64\elastic-agent.exe" install --url=https://"{{ elk_host }}":8220 --enrollment-token="{{ api_key }}" --insecure -f
+  win_shell: |
+    echo Y | & "{{ install_dir }}\elastic-agent-{{ elastic_agent_version }}-windows-x86_64\elastic-agent.exe" install --url=https://{{ elk_host }}:8220 --enrollment-token="{{ api_key }}" --insecure -f
   when: not agentinstall_stat.stat.exists or uninstall_stat
