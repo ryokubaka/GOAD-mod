@@ -1,0 +1,13 @@
+  - vm_name: "{{ range_id }}-NEMESIS"
+    hostname: "{{ range_id }}-NEMESIS"
+    template: ubuntu-24.04-x64-server-template
+    vlan: 10
+    ip_last_octet: 53
+    ram_gb: 12
+    cpus: 4
+    linux: true
+    roles:
+      - geerlingguy.docker
+      - brmkit.ludus_nemesis
+    role_vars:
+      nemesis_port: 7443

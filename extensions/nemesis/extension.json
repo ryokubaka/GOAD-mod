@@ -1,0 +1,11 @@
+{
+    "name": "nemesis",
+    "description": "Add SpecterOps Nemesis for file ingestion, enrichment, and triage",
+    "machines": [
+        "nemesis"
+    ],
+    "compatibility": [
+        "*"
+    ],
+    "impact": "add an Ubuntu VM (~12 GB RAM) with Nemesis via Ludus roles geerlingguy.docker and brmkit.ludus_nemesis"
+}

@@ -1,0 +1,12 @@
+---
+# Nemesis is provisioned by Ludus user-defined roles during range deploy.
+# Prerequisite on the Ludus host:
+#   ludus ansible role add geerlingguy.docker
+#   ludus ansible role add brmkit.ludus_nemesis
+- name: Verify nemesis host is reachable
+  hosts: nemesis
+  gather_facts: false
+  tasks:
+    - name: Confirm SSH connectivity
+      ansible.builtin.wait_for_connection:
+        timeout: 60
