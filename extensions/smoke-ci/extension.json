@@ -3,11 +3,7 @@
   "description": "Fast pipeline check: no extra Ludus VMs; Ansible runs on localhost only (no WinRM/SSH to guests).",
   "machines": [],
   "compatibility": [
-    "GOAD-Smoke",
-    "GOAD-Mini",
-    "GOAD",
-    "GOAD-Light",
-    "DRACARYS"
+    "*"
   ],
   "impact": "none"
 }

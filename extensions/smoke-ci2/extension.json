@@ -3,11 +3,7 @@
   "description": "Smoke-ci2 — same pattern as smoke-ci: no extra Ludus VMs; Ansible localhost-only (pipeline / second smoke slot).",
   "machines": [],
   "compatibility": [
-    "GOAD-Smoke",
-    "GOAD-Mini",
-    "GOAD",
-    "GOAD-Light",
-    "DRACARYS"
+    "*"
   ],
   "impact": "none"
 }

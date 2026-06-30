@@ -125,7 +125,7 @@
             },
             "multi_domain_groups_member" : {},
             "acls" : {
-                "WriteSPN_viserion_vhagar": {"for": "viserion", "to": "vhagar$", "right": "Ext-Write-SPN", "inheritance": "None"},
+                "WriteSPN_viserion_vhagar": {"for": "viserion", "to": "vhagar$", "right": "Ext-Write-SPN", "inheritance": "None"}
             },
             "users" : {
                 "drogon" : {
