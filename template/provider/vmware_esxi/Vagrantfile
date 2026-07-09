@@ -77,6 +77,15 @@ boxes.append(
         end
       else
         target.vm.communicator = "ssh"
+        target.ssh.insert_key = false
+        bento_box_versions = {
+          "bento/ubuntu-22.04" => "202401.31.0",
+          "bento/debian-12" => "202401.31.0",
+          "bento/ubuntu-24.04" => "202404.26.0",
+        }
+        if !box.has_key?(:box_version) && bento_box_versions.key?(box[:box])
+          target.vm.box_version = bento_box_versions[box[:box]]
+        end
       end
 
       if box.has_key?(:forwarded_port)

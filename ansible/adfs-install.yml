@@ -1,0 +1,85 @@
+---
+# ADFS lab type: federation, Entra Connect prep, GitLab SAML (roles in extensions/adfs/ansible/roles)
+- import_playbook: data.yml
+  vars:
+    data_path: "../ad/{{domain_name}}/data/"
+  tags: 'data'
+
+- name: Configure AD CS and ADFS prerequisites on DC
+  hosts: dc01
+  vars:
+    adfs_member_domain: "{{ lab.hosts['dc01'].domain }}"
+    adfs_domain_netbios: "{{ lab.domains[adfs_member_domain].netbios_name }}"
+    adfs_dc_host: dc01
+    adfs_dc_fqdn: "{{ lab.hosts[adfs_dc_host].hostname }}.{{ adfs_member_domain }}"
+    adfs_domain_admin_password: "{{ lab.domains[adfs_member_domain].domain_password }}"
+    adfs_domain_admin_user: "{{ adfs_domain_netbios }}\\{{ admin_user }}"
+    adfs_users_ou: "CN=Users,{{ lab.hosts[adfs_dc_host].path }}"
+    dns_name: gitlab
+    dns_zone: "{{ adfs_member_domain }}"
+    dns_ip: "{{ hostvars['gitlab'].ansible_host }}"
+    adfs_service_account: "{{ adfs_domain_netbios }}\\adfs_svc"
+    adfs_fqdn: "adfs.{{ adfs_member_domain }}"
+    target_ou_dn: "{{ lab.hosts[adfs_dc_host].path }}"
+    adfs_CA: "{{ adfs_domain_netbios }}-CA"
+    gitlab_inventory_host: gitlab
+    adfs_url_host: adfs
+  roles:
+    - { role: 'install_adcs', tags: ['adcs'] }
+    - { role: 'adfs_kerberos_auth', tags: ['adfs_kerberos_auth'] }
+
+- name: Install and configure ADFS server
+  hosts: adfs
+  vars:
+    adfs_member_domain: "{{ lab.hosts['dc01'].domain }}"
+    adfs_domain_netbios: "{{ lab.domains[adfs_member_domain].netbios_name }}"
+    adfs_dc_host: dc01
+    adfs_dc_fqdn: "{{ lab.hosts[adfs_dc_host].hostname }}.{{ adfs_member_domain }}"
+    adfs_domain_admin_password: "{{ lab.domains[adfs_member_domain].domain_password }}"
+    adfs_domain_admin_user: "{{ adfs_domain_netbios }}\\{{ admin_user }}"
+    adfs_users_ou: "CN=Users,{{ lab.hosts[adfs_dc_host].path }}"
+    adfs_service_account: "adfs_svc"
+    adfs_service_account_password: "{{ lab.domains[adfs_member_domain].users.adfs_svc.password }}"
+    adfs_service_display_name: "ADFS Service"
+    adfs_hostname: "adfs.{{ adfs_member_domain }}"
+    adfs_FQDN_CA: "{{ adfs_dc_fqdn }}\\{{ adfs_domain_netbios }}-CA"
+    adfs_CA: "{{ adfs_domain_netbios }}-CA"
+    adfs_certificate_subject: "CN=adfs.{{ adfs_member_domain }}, O={{ adfs_domain_netbios }}, C=US"
+  roles:
+    - { role: 'install_adfs', tags: ['install_adfs'] }
+
+- name: Prepare Entra Connect server
+  hosts: entraconnect
+  vars:
+    adfs_member_domain: "{{ lab.hosts['dc01'].domain }}"
+    adfs_domain_netbios: "{{ lab.domains[adfs_member_domain].netbios_name }}"
+    adfs_dc_host: dc01
+    adfs_dc_fqdn: "{{ lab.hosts[adfs_dc_host].hostname }}.{{ adfs_member_domain }}"
+    adfs_domain_admin_password: "{{ lab.domains[adfs_member_domain].domain_password }}"
+    adfs_domain_admin_user: "{{ adfs_domain_netbios }}\\{{ admin_user }}"
+    adfs_users_ou: "CN=Users,{{ lab.hosts[adfs_dc_host].path }}"
+    adfs_CA: "{{ adfs_domain_netbios }}-CA"
+    ludus_entra_join_svc_account: "entra_svc"
+    ludus_entra_join_svc_account_password: "{{ lab.domains[adfs_member_domain].users.entra_svc.password }}"
+    ludus_entra_join_alt_upn: ""
+  roles:
+    - { role: 'entra_prep', tags: ['entra_prep'] }
+
+- name: Install and integrate GitLab with ADFS
+  hosts: gitlab
+  become: true
+  vars:
+    adfs_member_domain: "{{ lab.hosts['dc01'].domain }}"
+    adfs_domain_netbios: "{{ lab.domains[adfs_member_domain].netbios_name }}"
+    adfs_dc_host: dc01
+    adfs_domain_admin_password: "{{ lab.domains[adfs_member_domain].domain_password }}"
+    adfs_domain_admin_user: "{{ adfs_domain_netbios }}\\{{ admin_user }}"
+    gitlab_domain: "gitlab.{{ adfs_member_domain }}"
+    adfs_fqdn: "adfs.{{ adfs_member_domain }}"
+    adfs_service_account: "{{ adfs_domain_netbios }}\\adfs_svc"
+    adfs_host: adfs
+    dc_host: dc01
+    gitlab_ip: "{{ ansible_host }}"
+    gitlab_version: "18.6.2"
+  roles:
+    - { role: 'install_gitlab', tags: ['install_gitlab'] }

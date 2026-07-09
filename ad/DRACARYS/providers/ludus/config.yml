@@ -8,6 +8,7 @@ ludus:
     cpus: 2
     windows:
       sysprep: true
+      install_additional_tools: true
   - vm_name: "{{ range_id }}-SRV01"
     hostname: "{{ range_id }}-SRV01"
     template: win2025-server-x64-tpm-template
@@ -17,6 +18,7 @@ ludus:
     cpus: 2
     windows:
       sysprep: true
+      install_additional_tools: true
   - vm_name: "{{ range_id }}-LX01"
     hostname: "{{ range_id }}-LX01"
     template: ubuntu-24.04-x64-server-template

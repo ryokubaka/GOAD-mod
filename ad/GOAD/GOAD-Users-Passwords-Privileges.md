@@ -20,7 +20,7 @@ This page lists all AD users, passwords, groups, and privileges defined in the G
 |------|------|----------------------|
 | kingslanding (dc01) | DC | `8dCT-DJjgScp` |
 | winterfell (dc02) | DC | `NgtI75cKV+Pu` |
-| castleblack (srv02) | Server | `NgtI75cKV+Pu` |
+| castelblack (srv02) | Server | `NgtI75cKV+Pu` |
 | meereen (dc03) | DC | `Ufe-bVXSx9rk` |
 | braavos (srv03) | Server | `978i2pF43UJ-` |
 
@@ -85,15 +85,15 @@ This page lists all AD users, passwords, groups, and privileges defined in the G
 | hodor | hodor | Stark | Password spray (user=password) |
 | jon.snow | iknownothing | Stark, Night Watch | MSSQL sysadmin; kerberoasting; trusted link to ESSOS; constrained delegation |
 | samwell.tarly | Heartsbane | Night Watch | Password in LDAP description; MSSQL execute as login → sa; GPO edit (StarkWallpaper) |
-| jeor.mormont | _L0ngCl@w_ | Night Watch, Mormont | Local admin castleblack; password in SYSVOL script |
-| sql_svc | YouWillNotKerboroast1ngMeeeeee | (none) | SPNs: MSSQLSvc/castleblack... (kerberoastable) |
+| jeor.mormont | _L0ngCl@w_ | Night Watch, Mormont | Local admin castelblack; password in SYSVOL script |
+| sql_svc | YouWillNotKerboroast1ngMeeeeee | (none) | SPNs: MSSQLSvc/castelblack... (kerberoastable) |
 
 ### Local machine access (north)
 
 | Host | Local Administrators | Remote Desktop Users |
 |------|----------------------|----------------------|
 | winterfell (dc02) | eddard.stark, catelyn.stark, robb.stark | Stark |
-| castleblack (srv02) | jeor.mormont | Night Watch, Mormont, Stark |
+| castelblack (srv02) | jeor.mormont | Night Watch, Mormont, Stark |
 
 ### ACLs (privileges) — north.sevenkingdoms.local
 
@@ -102,7 +102,7 @@ This page lists all AD users, passwords, groups, and privileges defined in the G
 | ANONYMOUS LOGON | DC=North,... | ReadProperty |
 | ANONYMOUS LOGON | DC=North,... | GenericExecute |
 
-### MSSQL (castleblack / srv02)
+### MSSQL (castelblack / srv02)
 
 | Role | Account | Notes |
 |------|---------|--------|
@@ -114,7 +114,7 @@ This page lists all AD users, passwords, groups, and privileges defined in the G
 | sa password | | Sup1_sa_P@ssw0rd! |
 | linked server (BRAAVOS) | NORTH\jon.snow → sa | remote: sa_P@ssw0rd!Ess0s |
 
-### Shares (castleblack)
+### Shares (castelblack)
 
 | Share | Path | Full | Change | Read |
 |-------|------|------|--------|------|
@@ -122,7 +122,7 @@ This page lists all AD users, passwords, groups, and privileges defined in the G
 
 ### Other (north)
 
-- **Credentials / autologon**: TERMSRV/castleblack and RDP autologon use north\robb.stark / sexywolfy.
+- **Credentials / autologon**: TERMSRV/castelblack and RDP autologon use north\robb.stark / sexywolfy.
 - **SYSVOL**: script.ps1 has jeor.mormont / _L0ngCl@w_; secret.ps1 has encrypted secret (tywin scenario).
 
 ---
@@ -136,7 +136,7 @@ This page lists all AD users, passwords, groups, and privileges defined in the G
 | daenerys.targaryen | BurnThemAll! | Targaryen, **Domain Admins** | Domain Admin ESSOS |
 | viserys.targaryen | GoldCrown | Targaryen | ACE: WriteProperty on jorah.mormont; CA manager (ADCS ESC7) |
 | khal.drogo | horse | Dothraki | MSSQL admin braavos; GenericAll on viserys, ESC4 template; LAPS reader |
-| jorah.mormont | H0nnor! | Targaryen | MSSQL execute as login → sa; trusted link to castleblack; LAPS reader |
+| jorah.mormont | H0nnor! | Targaryen | MSSQL execute as login → sa; trusted link to castelblack; LAPS reader |
 | missandei | fr3edom | (none) | ASREP roasting; GenericAll on khal.drogo; GenericWrite on viserys.targaryen |
 | drogon | Dracarys | Dragons | gMSA (gmsaDragon) has GenericAll on drogon |
 | sql_svc | YouWillNotKerboroast1ngMeeeeee | (none) | SPNs: MSSQLSvc/braavos... (kerberoastable) |
@@ -168,7 +168,7 @@ This page lists all AD users, passwords, groups, and privileges defined in the G
 | sysadmin | ESSOS\khal.drogo | |
 | execute as login | ESSOS\jorah.mormont → sa | |
 | sa password | | sa_P@ssw0rd!Ess0s |
-| linked server (castleblack) | ESSOS\khal.drogo → sa | remote: Sup1_sa_P@ssw0rd! |
+| linked server (castelblack) | ESSOS\khal.drogo → sa | remote: Sup1_sa_P@ssw0rd! |
 
 ### LAPS (essos)
 
@@ -197,7 +197,7 @@ This page lists all AD users, passwords, groups, and privileges defined in the G
 
 | Context | Password |
 |---------|----------|
-| MSSQL sa (castleblack) | Sup1_sa_P@ssw0rd! |
+| MSSQL sa (castelblack) | Sup1_sa_P@ssw0rd! |
 | MSSQL sa (braavos) | sa_P@ssw0rd!Ess0s |
 | sql_svc (both domains) | YouWillNotKerboroast1ngMeeeeee |
 

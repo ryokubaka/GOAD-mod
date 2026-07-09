@@ -6,6 +6,7 @@ dc01 ansible_host={{ip_range}}.10 dns_domain=dc01 dict_key=dc01
 adfs ansible_host={{ip_range}}.11 dns_domain=dc01 dict_key=adfs
 entraconnect ansible_host={{ip_range}}.12 dns_domain=dc01 dict_key=entraconnect
 ws01 ansible_host={{ip_range}}.13 dns_domain=dc01 dict_key=ws01
+gitlab ansible_host={{ip_range}}.100 dict_key=gitlab ansible_user=debian ansible_password=debian ansible_connection=ssh ansible_ssh_common_args='-o StrictHostKeyChecking=no'
 
 [all:vars]
 force_dns_server=no

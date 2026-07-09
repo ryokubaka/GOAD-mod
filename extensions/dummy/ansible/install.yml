@@ -1,0 +1,26 @@
+---
+- import_playbook: "../../../ansible/data.yml"
+  vars:
+    data_path: "../ad/{{domain_name}}/data/"
+  tags: 'data'
+
+- name: "Read local config file"
+  hosts: domain:extensions
+  connection: local
+  vars_files:
+    - "../data/config.json"
+  tasks:
+    - name: merge lab variable with local config
+      set_fact:
+        lab: "{{ lab|combine(lab_extension, recursive=True) }}"
+
+- name: Dummy extension — write marker file
+  hosts: dummy
+  become: true
+  tasks:
+    - name: Write /tmp/dummy-goad-extension.txt
+      ansible.builtin.copy:
+        dest: /tmp/dummy-goad-extension.txt
+        content: |
+          dummy extension provisioned
+        mode: "0644"

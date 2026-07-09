@@ -91,6 +91,9 @@ dc01
 ; usage : elk.yml
 [elk_log]
 
+[linux_domain]
+gitlab
+
 [laps_dc]
 [laps_server]
 [laps_workstation]

@@ -1,0 +1,25 @@
+---
+# Lab-only: activate expired/unlicensed Windows via Microsoft Activation Scripts (MAS).
+# https://github.com/massgravel/Microsoft-Activation-Scripts
+# https://massgrave.dev/command_line_switches
+
+windows_activation_enabled: true
+windows_activation_force: false
+
+windows_activation_mas_dir: C:\Tools\MAS
+# Defender flags MAS_AIO.cmd as PUA; add path exclusion before download/run (lab only).
+windows_activation_defender_exclusion: true
+windows_activation_mas_url: >-
+  https://raw.githubusercontent.com/massgravel/Microsoft-Activation-Scripts/master/MAS/All-In-One-Version-KL/MAS_AIO.cmd
+
+# auto = TSforge on server/DC, HWID on workstation (with TSforge fallback if still unlicensed)
+windows_activation_method: auto
+
+# MAS CLI switches (unattended). See https://massgrave.dev/command_line_switches
+# GOAD/Ludus eval Server/DC images: TSforge /Z-Windows (not ESUOffice).
+windows_activation_server_args: "/Z-Windows /S"
+# Eval VHDs often fail HWID — TSforge first; HWID only when windows_activation_method: hwid
+windows_activation_workstation_args: "/Z-Windows /S"
+windows_activation_workstation_fallback_args: "/HWID /S"
+# Seconds to wait after MAS before license WMI/slmgr refresh
+windows_activation_post_mas_delay_sec: 20

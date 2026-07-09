@@ -8,6 +8,4 @@ ludus:
     cpus: 2
     windows:
       sysprep: true
-    domain:
-      fqdn: sevenkingdoms.local
-      role: primary-dc
+      install_additional_tools: true

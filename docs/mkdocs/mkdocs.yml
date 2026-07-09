@@ -32,7 +32,9 @@ nav:
     - guacamole: extensions/guacamole.md
     - exchange: extensions/exchange.md
     - lx01: extensions/lx01.md
-    - ws01: extensions/ws01.md
+    - w11-23h2: extensions/w11-23h2.md
+    - w11-24h2: extensions/w11-24h2.md
+    - w11-25h2: extensions/w11-25h2.md
     - elk: extensions/elk.md
     - wazuh: extensions/wazuh.md
   - 💻 Usage: 

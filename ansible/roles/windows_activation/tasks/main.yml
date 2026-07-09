@@ -1,0 +1,184 @@
+---
+# Activate Windows when unlicensed or evaluation expired (lab use only).
+
+- name: Skip Windows activation when disabled
+  ansible.builtin.meta: end_host
+  when: not (windows_activation_enabled | default(true) | bool)
+
+- name: Prepare MAS directory and Defender exclusion
+  ansible.windows.win_powershell:
+    script: |
+      $ErrorActionPreference = 'Stop'
+      $dir = '{{ windows_activation_mas_dir }}'
+      if (-not (Test-Path -LiteralPath $dir)) {
+        New-Item -ItemType Directory -Path $dir -Force | Out-Null
+      }
+      {% if windows_activation_defender_exclusion | default(true) | bool %}
+      if (Get-Command Add-MpPreference -ErrorAction SilentlyContinue) {
+        $existing = @((Get-MpPreference -ErrorAction SilentlyContinue).ExclusionPath)
+        if ($existing -notcontains $dir) {
+          Add-MpPreference -ExclusionPath $dir -ErrorAction Stop
+          Write-Output "Added Defender path exclusion: $dir"
+        } else {
+          Write-Output "Defender exclusion already set: $dir"
+        }
+      } else {
+        Write-Output 'SKIP: Add-MpPreference unavailable (no Defender cmdlet)'
+      }
+      {% else %}
+      Write-Output 'Defender exclusion skipped (windows_activation_defender_exclusion=false)'
+      {% endif %}
+  register: windows_activation_prepare
+  changed_when: "'Added Defender' in (windows_activation_prepare.output | default([]) | join(' '))"
+
+- name: Copy license check helper script
+  ansible.windows.win_copy:
+    src: Test-GoadWindowsLicensed.ps1
+    dest: "{{ windows_activation_mas_dir }}\\Test-GoadWindowsLicensed.ps1"
+
+- name: Detect Windows licensing and platform
+  ansible.windows.win_powershell:
+    script: |
+      $ErrorActionPreference = 'Stop'
+      $os = Get-CimInstance Win32_OperatingSystem
+      . '{{ windows_activation_mas_dir }}\Test-GoadWindowsLicensed.ps1'
+      $lic = Get-GoadWindowsLicenseState
+      $needsActivation = -not $lic.IsLicensed
+      {% if windows_activation_force | default(false) | bool %}
+      $force = $true
+      {% else %}
+      $force = $false
+      {% endif %}
+      if ($force) { $needsActivation = $true }
+      [PSCustomObject]@{
+        NeedsActivation = $needsActivation
+        IsWorkstation = ($os.ProductType -eq 1)
+        ProductType = $os.ProductType
+        Caption = $os.Caption
+        LicensedCount = $lic.LicensedCount
+        LicenseMethod = $lic.Method
+      } | ConvertTo-Json -Compress
+  register: windows_activation_state
+  changed_when: false
+
+- name: Skip activation when Windows is already licensed
+  ansible.builtin.meta: end_host
+  when: not ((windows_activation_state.output | default(['{}']) | first | from_json).NeedsActivation | default(true))
+
+- name: Download Microsoft Activation Scripts AIO
+  ansible.windows.win_powershell:
+    script: |
+      $ErrorActionPreference = 'Stop'
+      $url = '{{ windows_activation_mas_url }}'
+      $dest = '{{ windows_activation_mas_dir }}\MAS_AIO.cmd'
+      [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+      if (Test-Path -LiteralPath $dest) { Remove-Item -LiteralPath $dest -Force }
+      Invoke-WebRequest -Uri $url -OutFile $dest -UseBasicParsing
+      if (-not (Test-Path -LiteralPath $dest)) {
+        throw "Download failed: $dest not created"
+      }
+      Write-Output "Downloaded MAS to $dest ($((Get-Item -LiteralPath $dest).Length) bytes)"
+  register: windows_activation_mas_download
+  retries: 3
+  delay: 10
+
+- name: Select MAS activation arguments
+  ansible.builtin.set_fact:
+    windows_activation_selected_args: >-
+      {%- set method = windows_activation_method | default('auto') -%}
+      {%- set is_ws = (windows_activation_state.output | default(['{}']) | first | from_json).IsWorkstation | default(false) -%}
+      {%- if method == 'hwid' -%}
+      {{ windows_activation_workstation_args }}
+      {%- elif method == 'tsforge' -%}
+      {{ windows_activation_server_args }}
+      {%- elif is_ws -%}
+      {{ windows_activation_workstation_args }}
+      {%- else -%}
+      {{ windows_activation_server_args }}
+      {%- endif -%}
+
+- name: Run MAS activation
+  ansible.windows.win_powershell:
+    script: |
+      $ErrorActionPreference = 'Stop'
+      $mas = '{{ windows_activation_mas_dir }}\MAS_AIO.cmd'
+      $args = '{{ windows_activation_selected_args }}'
+      if (-not (Test-Path -LiteralPath $mas)) {
+        throw "MAS script not found: $mas"
+      }
+      Write-Host "[*] Running MAS with args: $args"
+      $proc = Start-Process -FilePath 'cmd.exe' -ArgumentList @('/c', "`"$mas`" $args") -Wait -PassThru -NoNewWindow
+      Write-Host "[*] MAS exit code: $($proc.ExitCode)"
+      if ($proc.ExitCode -ne 0) {
+        throw "MAS activation failed (exit code: $($proc.ExitCode))"
+      }
+      Start-Sleep -Seconds {{ windows_activation_post_mas_delay_sec | default(20) }}
+  register: windows_activation_run
+  changed_when: true
+
+- name: Verify Windows is licensed after MAS run
+  ansible.windows.win_powershell:
+    script: |
+      . '{{ windows_activation_mas_dir }}\Test-GoadWindowsLicensed.ps1'
+      $lic = Get-GoadWindowsLicenseState
+      [PSCustomObject]@{
+        LicensedCount = $lic.LicensedCount
+        IsLicensed = $lic.IsLicensed
+        Method = $lic.Method
+        SlmgrXpr = $lic.SlmgrXpr
+      } | ConvertTo-Json -Compress
+  register: windows_activation_verify
+  changed_when: false
+
+- name: Run MAS workstation fallback when still unlicensed
+  when:
+    - (windows_activation_method | default('auto')) == 'auto'
+    - (windows_activation_state.output | default(['{}']) | first | from_json).IsWorkstation | default(false)
+    - not ((windows_activation_verify.output | default(['{}']) | first | from_json).IsLicensed | default(false))
+  block:
+    - name: Run MAS TSforge fallback on workstation
+      ansible.windows.win_powershell:
+        script: |
+          $ErrorActionPreference = 'Stop'
+          $mas = '{{ windows_activation_mas_dir }}\MAS_AIO.cmd'
+          $args = '{{ windows_activation_workstation_fallback_args }}'
+          Write-Host "[*] Workstation still unlicensed; running MAS fallback with args: $args"
+          $proc = Start-Process -FilePath 'cmd.exe' -ArgumentList @('/c', "`"$mas`" $args") -Wait -PassThru -NoNewWindow
+          if ($proc.ExitCode -ne 0) {
+            throw "MAS fallback activation failed (exit code: $($proc.ExitCode))"
+          }
+          Start-Sleep -Seconds {{ windows_activation_post_mas_delay_sec | default(20) }}
+      register: windows_activation_fallback_run
+      changed_when: true
+
+    - name: Verify Windows is licensed after MAS fallback
+      ansible.windows.win_powershell:
+        script: |
+          . '{{ windows_activation_mas_dir }}\Test-GoadWindowsLicensed.ps1'
+          $lic = Get-GoadWindowsLicenseState
+          [PSCustomObject]@{
+            LicensedCount = $lic.LicensedCount
+            IsLicensed = $lic.IsLicensed
+            Method = $lic.Method
+            SlmgrXpr = $lic.SlmgrXpr
+          } | ConvertTo-Json -Compress
+      register: windows_activation_verify
+      changed_when: false
+
+- name: Fail when Windows is still unlicensed
+  ansible.builtin.fail:
+    msg: >-
+      Windows activation failed on {{ inventory_hostname }} after MAS
+      ({{ windows_activation_selected_args | trim }}{% if windows_activation_fallback_run is defined and not (windows_activation_fallback_run.skipped | default(true)) %} + fallback {{ windows_activation_workstation_fallback_args | trim }}{% endif %}).
+      LicensedCount={{ (windows_activation_verify.output | default(['{}']) | first | from_json).LicensedCount | default(0) }},
+      method={{ (windows_activation_verify.output | default(['{}']) | first | from_json).Method | default('none') }},
+      slmgr_xpr={{ (windows_activation_verify.output | default(['{}']) | first | from_json).SlmgrXpr | default('') | truncate(120) }}.
+  when: not ((windows_activation_verify.output | default(['{}']) | first | from_json).IsLicensed | default(false))
+
+- name: Log successful Windows activation
+  ansible.windows.win_powershell:
+    script: >-
+      Add-Content -Path 'C:\Windows\Temp\goad-ansible.log'
+      -Value "OK windows_activation on {{ inventory_hostname }}"
+      -ErrorAction SilentlyContinue
+  changed_when: false

@@ -7,6 +7,9 @@ ansible_runner
 # ansible-core 2.12.6 min version python 3.8
 ansible-core==2.12.6
 pywinrm
+# ELK role json_query filter; tomllib backport for ansible-core on Python < 3.11
+jmespath
+tomli
 # AZURE
 azure-identity
 azure-mgmt-compute

@@ -1,11 +1,39 @@
 boxes.append(
-    { :name => "ELK",
-      :ip => "{{ip_range}}.50",
-      :box => "bento/ubuntu-22.04",
-      :os => "linux",
-      :distro => "ubuntu",
-      :cpus => 2,
-      :mem => 4000,
-      :forwarded_port => [ {:guest => 22, :host => 2211, :id => "ssh"} ]
-    }
+  { :name => "{{lab_name}}-ADFS-ADFS",
+    :ip => "{{ip_range}}.70",
+    :box => "StefanScherer/windows_2022",
+    :box_version => "2021.08.23",
+    :os => "windows",
+    :cpus => 4,
+    :mem => 8000
+  }
+)
+boxes.append(
+  { :name => "{{lab_name}}-ADFS-EntraConnect",
+    :ip => "{{ip_range}}.71",
+    :box => "StefanScherer/windows_2022",
+    :box_version => "2021.08.23",
+    :os => "windows",
+    :cpus => 4,
+    :mem => 8000
+  }
+)
+boxes.append(
+  { :name => "{{lab_name}}-ADFS-Workstation",
+    :ip => "{{ip_range}}.72",
+    :box => "gusztavvargadr/windows-11-22h2-enterprise",
+    :os => "windows",
+    :cpus => 4,
+    :mem => 4000
+  }
+)
+boxes.append(
+  { :name => "{{lab_name}}-ADFS-gitlab",
+    :ip => "{{ip_range}}.73",
+    :box => "bento/debian-12",
+    :os => "linux",
+    :cpus => 2,
+    :mem => 8000,
+    :forwarded_port => [ {:guest => 22, :host => 2213, :id => "ssh"} ]
+  }
 )

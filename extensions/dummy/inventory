@@ -1,0 +1,5 @@
+[default]
+dummy ansible_host={{ip_range}}.169 dict_key=dummy ansible_connection=ssh ansible_user=debian ansible_password=debian ansible_ssh_common_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o GlobalKnownHostsFile=/dev/null'
+
+[extensions]
+dummy

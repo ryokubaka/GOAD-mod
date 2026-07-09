@@ -22,6 +22,7 @@ fi
 python3 -m pip install --upgrade pip
 cd $GOAD_REPO
 python3 -m pip install -r requirements.yml
+python3 -m pip install jmespath 'tomli; python_version < "3.11"'
 
 cd $GOAD_REPO/ansible
 /home/vagrant/.local/bin/ansible-galaxy install -r requirements.yml

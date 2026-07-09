@@ -8,8 +8,6 @@
     windows:
       sysprep: true
       install_additional_tools: true
-      chocolatey_packages:
-        - wireshark
   - vm_name: "{{ range_id }}-ADFS-EntraConnect"
     hostname: "EntraConnect-WinServer2022"
     template: win2022-server-x64-template
@@ -20,8 +18,6 @@
     windows:
       sysprep: true
       install_additional_tools: true
-      chocolatey_packages:
-        - wireshark
   - vm_name: "{{ range_id }}-ADFS-Workstation"
     hostname: "Workstation-Win11"
     template: win11-22h2-x64-enterprise-template
@@ -32,8 +28,6 @@
     windows:
       sysprep: true
       install_additional_tools: true
-      chocolatey_packages:
-        - wireshark
   - vm_name: "{{ range_id }}-ADFS-gitlab"
     hostname: "{{ range_id }}-gitlab"
     template: debian-12-x64-server-template

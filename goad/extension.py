@@ -11,6 +11,8 @@ class Extension:
         self.providers_name_list = self.load_extension_providers(extension_name)
         self.compatibility = []
         self.description = ''
+        self.machines = []
+        self.impact = ''
         self.load_extension_config_file(extension_name)
 
     def load_extension_providers(self, extension_name):
@@ -26,8 +28,10 @@ class Extension:
             with open(extension_json_file, 'r') as extension_json_openfile:
                 # Reading from json file
                 extension_info = json.load(extension_json_openfile)
-                self.compatibility = extension_info['compatibility']
-                self.description = extension_info['description']
+                self.compatibility = extension_info.get('compatibility', [])
+                self.description = extension_info.get('description', '')
+                self.machines = extension_info.get('machines', [])
+                self.impact = extension_info.get('impact', '')
 
     def is_available(self, lab_name):
         return '*' in self.compatibility or lab_name in self.compatibility

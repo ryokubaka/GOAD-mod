@@ -300,11 +300,17 @@ class Goad(cmd.Cmd):
                 if extension is not None:
                     # enable and create files
                     self.lab_manager.get_current_instance().enable_extension(extension_name)
-                    # # start lab with extensions files (vagrant up / terraform plan)
-                    if not self.lab_manager.get_current_instance_provider().install():
-                        Log.error('Provider install failed; skipping extension provision')
-                        return
-                    # # provision extension
+                    # No Ludus/Vagrant/Terraform VMs for this extension — skip provider install
+                    # (e.g. windows_activation: Ansible-only against existing Windows hosts).
+                    if extension.machines:
+                        if not self.lab_manager.get_current_instance_provider().install():
+                            Log.error('Provider install failed; skipping extension provision')
+                            return
+                    else:
+                        Log.info(
+                            f'Extension {extension_name} adds no provider VMs — skipping install(), '
+                            f'running provision only'
+                        )
                     self.do_provision_extension(extension_name)
                 else:
                     Log.error(f'extension {extension_name} not found abort')

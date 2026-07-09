@@ -1,0 +1,14 @@
+{
+    "name": "dummy",
+    "description": "Minimal Debian test VM (Ludus: debian-12-x64-server-template @ .169); ansible writes /tmp/dummy-goad-extension.txt",
+    "machines": [
+        "dummy"
+    ],
+    "compatibility": [
+        "GOAD",
+        "GOAD-Light",
+        "GOAD-Mini",
+        "DRACARYS"
+    ],
+    "impact": "none"
+}

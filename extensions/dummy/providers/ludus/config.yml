@@ -1,0 +1,8 @@
+  - vm_name: "{{ range_id }}-GOAD-dummy"
+    hostname: "{{ range_id }}-dummy"
+    template: debian-12-x64-server-template
+    vlan: 10
+    ip_last_octet: 169
+    ram_gb: 1
+    cpus: 1
+    linux: true

@@ -7,5 +7,9 @@ This lab defines an Active Directory environment for `ludus.nuketown` with the f
 - `entraconnect` (`EntraConnect`) – Entra Connect / AAD Connect server.
 - `ws01` (`Workstation`) – Windows 11 workstation.
 
-The `providers/ludus/config.yml` and `providers/ludus/inventory` files are wired for Ludus deployment (using `{{ range_id }}` and `{{ ip_range }}`), and `data/config.json` / `data/inventory` follow the standard GOAD layout for hosts and the `ludus.nuketown` domain. Service accounts `adfs_svc` and `entra_svc` are pre-created in the domain; you can now add your own roles and scenario-specific configuration on top of this base.
+The `providers/ludus/config.yml` and `providers/ludus/inventory` files are wired for Ludus deployment (using `{{ range_id }}` and `{{ ip_range }}`), and `data/config.json` / `data/inventory` follow the standard GOAD layout for hosts and the `ludus.nuketown` domain. `data/inventory_disable_vagrant` is required for Ludus instance creation (`create_empty`). Service accounts `adfs_svc` and `entra_svc` are pre-created in the domain; you can now add your own roles and scenario-specific configuration on top of this base.
+
+**Provisioning:** `playbooks.yml` entry `ADFS` runs the standard AD build, then `ansible/adfs-install.yml` (AD CS, ADFS farm, Entra Connect prep, GitLab SAML) using roles under `extensions/adfs/ansible/roles/`.
+
+**Note:** The `extensions/adfs` extension is for GOAD / GOAD-Light / GOAD-Mini only (extra VMs on `sevenkingdoms.local`, IPs `.70`–`.73`). The **ADFS lab type** is a standalone range on `ludus.nuketown` with its own playbook chain.
 

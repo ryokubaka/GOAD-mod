@@ -8,6 +8,7 @@ ludus:
     cpus: 2
     windows:
       sysprep: true
+      install_additional_tools: true
   - vm_name: "{{ range_id }}-SCCM-MECM"
     hostname: "{{ range_id }}-SRV01"
     template: win2019-server-x64-template
@@ -17,6 +18,7 @@ ludus:
     cpus: 2
     windows:
       sysprep: true
+      install_additional_tools: true
   - vm_name: "{{ range_id }}-SCCM-MSSQL"
     hostname: "{{ range_id }}-SRV02"
     template: win2019-server-x64-template
@@ -26,6 +28,7 @@ ludus:
     cpus: 4
     windows:
       sysprep: true
+      install_additional_tools: true
   - vm_name: "{{ range_id }}-SCCM-CLIENT"
     hostname: "{{ range_id }}-WS01"
     template: win2019-server-x64-template
@@ -35,3 +38,4 @@ ludus:
     cpus: 2
     windows:
       sysprep: true
+      install_additional_tools: true

@@ -8,6 +8,7 @@ ludus:
     cpus: 2
     windows:
       sysprep: true
+      install_additional_tools: true
     # Ludus range deploy uses this to route the VM into DC-tagged plays (Deploy DC VMs,
     # collect primary DC, etc.). Without it, the box is only cloned as a generic Windows VM.
     domain:

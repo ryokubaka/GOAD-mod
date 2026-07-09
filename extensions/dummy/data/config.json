@@ -1,0 +1,11 @@
+{
+    "lab_extension": {
+        "hosts": {
+            "dummy": {
+                "hostname": "dummy",
+                "type": "server",
+                "os": "linux"
+            }
+        }
+    }
+}

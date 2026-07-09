@@ -8,5 +8,3 @@
     windows:
       sysprep: true
       install_additional_tools: true
-      chocolatey_packages:
-        - wireshark

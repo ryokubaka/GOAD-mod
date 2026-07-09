@@ -56,6 +56,20 @@
         },
         "scripts": [],
         "vulns": []
+      },
+      "gitlab": {
+        "hostname": "gitlab",
+        "type": "server",
+        "os": "linux",
+        "local_admin_password": "debian",
+        "domain": "ludus.nuketown",
+        "path": "DC=ludus,DC=nuketown",
+        "local_groups": {
+          "sudoers": [],
+          "ssh": []
+        },
+        "scripts": [],
+        "vulns": []
       }
     },
     "domains": {
