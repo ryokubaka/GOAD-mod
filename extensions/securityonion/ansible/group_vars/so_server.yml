@@ -1,0 +1,5 @@
+# SO manager connection (inventory also sets these; reinforce for play vars)
+ansible_user: onion
+ansible_ssh_pass: onion
+ansible_become: true
+ansible_sudo_pass: onion

@@ -1,0 +1,51 @@
+---
+# Security Onion manager inventory hostname (GOAD extension inventory: so)
+ludus_so_agent_manager: so
+
+# Override manager IP when inventory ansible_host is wrong/missing
+ludus_so_agent_manager_ip: ""
+
+# Fleet policy enrollment key to use (SO default for endpoints)
+ludus_so_agent_policy_id: endpoints-initial
+
+# Optional hard-coded enrollment token (skip Fleet API fetch when set)
+ludus_so_agent_enrollment_token: ""
+
+# Optional Fleet URL override (default https://<manager_ip>:8220)
+ludus_so_agent_fleet_url: ""
+
+# CIDR added to SO hostgroup elastic_agent_endpoint via so-firewall
+# install.yml overrides from SO ansible_host (10.X.0.0/16)
+ludus_so_agent_allow_cidr: "10.0.0.0/8"
+
+# Remote installer directory on the SO manager
+ludus_so_agent_installer_dir: /nsm/elastic-fleet/so_agent-installers
+
+# Cache on Ludus ansible controller (fetch is large ~200–300MB per OS)
+ludus_so_agent_cache_dir: /tmp/ludus-so-elastic-agent-cache
+
+# Staging path on endpoints
+ludus_so_agent_linux_staging: /opt/ludus/so-elastic-agent_linux_amd64
+ludus_so_agent_windows_staging: 'C:\Windows\Temp\so-elastic-agent_windows_amd64_msi'
+
+# Skip installing on the SO manager itself
+ludus_so_agent_skip_manager: true
+
+# Wait for ludus_securityonion marker before Fleet prep (seconds).
+# Prefer Ludus role-level depends_on so SO finishes first; this is a short race buffer.
+ludus_so_agent_setup_marker: /etc/ludus-so-setup-complete
+ludus_so_agent_setup_wait_timeout: 600
+ludus_so_agent_setup_wait_sleep: 15
+
+# Re-run installer even when marker / service present
+ludus_so_agent_force: false
+
+# Marker written after successful enroll
+ludus_so_agent_marker_linux: /etc/ludus-so-elastic-agent-installed
+ludus_so_agent_marker_windows: 'C:\ProgramData\ludus-so-elastic-agent-installed'
+
+# Installer timeout passed to SO linux agent binary
+ludus_so_agent_install_timeout: 10m
+
+# SO Fleet outputs use hostname "manager" — write hosts entry → manager IP
+ludus_so_agent_fix_manager_hosts: true

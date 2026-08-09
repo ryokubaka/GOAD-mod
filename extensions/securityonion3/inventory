@@ -1,0 +1,14 @@
+; EXTENSION : SECURITY ONION 3.2 ------------------------------------------
+[default]
+so ansible_host={{ip_range}}.20 ansible_connection=ssh ansible_user=onion ansible_ssh_pass=onion ansible_become=true ansible_become_method=sudo ansible_sudo_pass=onion ansible_ssh_common_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
+
+; Recipe associations -------------------
+[so_server]
+so
+
+[ol:children]
+so_server
+
+; Fleet agents on GOAD domain Windows
+[so_agents:children]
+domain

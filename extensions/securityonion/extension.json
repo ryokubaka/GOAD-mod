@@ -1,0 +1,11 @@
+{
+    "name": "securityonion",
+    "description": "Add Security Onion 2.4 standalone (Ludus) with Fleet agents on domain hosts",
+    "machines": [
+        "so"
+    ],
+    "compatibility": [
+        "*"
+    ],
+    "impact": "Ludus-only. Adds {{lab}}-so on vlan 20 (.20), 8–24 GB RAM, sniff net1 on vlan 10, so-setup + Elastic Security on manager, Elastic Agent on domain Windows. Requires securityonion-2.4-x64-template. Do not enable with securityonion3 (same IP)."
+}

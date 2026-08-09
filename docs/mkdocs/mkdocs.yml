@@ -37,6 +37,8 @@ nav:
     - w11-25h2: extensions/w11-25h2.md
     - elk: extensions/elk.md
     - wazuh: extensions/wazuh.md
+    - securityonion: extensions/securityonion.md
+    - securityonion3: extensions/securityonion3.md
   - 💻 Usage: 
     - index : usage/index.md
     - Arguments: usage/goad_args.md

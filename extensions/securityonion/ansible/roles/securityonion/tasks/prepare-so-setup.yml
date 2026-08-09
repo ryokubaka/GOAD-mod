@@ -1,0 +1,54 @@
+---
+# Partial/failed so-setup leaves bond0 behind. TESTING profiles often exclude bond0
+# from MNIC auto-detect but not the bonding_masters sysfs entry, so MNIC becomes
+# bonding_masters and nmcli fails. Role passes MNIC/BNICS explicitly; still clean bonds.
+# Sniff DHCP sanitize also runs earlier (main.yml); re-run here as safety before so-setup.
+- name: Sanitize sniff NIC (idempotent; also run early before DNS)
+  ansible.builtin.include_tasks: sanitize-sniff-nic.yml
+
+- name: Remove stale Security Onion bond0 before so-setup
+  ansible.builtin.shell: |
+    set -euo pipefail
+    changed=0
+    while IFS= read -r con; do
+      [[ -z "$con" ]] && continue
+      nmcli con down "$con" 2>/dev/null || true
+      nmcli con delete "$con" 2>/dev/null || true
+      changed=1
+    done < <(nmcli -t -f NAME con show | grep -E '^(bond0|bond0-slave-|bonding_masters)' || true)
+    if ip link show bond0 &>/dev/null; then
+      nmcli dev disconnect bond0 2>/dev/null || true
+      ip link set bond0 down 2>/dev/null || true
+      ip link delete bond0 2>/dev/null || true
+      changed=1
+    fi
+    if [[ -f /sys/class/net/bonding_masters ]]; then
+      while read -r master; do
+        [[ -z "$master" ]] && continue
+        ip link set "$master" down 2>/dev/null || true
+        echo "-${master}" > /sys/class/net/bonding_masters 2>/dev/null || true
+        changed=1
+      done < /sys/class/net/bonding_masters
+    fi
+    if [[ "$changed" -eq 1 ]]; then
+      echo "removed-stale-bond0"
+    else
+      echo "no-stale-bond0"
+    fi
+  args:
+    executable: /bin/bash
+  become: true
+  register: ludus_so_bond_cleanup
+  changed_when: "'removed-stale-bond0' in ludus_so_bond_cleanup.stdout"
+
+- name: Confirm management and sniff NICs are distinct
+  ansible.builtin.assert:
+    that:
+      - ludus_so_mnic | length > 0
+      - ludus_so_bnic | length > 0
+      - ludus_so_mnic != ludus_so_bnic
+      - ludus_so_main_ip is match('^10\\.')
+    fail_msg: >
+      Bad NIC mapping for so-setup: MNIC={{ ludus_so_mnic | default('?') }}
+      BNICS={{ ludus_so_bnic | default('?') }} MAINIP={{ ludus_so_main_ip | default('?') }}.
+      ansible_host should be the static Ludus control IP on the mgmt NIC.
