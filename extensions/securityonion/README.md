@@ -22,7 +22,8 @@ ludus templates build -n securityonion-2.4-x64-template
    - WireGuard → vlan **20** TCP `443`, `22` (SOC / SSH)
 
 3. SO needs outbound internet + DNS to `repo.securityonion.net` — **stop Testing Mode**
-   before install (or allowlist those repos).
+   before install (or allowlist those repos). If `testing:` is set, include
+   `block_internet: true` (Ludus requires both keys; never `false` to bypass).
 
 4. Sniff NIC attach uses Proxmox/Ludus API env (`LUDUS_RANGE_NUMBER` / range second octet). GOAD ansible derives the range number from `so`’s `ansible_host`.
 
