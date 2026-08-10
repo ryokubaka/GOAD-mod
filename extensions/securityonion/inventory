@@ -1,6 +1,11 @@
 ; EXTENSION : SECURITY ONION 2.4 ------------------------------------------
 [default]
+{# Ludus SO lives on vlan 20 → 10.<range>.20.20. GOAD ip_range is vlan-10 prefix 10.<range>.10. #}
+{% if provider_name == 'ludus' and ip_range.startswith('10.') %}
+so ansible_host=10.{{ ip_range.split('.')[1] }}.20.20 ansible_connection=ssh ansible_user=onion ansible_ssh_pass=onion ansible_become=true ansible_become_method=sudo ansible_sudo_pass=onion ansible_ssh_common_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
+{% else %}
 so ansible_host={{ip_range}}.20 ansible_connection=ssh ansible_user=onion ansible_ssh_pass=onion ansible_become=true ansible_become_method=sudo ansible_sudo_pass=onion ansible_ssh_common_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
+{% endif %}
 
 ; Recipe associations -------------------
 [so_server]

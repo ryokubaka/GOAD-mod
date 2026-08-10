@@ -1,7 +1,6 @@
-# so_elastic_agent (GOAD-mod)
+# so_elastic_agent
 
 Enroll Linux/Windows endpoints into Security Onion Fleet (`endpoints-initial`).
-Manager inventory hostname defaults to `so` (set `ludus_so_agent_manager` /
-`ludus_so_agent_manager_ip` from install.yml).
+Manager hostname defaults to `so` (`ludus_so_agent_manager` / `_ip` from install.yml).
 
-Ported from ludus-source-meow `ludus_so_elastic_agent`.
+Reinstalls when an existing agent is enrolled to a different SO manager instance.

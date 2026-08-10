@@ -19,6 +19,9 @@
 
 - name: Install Security Onion Elastic Agent on domain hosts
   hosts: so_agents
+  # WinRM/PowerShell — never inherit sudo become from ansible.cfg / prior plays
+  become: false
+  gather_facts: true
   vars:
     ludus_so_agent_manager: so
     ludus_so_agent_manager_ip: "{{ hostvars['so'].ansible_host }}"

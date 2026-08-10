@@ -39,7 +39,7 @@ Or:
 ## Access
 
 - SOC HTTPS: `https://{{ip_range}}.20`
-- Web: `onionadmin@ludus.local` / `0n10nAdm1n!`
+- Web: `onionadmin@ludus.local` / `MeowMeow123`
 - SSH: `onion` / `onion`
 
 ## Uninstall

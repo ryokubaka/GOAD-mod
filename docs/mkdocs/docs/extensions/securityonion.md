@@ -19,7 +19,7 @@ Do **not** enable with `securityonion3` (same IP).
 - Packer template `securityonion-2.4-x64-template` (from [ludus-source-meow](https://github.com/ryokubaka/ludus-source-meow))
 - Internet + DNS to `repo.securityonion.net` on the SO VM
 - If `inter_vlan_default: DROP`: allow vlan **10→20** TCP `8220,5055,8443` and WG→20 `443`/`22`
-- ~24 GB RAM available for the SO VM (balloon 8–24)
+- ≥16 GiB MemTotal for so-setup (provider typically **20 GiB** RAM)
 
 ## Install
 
@@ -37,5 +37,5 @@ Or:
 ## Access
 
 - SOC: `https://{{ip_range}}.20`
-- Web: `onionadmin@ludus.local` / `0n10nAdm1n!`
+- Web: `onionadmin@ludus.local` / `MeowMeow123`
 - SSH: `onion` / `onion`

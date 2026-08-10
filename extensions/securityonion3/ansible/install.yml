@@ -8,7 +8,7 @@
     ludus_so_sniff_tag: 10
     ludus_so_install_type: standalone
     ludus_so_web_user: "onionadmin@ludus.local"
-    ludus_so_web_password: "0n10nAdm1n!"
+    ludus_so_web_password: "MeowMeow123"
     ludus_so_allow_cidr: >-
       {{ hostvars['so'].ansible_host.split('.')[0:2] | join('.') }}.0.0/16
     ludus_so_range_number_override: "{{ hostvars['so'].ansible_host.split('.')[1] }}"

@@ -40,17 +40,17 @@ Or:
 
 ## What it does
 
-1. Deploys SO VM (vlan 20, 8–24 GB RAM, 8 CPU)
+1. Deploys SO VM (vlan 20, **16–20 GiB** RAM, 8 CPU)
 2. Attaches sniff `net1` (vlan tag **10**), runs `so-setup iso standalone-net`
-3. Starts Elastic trial, configures Elastic Defend, enables detection rules
-4. Enrolls Elastic Agent on all `domain` Windows hosts → Fleet `endpoints-initial`
+3. Heals `bond0` / containers on redeploy; starts Elastic trial, Defend, detection rules
+4. Enrolls Elastic Agent on `domain` Windows hosts → Fleet `endpoints-initial`
 
 ## Access
 
 - SOC HTTPS: `https://{{ip_range}}.20`
-- Default web user (role defaults / install.yml): `onionadmin@ludus.local` / `0n10nAdm1n!`
+- Default web user: `onionadmin@ludus.local` / `MeowMeow123` (lab default — change in prod)
 - SSH: `onion` / `onion`
 
 ## Uninstall
 
-Not implemented.
+Full extension remove is not implemented. Agent role can uninstall/re-enroll Elastic Agent when the SO manager instance changes.
