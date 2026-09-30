@@ -44,7 +44,7 @@ Or:
 
 ## What it does
 
-1. Deploys SO VM (vlan 20, **16–20 GiB** RAM, 8 CPU)
+1. Deploys SO VM (vlan 20, **20 GiB** RAM, 8 CPU)
 2. Attaches sniff `net1` (vlan tag **10**), runs `so-setup iso standalone-net`
 3. Heals `bond0` / containers on redeploy; starts Elastic trial, Defend, detection rules
 4. Enrolls Elastic Agent on `domain` Windows hosts → Fleet `endpoints-initial`

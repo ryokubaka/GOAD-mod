@@ -22,7 +22,7 @@ ludus templates build -n securityonion-3.3-x64-template
    - vlan **10 → 20** TCP `8220`, `5055`, `8443` (Fleet)
    - WireGuard → vlan **20** TCP `443`, `22`
 
-3. **16–20 GiB** RAM. so-setup needs ≥16 GiB MemTotal; the role cold-boots the guest to 20 GiB when a 16 GiB VM reports ~15 GiB.
+3. **20 GiB** RAM (`ram_min_gb` = `ram_gb`). so-setup needs ≥16 GiB MemTotal, and a 16 GiB VM reports ~15.2 GiB.
 
 ## Install
 
