@@ -1,8 +1,12 @@
-# Oracle Linux / Security Onion templates use onion:onion (not localuser).
+# Guest agent reports Oracle Linux id "ol". Ludus ships no vars for that group.
+# Playbook SSH matches the template's Ludus account (localuser), same as rhel group_vars.
+# Console login remains onion:onion.
 ansible_connection: ssh
-ansible_user: onion
-ansible_ssh_pass: onion
+ansible_user: localuser
+ansible_password: password
+ansible_ssh_pass: password
 ansible_become: true
 ansible_become_method: sudo
-ansible_sudo_pass: onion
+ansible_become_password: password
+ansible_sudo_pass: password
 ansible_ssh_common_args: "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"

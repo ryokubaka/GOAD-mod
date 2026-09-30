@@ -9,4 +9,4 @@
 - [wazuh](wazuh.md) : Add wazuh EDR to visualize alerts
 - [elk](elk.md) : Add an ELK to collect and read the logs
 - [securityonion](securityonion.md) : Add Security Onion 2.4 (Ludus) + Fleet agents on domain hosts
-- [securityonion3](securityonion3.md) : Add Security Onion 3.2 (Ludus) + Fleet agents on domain hosts
+- [securityonion3](securityonion3.md) : Add Security Onion 3.3 (Ludus) + Fleet agents on domain hosts

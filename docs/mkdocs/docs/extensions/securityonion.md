@@ -38,4 +38,5 @@ Or:
 
 - SOC: `https://{{ip_range}}.20`
 - Web: `onionadmin@ludus.local` / `MeowMeow123`
-- SSH: `onion` / `onion`
+- Ludus / Ansible SSH: `localuser` / `password` (VM is in the `rhel` group)
+- Console: `onion` / `onion`
