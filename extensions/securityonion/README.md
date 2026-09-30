@@ -17,6 +17,8 @@ ludus templates add -d securityonion-2.4   # or install from the meow source
 ludus templates build -n securityonion-2.4-x64-template
 ```
 
+The current image creates `localuser` (password `password`) for Ludus SSH. Rebuild if this template was built before that account existed.
+
 2. Ludus range networking (if `inter_vlan_default: DROP`):
    - vlan **10 → 20** TCP `8220`, `5055`, `8443` (Fleet)
    - WireGuard → vlan **20** TCP `443`, `22` (SOC / SSH)
@@ -51,7 +53,8 @@ Or:
 
 - SOC HTTPS: `https://{{ip_range}}.20`
 - Default web user: `onionadmin@ludus.local` / `MeowMeow123` (lab default — change in prod)
-- SSH: `onion` / `onion`
+- Ludus / Ansible SSH: `localuser` / `password` (template account; the VM is in the `rhel` group)
+- Console: `onion` / `onion`
 
 ## Uninstall
 

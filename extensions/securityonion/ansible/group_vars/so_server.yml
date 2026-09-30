@@ -1,5 +1,8 @@
-# SO manager connection (inventory also sets these; reinforce for play vars)
-ansible_user: onion
-ansible_ssh_pass: onion
+# SO manager connection (inventory also sets these; reinforce for play vars).
+# Ludus SSH account created by the Security Onion template. Console user is onion.
+ansible_user: localuser
+ansible_password: password
+ansible_ssh_pass: password
 ansible_become: true
-ansible_sudo_pass: onion
+ansible_become_password: password
+ansible_sudo_pass: password

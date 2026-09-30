@@ -6,14 +6,14 @@
 - Add a machine  : `so` (`{{ip_range}}.20`, vlan **20**)
 - Roles : shared from `extensions/securityonion/ansible/roles/`
 
-Adds Security Onion **3.2** standalone to a GOAD lab (same agent/security flow as `securityonion`).
+Adds Security Onion **3.3** standalone to a GOAD lab (same agent/security flow as `securityonion`).
 
 Do **not** enable with `securityonion` (same IP).
 
 ## Prerequisites
 
-- Packer template `securityonion-3-x64-template` (from [ludus-source-meow](https://github.com/ryokubaka/ludus-source-meow))
-- Fixed **24 GB** RAM (`ram_min_gb` = `ram_gb` = 24 — so-setup aborts below 16 GiB)
+- Packer template `securityonion-3.3-x64-template` (from [ludus-source-meow](https://github.com/ryokubaka/ludus-source-meow), branch `feat/securityonion-3.3.0` until that template is on `main`)
+- **16–20 GiB** RAM (so-setup needs ≥16 GiB MemTotal; a 16 GiB VM reports ~15 GiB until the role cold-boots it to 20)
 - Internet + DNS to `repo.securityonion.net`
 - If `inter_vlan_default: DROP`: allow vlan **10→20** TCP `8220,5055,8443` and WG→20 `443`/`22`
 
@@ -34,4 +34,5 @@ Or:
 
 - SOC: `https://{{ip_range}}.20`
 - Web: `onionadmin@ludus.local` / `MeowMeow123`
-- SSH: `onion` / `onion`
+- Ludus / Ansible SSH: `localuser` / `password` (VM is in the `rhel` group)
+- Console: `onion` / `onion`
