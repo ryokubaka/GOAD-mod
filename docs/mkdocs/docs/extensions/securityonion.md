@@ -12,7 +12,7 @@ Adds Security Onion **2.4** standalone to a GOAD lab:
 - Elastic trial + Defend + prepackaged detection rules
 - Sysmon, then Elastic Agent (Fleet) on all `domain` Windows hosts
 
-Ansible roles come from the `extensions/securityonion/vendor/ludus-source-meow` submodule (`feat/securityonion-3.3.0`). After clone: `git submodule update --init extensions/securityonion/vendor/ludus-source-meow`.
+Ansible roles come from the `extensions/securityonion/vendor/ludus-source-meow` submodule. `install_extension` runs `git submodule update --init` when that checkout is missing.
 
 Do **not** enable with `securityonion3` (same IP).
 

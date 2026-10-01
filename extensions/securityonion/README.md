@@ -5,7 +5,7 @@
 - Machine: `{{range_id}}-so` @ `{{ip_range}}.20` (vlan **20**)
 - Compatible with labs: `*`
 - **Provider: Ludus only** — other providers are stubs
-- Ansible roles: [ludus-source-meow](https://github.com/ryokubaka/ludus-source-meow) submodule at `vendor/ludus-source-meow`, branch `feat/securityonion-3.3.0`
+- Ansible roles: [ludus-source-meow](https://github.com/ryokubaka/ludus-source-meow) submodule at `vendor/ludus-source-meow` (branch in `.gitmodules`, currently `main`)
 
 Do **not** enable together with `securityonion3` (same IP `.20`).
 
