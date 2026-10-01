@@ -8,14 +8,13 @@
     ludus_so_install_type: standalone
     ludus_so_web_user: "onionadmin@ludus.local"
     ludus_so_web_password: "MeowMeow123"
-    ludus_so_allow_cidr: >-
-      {{ hostvars['so'].ansible_host.split('.')[0:2] | join('.') }}.0.0/16
+    ludus_so_allow_cidr: "0.0.0.0/0"
     ludus_so_range_number_override: "{{ hostvars['so'].ansible_host.split('.')[1] }}"
     ludus_so_agent_allow_cidr: >-
       {{ hostvars['so'].ansible_host.split('.')[0:2] | join('.') }}.0.0/16
   roles:
-    - { role: securityonion, tags: ['securityonion', 'so-setup'] }
-    - { role: so_elastic_security, tags: ['elastic_security', 'so-elastic'] }
+    - { role: ludus_securityonion, tags: ['securityonion', 'so-setup'] }
+    - { role: ludus_so_elastic_security, tags: ['elastic_security', 'so-elastic'] }
 
 - name: Install Security Onion Elastic Agent on domain hosts
   hosts: so_agents
@@ -29,4 +28,5 @@
       {{ hostvars['so'].ansible_host.split('.')[0:2] | join('.') }}.0.0/16
     ludus_so_agent_skip_manager: true
   roles:
-    - { role: so_elastic_agent, tags: ['elastic_agent', 'so-agent'] }
+    - { role: ludus_sysmon, tags: ['sysmon'] }
+    - { role: ludus_so_elastic_agent, tags: ['elastic_agent', 'so-agent'] }

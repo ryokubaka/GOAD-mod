@@ -1,11 +1,11 @@
 # Security Onion 3.3 extension
 
 - Extension Name: `securityonion3`
-- Description: Add Security Onion 3.3 standalone (Ludus) + Fleet agents on domain hosts
+- Description: Add Security Onion 3.3 standalone (Ludus) + Sysmon and Fleet agents on domain hosts
 - Machine: `{{range_id}}-so` @ `{{ip_range}}.20` (vlan **20**)
 - Compatible with labs: `*`
 - **Provider: Ludus only** — other providers are stubs
-- Ansible roles: shared from `extensions/securityonion/ansible/roles/`
+- Ansible roles: the `extensions/securityonion/vendor/ludus-source-meow` submodule (`feat/securityonion-3.3.0`). Initialize it with `git submodule update --init extensions/securityonion/vendor/ludus-source-meow`.
 
 Do **not** enable together with `securityonion` (same IP `.20`).
 
@@ -42,6 +42,7 @@ Or:
 - SOC HTTPS: `https://{{ip_range}}.20`
 - Web: `onionadmin@ludus.local` / `MeowMeow123`
 - Ludus / Ansible SSH: `localuser` / `password` (template account; the VM is in the `rhel` group)
+- Setup retries `elasticfleet.install_agent_grid` when Salt cannot sign in to the local master, then continues so-setup.
 - Console: `onion` / `onion`
 
 ## Uninstall
