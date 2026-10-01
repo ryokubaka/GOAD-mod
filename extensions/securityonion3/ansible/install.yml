@@ -30,5 +30,4 @@
       {{ hostvars['so'].ansible_host.split('.')[0:2] | join('.') }}.0.0/16
     ludus_so_agent_skip_manager: true
   roles:
-    - { role: ludus_sysmon, tags: ['sysmon'] }
     - { role: ludus_so_elastic_agent, tags: ['elastic_agent', 'so-agent'] }

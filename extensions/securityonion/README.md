@@ -5,7 +5,7 @@
 - Machine: `{{range_id}}-so` @ `{{ip_range}}.20` (vlan **20**)
 - Compatible with labs: `*`
 - **Provider: Ludus only** — other providers are stubs
-- Ansible roles: symlinks in `ansible/roles/` to the [ludus-source-meow](https://github.com/ryokubaka/ludus-source-meow) submodule at `vendor/ludus-source-meow` (`.gitmodules` branch `feat/securityonion-3.3.0`)
+- Ansible roles: symlinks in `ansible/roles/` to the [ludus-source-meow](https://github.com/ryokubaka/ludus-source-meow) submodule at `vendor/ludus-source-meow` (`.gitmodules` branch `main`)
 
 Do **not** enable together with `securityonion3` (same IP `.20`).
 
@@ -17,8 +17,9 @@ Playbooks use the Ludus role names. `ansible/roles/` only contains symlinks into
 ansible/roles/ludus_securityonion -> ../../vendor/ludus-source-meow/ansible/roles/ludus_securityonion
 ansible/roles/ludus_so_elastic_security
 ansible/roles/ludus_so_elastic_agent
-ansible/roles/ludus_sysmon
 ```
+
+`securityonion3/ansible/roles/` has the same three links, aimed at this checkout.
 
 After cloning goad-mod:
 
@@ -26,7 +27,7 @@ After cloning goad-mod:
 git submodule update --init extensions/securityonion/vendor/ludus-source-meow
 ```
 
-`install_extension` does this itself when the checkout is missing, so a LUX deploy of `securityonion` or `securityonion3` still finds the roles. `securityonion3` uses the same checkout.
+`install_extension` does this itself when the checkout is missing, so a LUX deploy of `securityonion` or `securityonion3` still finds the roles.
 
 ## Prerequisites
 
@@ -70,7 +71,7 @@ Or:
 1. Deploys SO VM (vlan 20, **20 GiB** RAM, 8 CPU)
 2. Attaches sniff `net1` (vlan tag **10**), runs `so-setup iso standalone-net`
 3. Heals `bond0` / containers on redeploy; starts Elastic trial, Defend, detection rules
-4. Installs Sysmon on Windows hosts, then enrolls Elastic Agent on `domain` hosts → Fleet `endpoints-initial`
+4. Enrolls Elastic Agent on `domain` hosts → Fleet `endpoints-initial`
 
 ## Access
 

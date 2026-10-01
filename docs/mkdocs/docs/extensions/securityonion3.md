@@ -4,7 +4,7 @@
 - Compatibility  : `*`
 - Providers : **Ludus only** (other providers are stubs)
 - Add a machine  : `so` (`{{ip_range}}.20`, vlan **20**)
-- Roles : `extensions/securityonion/vendor/ludus-source-meow` (initialized by `install_extension`)
+- Roles : symlinks in `ansible/roles/` to the ludus-source-meow submodule on `main`
 
 Adds Security Onion **3.3** standalone to a GOAD lab (same agent/security flow as `securityonion`).
 

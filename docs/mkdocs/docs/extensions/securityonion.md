@@ -10,9 +10,9 @@ Adds Security Onion **2.4** standalone to a GOAD lab:
 - Sniff `net1` on vlan tag **10** (AD traffic)
 - `so-setup iso standalone-net`
 - Elastic trial + Defend + prepackaged detection rules
-- Sysmon, then Elastic Agent (Fleet) on all `domain` Windows hosts
+- Elastic Agent (Fleet) on all `domain` Windows hosts
 
-Ansible roles come from the `extensions/securityonion/vendor/ludus-source-meow` submodule. `install_extension` runs `git submodule update --init` when that checkout is missing.
+Ansible roles are symlinks under `extensions/securityonion/ansible/roles/` and `extensions/securityonion3/ansible/roles/`, into the `ludus-source-meow` submodule on `main`. `install_extension` runs `git submodule update --init` when that checkout is missing.
 
 Do **not** enable with `securityonion3` (same IP).
 
