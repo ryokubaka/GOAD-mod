@@ -26,7 +26,7 @@ After cloning goad-mod:
 git submodule update --init extensions/securityonion/vendor/ludus-source-meow
 ```
 
-`securityonion3` uses the same checkout.
+`install_extension` does this itself when the checkout is missing, so a LUX deploy of `securityonion` or `securityonion3` still finds the roles. `securityonion3` uses the same checkout.
 
 ## Prerequisites
 

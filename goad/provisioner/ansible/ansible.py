@@ -1,4 +1,5 @@
 import os.path
+import subprocess
 import yaml
 from goad.utils import *
 from goad.log import Log
@@ -95,6 +96,10 @@ class Ansible(Provisioner):
         playbook = extension.get_playbook(install)
         extension_ansible_path = extension.get_ansible_path()
 
+        if not self._ensure_project_submodules():
+            Log.error('Extension roles are not available; submodule checkout failed')
+            return False
+
         provision_result = self.run_playbook(playbook, inventory, playbook_path=extension_ansible_path)
         if not provision_result:
             Log.error(f'Something wrong during the provisioning task : {playbook}')
@@ -123,6 +128,60 @@ class Ansible(Provisioner):
                 if not provision_result:
                     Log.error(f'Something wrong during the provisioning task : {playbook}')
                     return False
+        return True
+
+    def _ensure_project_submodules(self):
+        """Checkout git submodules before extension Ansible.
+
+        Security Onion roles live in the ludus-source-meow submodule. A plain
+        git pull of goad-mod does not populate it, and LUX install_extension
+        would otherwise fail with a missing role.
+        """
+        root = GoadPath.get_project_path()
+        if not os.path.isfile(os.path.join(root, '.gitmodules')):
+            return True
+        marker = os.path.join(
+            root,
+            'extensions',
+            'securityonion',
+            'vendor',
+            'ludus-source-meow',
+            'ansible',
+            'roles',
+            'ludus_securityonion',
+            'tasks',
+            'main.yml',
+        )
+        if not os.path.isdir(os.path.join(root, '.git')):
+            if os.path.isfile(marker):
+                return True
+            Log.error(
+                'goad-mod has .gitmodules but this tree is not a git checkout. '
+                'Clone with git and run: git submodule update --init --recursive'
+            )
+            return False
+        if not os.path.isfile(marker):
+            Log.info('Checking out ludus-source-meow roles (git submodule)')
+        try:
+            completed = subprocess.run(
+                ['git', 'submodule', 'update', '--init', '--recursive'],
+                cwd=root,
+                capture_output=True,
+                text=True,
+            )
+        except OSError as exc:
+            Log.error(f'git submodule update failed to start: {exc}')
+            return False
+        if completed.returncode != 0:
+            detail = (completed.stderr or completed.stdout or '').strip()
+            Log.error(f'git submodule update failed: {detail}')
+            return False
+        if not os.path.isfile(marker):
+            Log.error(
+                'ludus_securityonion is still missing after submodule init. '
+                'Expected extensions/securityonion/vendor/ludus-source-meow'
+            )
+            return False
         return True
 
     def run_playbook(self, playbook, inventories, tries=3, timeout=30, playbook_path=None):
