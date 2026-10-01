@@ -5,7 +5,7 @@
 - Machine: `{{range_id}}-so` @ `{{ip_range}}.20` (vlan **20**)
 - Compatible with labs: `*`
 - **Provider: Ludus only** — other providers are stubs
-- Ansible roles: the `extensions/securityonion/vendor/ludus-source-meow` submodule (`.gitmodules` branch, currently `main`). `install_extension` initializes it when the checkout is missing.
+- Ansible roles: symlinks in `extensions/securityonion/ansible/roles/` into the ludus-source-meow submodule (`.gitmodules` branch `feat/securityonion-3.3.0`). `install_extension` initializes it when the checkout is missing.
 
 Do **not** enable together with `securityonion` (same IP `.20`).
 

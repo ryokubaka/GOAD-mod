@@ -5,19 +5,19 @@
 - Machine: `{{range_id}}-so` @ `{{ip_range}}.20` (vlan **20**)
 - Compatible with labs: `*`
 - **Provider: Ludus only** — other providers are stubs
-- Ansible roles: [ludus-source-meow](https://github.com/ryokubaka/ludus-source-meow) submodule at `vendor/ludus-source-meow` (branch in `.gitmodules`, currently `main`)
+- Ansible roles: symlinks in `ansible/roles/` to the [ludus-source-meow](https://github.com/ryokubaka/ludus-source-meow) submodule at `vendor/ludus-source-meow` (`.gitmodules` branch `feat/securityonion-3.3.0`)
 
 Do **not** enable together with `securityonion3` (same IP `.20`).
 
 ## Roles
 
-Playbooks use the Ludus role names. There is no copy under this extension.
+Playbooks use the Ludus role names. `ansible/roles/` only contains symlinks into the submodule. There is no second copy of the role files.
 
 ```text
-vendor/ludus-source-meow/ansible/roles/ludus_securityonion
-vendor/ludus-source-meow/ansible/roles/ludus_so_elastic_security
-vendor/ludus-source-meow/ansible/roles/ludus_so_elastic_agent
-vendor/ludus-source-meow/ansible/roles/ludus_sysmon
+ansible/roles/ludus_securityonion -> ../../vendor/ludus-source-meow/ansible/roles/ludus_securityonion
+ansible/roles/ludus_so_elastic_security
+ansible/roles/ludus_so_elastic_agent
+ansible/roles/ludus_sysmon
 ```
 
 After cloning goad-mod:
