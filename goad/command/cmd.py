@@ -1,8 +1,6 @@
 import subprocess
 import psutil
 import sys
-import os
-import tempfile
 from goad.log import Log
 from goad.utils import Utils
 from goad.dependencies import Dependencies
@@ -193,25 +191,6 @@ class Command:
         # linux only
         pass
 
-    def ansible_run_env(self):
-        """Env for ansible-playbook on the controller.
-
-        ANSIBLE_HOME on a Ludus host is /opt/ludus/users/<name>/.ansible. LUX
-        and the ludus service account sometimes create tmp/ mode 700 as user
-        ludus, so the range user running GOAD cannot create ansible-local-*
-        there and every playbook dies before the first task.
-        """
-        env = os.environ.copy()
-        uid = os.getuid() if hasattr(os, "getuid") else "user"
-        local_tmp = os.path.join(tempfile.gettempdir(), f"goad-ansible-{uid}")
-        try:
-            os.makedirs(local_tmp, mode=0o700, exist_ok=True)
-        except OSError as exc:
-            Log.warning(f'Could not create Ansible local tmp {local_tmp}: {exc}')
-        else:
-            env["ANSIBLE_LOCAL_TEMP"] = local_tmp
-        return env
-
     def run_ansible(self, args, path):
         result = None
         try:
@@ -220,10 +199,7 @@ class Command:
             command += ' -vv'
             Log.info('CWD: ' + Utils.get_relative_path(str(path)))
             Log.cmd(command)
-            result = subprocess.run(
-                command, cwd=path, stderr=sys.stderr, stdout=sys.stdout, shell=True,
-                env=self.ansible_run_env(),
-            )
+            result = subprocess.run(command, cwd=path, stderr=sys.stderr, stdout=sys.stdout, shell=True)
         except subprocess.CalledProcessError as e:
             Log.error(f"An error occurred while running the command: {e}")
             return False
