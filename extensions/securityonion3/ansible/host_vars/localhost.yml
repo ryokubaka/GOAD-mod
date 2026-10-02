@@ -1,5 +1,0 @@
----
-# Guests pin ansible_connection=ssh. delegate_to localhost inherits that and
-# tries to SSH to the controller. Controller tasks (Proxmox API) stay local.
-ansible_connection: local
-ansible_python_interpreter: "{{ ansible_playbook_python }}"
