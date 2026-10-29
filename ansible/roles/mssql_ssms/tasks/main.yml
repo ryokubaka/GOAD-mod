@@ -53,8 +53,10 @@
       $installed
   register: ssms_installation
 
+# SSMS 18 uses MSI-style switches (/install /quiet). The --quiet/--wait form is
+# for SSMS 21/22 (VS installer) and leaves the 18.x bootstrapper hanging under WinRM.
 - name: Install SSMS
-  ansible.windows.win_command: c:\setup\mssql\SSMS_installer.exe --quiet --norestart --wait
+  ansible.windows.win_command: c:\setup\mssql\SSMS_installer.exe /install /quiet /norestart
   args:
     chdir: C:\Windows\Temp
   become: true
