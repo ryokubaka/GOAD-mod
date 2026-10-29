@@ -14,5 +14,20 @@
   ansible.windows.win_reboot:
   when: pri_laps_install.reboot_required
 
+# Kerberos rejects computer GPO when member/DC clocks diverge (common after long
+# pauses or snapshot restores). Sync against the domain before gpupdate.
+- name: Sync clock with domain before GPO refresh
+  ansible.windows.win_shell: |
+    Set-Service W32Time -StartupType Automatic -ErrorAction SilentlyContinue
+    Start-Service W32Time -ErrorAction SilentlyContinue
+    w32tm /resync /force
+  register: laps_time_sync
+  changed_when: false
+  failed_when: false
+
 - name: Refresh GPO on the Clients
   ansible.windows.win_command: gpupdate /force
+  register: laps_gpupdate
+  retries: 3
+  delay: 15
+  until: laps_gpupdate.rc == 0
